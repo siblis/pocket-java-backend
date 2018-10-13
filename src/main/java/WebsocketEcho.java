@@ -16,6 +16,7 @@ public class WebsocketEcho {
         System.out.println("onOpen::" + session.getId());
         try {
             session.getBasicRemote().sendText("Hello Client " + session.getId() + "!");
+            session.getBasicRemote().sendText("You connected pocketMSG server echo ");
         } catch (IOException e) {
             e.printStackTrace();
         }
