@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Registration Confirmation</title>
+</head>
+
+<body>
+<h2>User registered successfully!</h2>
+<hr>
+<a th:href="@{/login}">Login with new user</a>
+<br>
+<div>
+    <a th:href="@{/register/showRegistrationForm}">Register another user</a>
+</div>
+<br>
+</body>
+<footer>
+    <div th:insert="~{my-footer :: foot}">
+    </div>
+</footer>
+</html>
