@@ -11,12 +11,17 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.geekbrains.pocket.backend.domain.Role;
 import ru.geekbrains.pocket.backend.domain.SystemUser;
 import ru.geekbrains.pocket.backend.domain.User;
+import ru.geekbrains.pocket.backend.exception.RoleNotFoundException;
+import ru.geekbrains.pocket.backend.exception.UserNotFoundException;
 import ru.geekbrains.pocket.backend.repository.RoleRepository;
 import ru.geekbrains.pocket.backend.repository.UserRepository;
+import ru.geekbrains.pocket.backend.resource.UserResource;
 import ru.geekbrains.pocket.backend.service.UserService;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,11 +46,55 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
-    public User findByUserName(String userName) {
-        return userRepository.findByUsername(userName);
+    public void delete(Long id) {
+        Optional<User> user = userRepository.findById(id);
+        if (!user.isPresent()) {
+            throw new UserNotFoundException("User with id = " + id + " not found");
+        }
+        userRepository.delete(user.get());
     }
 
+    @Override
+    public Iterable<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+    @Override
+    public List<UserResource> getAllUserResources() {
+        return userRepository.findAll()
+                .stream()
+                .map(UserResource::new)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public User getUserById(Long id) {
+        Optional<User> user = Optional.of(userRepository.findById(id).orElseThrow(
+                () -> new UserNotFoundException("User with id = " + id + " not found")));
+        return user.get();
+    }
+
+    @Override
+    @Transactional
+    public User getUserByUsername(String username) {
+        Optional<User> user = Optional.of(userRepository.findByUsername(username).orElseThrow(
+                () -> new UserNotFoundException("User with username = " + username + " not found")));
+        return user.get();
+    }
+
+    @Override
+    public Collection<Role> getRolesByUsername(String username) {
+        Optional<User> user = Optional.of(userRepository.findUserByUsernameWithRoles(username).orElseThrow(
+                () -> new UserNotFoundException("User with username = " + username + " not found")));
+        return user.get().getRoles();
+    }
+
+    @Override
+    public User save(User user) {
+        return userRepository.save(user);
+    }
+
+    //for WebController
     @Override
     @Transactional
     public User save(SystemUser systemUser) {
@@ -56,23 +105,33 @@ public class UserServiceImpl implements UserService {
         user.setFirstname(systemUser.getFirstname());
         user.setEmail(systemUser.getEmail());
 
-        user.setRoles(Arrays.asList(roleRepository.findByName("ROLE_USER")));
+        Optional<Role> role = Optional.of(roleRepository.findByName("ROLE_USER").orElseThrow(
+                () -> new RoleNotFoundException("Role with name = 'ROLE_USER' not found")));
+
+        user.setRoles(Arrays.asList(role.get()));
         return userRepository.save(user);
     }
 
     @Override
     @Transactional
-    public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(userName);
-        if (user == null) {
-            throw new UsernameNotFoundException("Invalid username or password");
-        }
-        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(),
-                mapRolesToAuthorities(user.getRoles()));
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Optional<User> user = Optional.of(userRepository.findByUsername(username).orElseThrow(
+                () -> new UserNotFoundException("Invalid username or password")));
+        return new org.springframework.security.core.userdetails.User(user.get().getUsername(),
+                user.get().getPassword(), mapRolesToAuthorities(user.get().getRoles()));
     }
 
     private Collection<? extends GrantedAuthority> mapRolesToAuthorities(Collection<Role> roles) {
         return roles.stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
     }
 
+    public void validateUser(Long id) {
+        userRepository.findById(id).orElseThrow(
+                () -> new UserNotFoundException("User with id = " + id + " not found"));
+    }
+
+    public void validateUser(String username) {
+        userRepository.findByUsername(username).orElseThrow(
+                () -> new UserNotFoundException("User with username = " + username + " not found"));
+    }
 }

@@ -22,11 +22,16 @@
 
     <div sec:authorize="isAuthenticated()">
         Text visible only to authenticated users.
+        <br>
+        Authenticated username:
+        <div sec:authentication="principal.username"></div>
+        Authenticated user roles:
+        <div sec:authentication="principal.authorities"></div>
     </div>
-    Authenticated username:
-    <div sec:authentication="principal.username"></div>
-    Authenticated user roles:
-    <div sec:authentication="principal.authorities"></div>
+
+    <div sec:authorize="hasRole('ADMIN')">
+        This content will only be visible to users who have the "supervisor" authority in their list of <tt>GrantedAuthority</tt>s.
+    </div>
 
     <button id="testBtn">Test</button>
     <br><br><br>
