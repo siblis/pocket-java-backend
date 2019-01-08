@@ -1,4 +1,4 @@
-package ru.geekbrains.pocket.backend.controller;
+package ru.geekbrains.pocket.backend.controller.web;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,8 +17,8 @@ import javax.validation.Valid;
 
 @Controller
 @RequestMapping("/register")
-public class RegistrationController {
-    private final Logger logger = LoggerFactory.getLogger(RegistrationController.class);
+public class RegistrationWebController {
+    private final Logger logger = LoggerFactory.getLogger(RegistrationWebController.class);
     private UserService userService;
 
     @Autowired
@@ -45,7 +45,7 @@ public class RegistrationController {
         if (bindingResult.hasErrors()) {
             return "registration-form";
         }
-        User existing = userService.findByUserName(userName);
+        User existing = userService.getUserByUsername(userName);
         if (existing != null) {
             model.addAttribute("systemUser", new SystemUser());
             model.addAttribute("registrationError", "User name already exists.");

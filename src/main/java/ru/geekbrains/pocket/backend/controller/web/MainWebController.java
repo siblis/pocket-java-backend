@@ -1,4 +1,4 @@
-package ru.geekbrains.pocket.backend.controller;
+package ru.geekbrains.pocket.backend.controller.web;
 
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
-public class MainController {
+public class MainWebController {
 
     @RequestMapping("/")
     public String showHomePage() {
