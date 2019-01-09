@@ -29,13 +29,11 @@ public class User {
     @Column(name = "password")
     private String password;
 
-    @NotNull
     @Size(min = 1, max = 50)
     //@Pattern(regexp = "[^0-9]*")
     @Column(name = "lastname", nullable = false)
     private String lastname;
 
-    @NotNull
     @Size(min = 1, max = 50)
     //@Pattern(regexp = "[^0-9]*")
     @Column(name = "firstname", nullable = false)
@@ -52,6 +50,12 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Collection<Role> roles;
+
+    public User(String username, String password, @NotEmpty String email) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+    }
 
     public User(String username, String password, @NotNull @Size(min = 1, max = 50) @Pattern(regexp = "[^0-9]*") String lastname, @NotNull @Size(min = 1, max = 50) @Pattern(regexp = "[^0-9]*") String firstname, @NotEmpty @Email String email) {
         this.username = username;

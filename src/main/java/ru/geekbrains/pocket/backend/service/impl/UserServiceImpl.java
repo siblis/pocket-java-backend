@@ -125,13 +125,13 @@ public class UserServiceImpl implements UserService {
         return roles.stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
     }
 
-    public void validateUser(Long id) {
-        userRepository.findById(id).orElseThrow(
+    public User validateUser(Long id) {
+        return userRepository.findById(id).orElseThrow(
                 () -> new UserNotFoundException("User with id = " + id + " not found"));
     }
 
-    public void validateUser(String username) {
-        userRepository.findByUsername(username).orElseThrow(
+    public User validateUser(String username) {
+        return userRepository.findByUsername(username).orElseThrow(
                 () -> new UserNotFoundException("User with username = " + username + " not found"));
     }
 }

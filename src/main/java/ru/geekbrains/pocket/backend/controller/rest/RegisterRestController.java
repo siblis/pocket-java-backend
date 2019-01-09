@@ -1,5 +1,7 @@
 package ru.geekbrains.pocket.backend.controller.rest;
 
+import java.security.Principal;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resources;
@@ -7,7 +9,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.geekbrains.pocket.backend.domain.User;
 import ru.geekbrains.pocket.backend.exception.UserNotFoundException;
 import ru.geekbrains.pocket.backend.resource.UserResource;
@@ -15,7 +16,6 @@ import ru.geekbrains.pocket.backend.response.UsersErrorResponse;
 import ru.geekbrains.pocket.backend.service.UserService;
 
 import java.net.URI;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -51,8 +51,10 @@ public class RegisterRestController {
     }
 
     @PutMapping("/user")
-    public User updateUser(@RequestBody User user) {
-        userService.validateUser(user.getUsername());
+    public User updateUser(Principal principal, @RequestBody User user) {
+        //обновление доступно только текущего авторизованного юзера
+        String username = principal.getName();
+        user.setId(userService.validateUser(username).getId());
         return userService.save(user);
     }
 
