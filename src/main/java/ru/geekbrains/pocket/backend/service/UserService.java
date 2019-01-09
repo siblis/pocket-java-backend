@@ -26,7 +26,7 @@ public interface UserService extends UserDetailsService {
 
     User save(SystemUser systemUser);
 
-    void validateUser(Long id);
+    User validateUser(Long id);
 
-    void validateUser(String username);
+    User validateUser(String username);
 }
