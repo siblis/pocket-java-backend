@@ -2,6 +2,7 @@ package ru.geekbrains.pocket.backend.controller.rest;
 
 import java.security.Principal;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resources;
@@ -18,7 +19,8 @@ import ru.geekbrains.pocket.backend.service.UserService;
 import java.net.URI;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/users")
+@Slf4j
 public class RegisterRestController {
     private UserService userService;
 
@@ -27,17 +29,17 @@ public class RegisterRestController {
         this.userService = userService;
     }
 
-    @GetMapping("/user/{userId}")
-    public UserResource getUserById(@PathVariable Long userId) {
-        return new UserResource(userService.getUserById(userId));
+    @GetMapping("/{id}")
+    public UserResource getUserById(@PathVariable Long id) {
+        return new UserResource(userService.getUserById(id));
     }
 
-    @GetMapping("/users")
+    @GetMapping("/all")
     public Resources<UserResource> getAllUsers() {
         return new Resources<>(userService.getAllUserResources());
     }
 
-    @PostMapping("/user")
+    @PostMapping("/")
     public ResponseEntity<?> addUser(@RequestBody User user) {
         user.setId(0L);
         //TODO вывод ошибки если юзер уже есть
@@ -47,10 +49,12 @@ public class RegisterRestController {
         Link forOneBookmark = new UserResource(user).getLink("self");
         httpHeaders.setLocation(URI.create(forOneBookmark.getHref()));
 
+        log.info("addUser: " + user);
+
         return new ResponseEntity<User>(null, httpHeaders, HttpStatus.CREATED);
     }
 
-    @PutMapping("/user")
+    @PutMapping("/")
     public User updateUser(Principal principal, @RequestBody User user) {
         //обновление доступно только текущего авторизованного юзера
         String username = principal.getName();
@@ -58,10 +62,10 @@ public class RegisterRestController {
         return userService.save(user);
     }
 
-    @DeleteMapping("/user/{userId}")
-    public int deleteUser(@PathVariable Long userId) {
-        userService.delete(userId);
-        return HttpStatus.OK.value();
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+        userService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
     @ExceptionHandler
