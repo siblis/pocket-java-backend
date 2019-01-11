@@ -1,23 +1,24 @@
 package ru.geekbrains.pocket.backend.domain;
 
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.validation.annotation.Validated;
+import lombok.Setter;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
-import javax.persistence.*;
-
-@Entity
-@Data
-@Validated
+@Getter
+@Setter
 @NoArgsConstructor
-@Table(schema = "pocket", name = "roles")
+@Document(collection = "roles")
 public class Role {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Field(value = "id")
     private Long id;
 
-    @Column(name = "name")
+    @Indexed(unique = true)
+    @Field(value = "name")
     private String name;
 
     @Override

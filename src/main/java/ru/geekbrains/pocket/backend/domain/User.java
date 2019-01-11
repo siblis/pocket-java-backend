@@ -4,51 +4,57 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.CompoundIndexes;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 import ru.geekbrains.pocket.backend.validation.ValidEmail;
 
-import javax.persistence.*;
-import javax.validation.constraints.*;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 import java.util.Collection;
 
-@Entity
 @Getter
 @Setter
-//@Validated
 @NoArgsConstructor
-@Table(schema = "pocket", name = "users")
+@Document(collection = "users")
+@CompoundIndexes({
+        @CompoundIndex(name = "name_email_idx", def = "{'username': 1, 'email': -1}")
+})
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Field(value = "id")
     private Long id;
 
-    @Column(name = "username")
+    @Indexed(unique = true)
+    @Field(value = "username")
     private String username;
 
     @JsonIgnore
-    @Column(name = "password")
+    @Field(value = "password")
     private String password;
 
     @Size(min = 1, max = 50)
     //@Pattern(regexp = "[^0-9]*")
-    @Column(name = "lastname", nullable = false)
+    @Field(value = "lastname")
     private String lastname;
 
     @Size(min = 1, max = 50)
     //@Pattern(regexp = "[^0-9]*")
-    @Column(name = "firstname", nullable = false)
+    @Field(value = "firstname")
     private String firstname;
 
     @NotEmpty
     @ValidEmail
-    @Column(name = "email")
+    @Indexed
+    @Field(value = "email")
     private String email;
 
-    @JsonIgnore
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "users_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    @DBRef
+    @Field(value = "roles")
     private Collection<Role> roles;
 
     public User(String username, String password, @NotEmpty String email) {
@@ -57,7 +63,7 @@ public class User {
         this.email = email;
     }
 
-    public User(String username, String password, @NotNull @Size(min = 1, max = 50) @Pattern(regexp = "[^0-9]*") String lastname, @NotNull @Size(min = 1, max = 50) @Pattern(regexp = "[^0-9]*") String firstname, @NotEmpty @Email String email) {
+    public User(String username, String password, String lastname, String firstname, String email) {
         this.username = username;
         this.password = password;
         this.lastname = lastname;
@@ -65,7 +71,7 @@ public class User {
         this.email = email;
     }
 
-    public User(String username, String password, @NotNull @Size(min = 1, max = 50) @Pattern(regexp = "[^0-9]*") String lastname, @NotNull @Size(min = 1, max = 50) @Pattern(regexp = "[^0-9]*") String firstname, @NotEmpty @Email String email, Collection<Role> roles) {
+    public User(String username, String password, String lastname, String firstname, String email, Collection<Role> roles) {
         this.username = username;
         this.password = password;
         this.lastname = lastname;

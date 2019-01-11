@@ -3,11 +3,11 @@
 # RESTfull backend api
 ## with MVC App implementation 
 
-are used
-Spring Boot, Spring Web, Spring Data Rest, Spring HATEOAS,
-Spring Data JPA, Spring Security,
-Spring Actuator, Spring Devtools, Spring Thymeleaf,
-Hibernate, Lombok, PostgreSQL, FlywayDB,
+are used 
+Spring Boot, Spring Data MongoDB,
+Spring Web, Spring Data Rest, Spring HATEOAS,
+Spring Security, Spring Actuator, Spring Devtools, Spring Thymeleaf,
+Lombok, Slf4j,
 HTTPS (SSL/TLS) & tomcat.keystore,
 OAuth2Configuration
 

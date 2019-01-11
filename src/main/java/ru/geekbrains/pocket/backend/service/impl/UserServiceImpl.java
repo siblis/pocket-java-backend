@@ -26,24 +26,10 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
+    @Autowired
     private UserRepository userRepository;
+    @Autowired
     private RoleRepository roleRepository;
-    private BCryptPasswordEncoder passwordEncoder;
-
-    @Autowired
-    public void setUserRepository(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
-    @Autowired
-    public void setRoleRepository(RoleRepository roleRepository) {
-        this.roleRepository = roleRepository;
-    }
-
-    @Autowired
-    public void setPasswordEncoder(BCryptPasswordEncoder passwordEncoder) {
-        this.passwordEncoder = passwordEncoder;
-    }
 
     @Override
     public void delete(Long id) {
@@ -75,7 +61,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
     public User getUserByUsername(String username) {
         Optional<User> user = Optional.of(userRepository.findByUsername(username).orElseThrow(
                 () -> new UserNotFoundException("User with username = " + username + " not found")));
@@ -83,37 +68,27 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Collection<Role> getRolesByUsername(String username) {
-        Optional<User> user = Optional.of(userRepository.findUserByUsernameWithRoles(username).orElseThrow(
+    public List<Role> getRolesByUsername(String username) {
+        Optional<User> user = Optional.of(userRepository.findByUsername(username).orElseThrow(
                 () -> new UserNotFoundException("User with username = " + username + " not found")));
-        return user.get().getRoles();
+        return (List<Role>) user.get().getRoles();
     }
 
     @Override
-    public User save(User user) {
-        return userRepository.save(user);
-    }
-
-    //for WebController
-    @Override
-    @Transactional
-    public User save(SystemUser systemUser) {
-        User user = new User();
-        user.setUsername(systemUser.getUsername());
-        user.setPassword(passwordEncoder.encode(systemUser.getPassword()));
-        user.setLastname(systemUser.getLastname());
-        user.setFirstname(systemUser.getFirstname());
-        user.setEmail(systemUser.getEmail());
-
+    public User insert(User user) {
         Optional<Role> role = Optional.of(roleRepository.findByName("ROLE_USER").orElseThrow(
                 () -> new RoleNotFoundException("Role with name = 'ROLE_USER' not found")));
 
         user.setRoles(Arrays.asList(role.get()));
+        return userRepository.insert(user);
+    }
+
+    @Override
+    public User update(User user) {
         return userRepository.save(user);
     }
 
     @Override
-    @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<User> user = Optional.of(userRepository.findByUsername(username).orElseThrow(
                 () -> new UserNotFoundException("Invalid username or password")));
