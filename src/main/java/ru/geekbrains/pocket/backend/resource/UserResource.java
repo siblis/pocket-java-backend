@@ -2,7 +2,7 @@ package ru.geekbrains.pocket.backend.resource;
 
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.ResourceSupport;
-import ru.geekbrains.pocket.backend.controller.rest.RegisterRestController;
+import ru.geekbrains.pocket.backend.controller.rest.UserRestController;
 import ru.geekbrains.pocket.backend.domain.User;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
@@ -17,8 +17,8 @@ public class UserResource extends ResourceSupport {
     public UserResource(User user) {
         this.user = user;
         this.add(new Link("uri"));
-        this.add(linkTo(RegisterRestController.class, user.getUsername()).withRel("username"));
-        this.add(linkTo(methodOn(RegisterRestController.class, user.getUsername()).getUserById(user.getId())).withSelfRel());
+        this.add(linkTo(UserRestController.class, user.getUsername()).withRel("username"));
+        this.add(linkTo(methodOn(UserRestController.class, user.getUsername()).getUserById(user.getId())).withSelfRel());
     }
 
     public User getUser() {

@@ -20,11 +20,11 @@ public interface UserService extends UserDetailsService {
 
     User getUserByUsername(String userName);
 
-    Collection<Role> getRolesByUsername(String userName);
+    List<Role> getRolesByUsername(String userName);
 
-    User save(User user);
+    User insert(User user);
 
-    User save(SystemUser systemUser);
+    User update(User user);
 
     User validateUser(Long id);
 

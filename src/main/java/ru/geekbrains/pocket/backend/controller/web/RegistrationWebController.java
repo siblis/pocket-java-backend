@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -25,6 +26,9 @@ public class RegistrationWebController {
     public void setUserService(UserService userService) {
         this.userService = userService;
     }
+
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 
     @InitBinder
     public void initBider(WebDataBinder dataBinder) {
@@ -52,7 +56,15 @@ public class RegistrationWebController {
             logger.debug("User name already exists.");
             return "registration-form";
         }
-        userService.save(systemUser);
+
+        User user = new User();
+        user.setUsername(systemUser.getUsername());
+        user.setPassword(passwordEncoder.encode(systemUser.getPassword()));
+        user.setLastname(systemUser.getLastname());
+        user.setFirstname(systemUser.getFirstname());
+        user.setEmail(systemUser.getEmail());
+
+        userService.insert(user);
         logger.debug("Successfully created user: " + userName);
         return "registration-confirmation";
     }
