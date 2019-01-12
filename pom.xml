@@ -29,10 +29,6 @@
     </properties>
 
     <dependencies>
-        <!--<dependency>-->
-        <!--<groupId>org.springframework.boot</groupId>-->
-        <!--<artifactId>spring-boot-starter-data-jpa</artifactId>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -85,12 +81,6 @@
             <scope>test</scope>
         </dependency>
 
-        <!--DataBase-->
-        <!--<dependency>-->
-        <!--<groupId>org.postgresql</groupId>-->
-        <!--<artifactId>postgresql</artifactId>-->
-        <!--<version>42.2.5</version>-->
-        <!--</dependency>-->
         <!--<dependency>-->
         <!--<groupId>org.springframework.boot</groupId>-->
         <!--<artifactId>spring-boot-starter-data-redis</artifactId>-->
@@ -118,12 +108,6 @@
         <!--<groupId>org.slf4j</groupId>-->
         <!--<artifactId>slf4j-jdk14</artifactId>-->
         <!--<version>1.7.25</version>-->
-        <!--</dependency>-->
-
-        <!--<dependency>-->
-        <!--<groupId>org.flywaydb</groupId>-->
-        <!--<artifactId>flyway-core</artifactId>-->
-        <!--<version>5.2.1</version>-->
         <!--</dependency>-->
 
         <dependency>
@@ -165,26 +149,6 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
-            <!--Flyway-->
-            <!--<plugin>-->
-            <!--<groupId>org.flywaydb</groupId>-->
-            <!--<artifactId>flyway-maven-plugin</artifactId>-->
-            <!--<version>5.2.1</version>-->
-            <!--<configuration>-->
-            <!--<driver>org.postgresql.Driver</driver>-->
-            <!--<url>jdbc:postgresql://localhost:5432/geek_db</url>-->
-            <!--<user>postgres</user>-->
-            <!--<password>postgres</password>-->
-            <!--<schemas>pocket</schemas>-->
-            <!--</configuration>-->
-            <!--<dependencies>-->
-            <!--<dependency>-->
-            <!--<groupId>org.postgresql</groupId>-->
-            <!--<artifactId>postgresql</artifactId>-->
-            <!--<version>42.2.5</version>-->
-            <!--</dependency>-->
-            <!--</dependencies>-->
-            <!--</plugin>-->
             <!--плагин для компиляции проекта-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
