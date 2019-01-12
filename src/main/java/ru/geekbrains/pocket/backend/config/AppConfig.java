@@ -13,7 +13,9 @@ import org.springframework.data.mongodb.core.convert.DefaultMongoTypeMapper;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @EnableCaching
@@ -30,6 +32,17 @@ public class AppConfig extends WebMvcAutoConfiguration {
 
         return mongoTemplate;
 
+    }
+
+    //https://spring.io/guides/gs/rest-service-cors/
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/api/users/").allowedOrigins("http://localhost:9000");
+            }
+        };
     }
 
     public void addResourceHandler(ResourceHandlerRegistry registry) {

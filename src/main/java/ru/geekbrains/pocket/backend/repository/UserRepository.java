@@ -1,19 +1,19 @@
 package ru.geekbrains.pocket.backend.repository;
 
+import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
-import org.springframework.data.repository.query.Param;
 import ru.geekbrains.pocket.backend.domain.User;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface UserRepository extends MongoRepository<User, Long> {
+public interface UserRepository extends MongoRepository<User, ObjectId> {
 
     User findFirstByUsername(String username);
 
     //@Cacheable()
-    Optional<User> findByUsername(@Param("username") String username);
+    Optional<User> findByUsername(String username);
 
     // Supports native JSON query string
     @Query("{firstname:'?0'}")
