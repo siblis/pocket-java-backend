@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
@@ -27,7 +28,7 @@ import java.util.Collection;
 public class User {
     @Id
     @Field(value = "id")
-    private Long id;
+    private ObjectId id;
 
     @Indexed(unique = true)
     @Field(value = "username")

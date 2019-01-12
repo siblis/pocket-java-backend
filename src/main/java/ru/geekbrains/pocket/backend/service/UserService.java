@@ -1,5 +1,6 @@
 package ru.geekbrains.pocket.backend.service;
 
+import org.bson.types.ObjectId;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import ru.geekbrains.pocket.backend.domain.Role;
 import ru.geekbrains.pocket.backend.domain.SystemUser;
@@ -10,13 +11,13 @@ import java.util.Collection;
 import java.util.List;
 
 public interface UserService extends UserDetailsService {
-    void delete(Long id);
+    void delete(ObjectId id);
 
-    Iterable<User> getAllUsers();
+    List<User> getAllUsers();
 
     List<UserResource> getAllUserResources();
 
-    User getUserById(Long id);
+    User getUserById(ObjectId id);
 
     User getUserByUsername(String userName);
 
@@ -26,7 +27,7 @@ public interface UserService extends UserDetailsService {
 
     User update(User user);
 
-    User validateUser(Long id);
+    User validateUser(ObjectId id);
 
     User validateUser(String username);
 }
