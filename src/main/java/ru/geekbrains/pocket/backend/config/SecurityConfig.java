@@ -18,14 +18,8 @@ import javax.sql.DataSource;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-    private DataSource dataSource;
     private UserService userService;
     private CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
-
-    @Autowired
-    public void setDataSource(DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
 
     @Autowired
     public void setUserService(UserService userService) {
@@ -46,13 +40,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
                 .antMatchers("/register/**").permitAll()
-                .antMatchers("/**").hasAnyRole("ADMIN", "USER")
+                //.antMatchers("/**").hasAnyRole("ADMIN", "USER")
+                .antMatchers("/web/**").hasAnyRole("ADMIN", "USER")
+                //.antMatchers("/api/**").hasAnyRole("ADMIN", "USER")
+                .antMatchers("/api/**").permitAll()
                 .antMatchers("/admin/**").hasRole("ADMIN")
-                //.anyRequest().authenticated()
+                .anyRequest().authenticated()
                 //.anyRequest().permitAll()
                 .and()
                 .formLogin()
-                .loginPage("/login")
+                .loginPage("/web/login")
                 .loginProcessingUrl("/authenticateTheUser")
                 .successHandler(customAuthenticationSuccessHandler)
                 .permitAll()
@@ -60,7 +57,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .logout()
                 .permitAll()
                 .and()
-                .exceptionHandling().accessDeniedPage("/accessDenied");
+                .exceptionHandling().accessDeniedPage("/web/accessDenied");
     }
 
     @Bean
