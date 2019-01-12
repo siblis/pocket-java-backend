@@ -99,7 +99,7 @@ public class RegisterRestControllerTest {
                 + this.users.get(0).getId()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$.id", is(this.users.get(0).getId().intValue())))
+                .andExpect(jsonPath("$.id", is(this.users.get(0).getId())))
                 .andExpect(jsonPath("$.uri", is("http://geelbrains.ru/1/" + userName)))
                 .andExpect(jsonPath("$.description", is("A description")));
     }
@@ -110,10 +110,10 @@ public class RegisterRestControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].id", is(this.users.get(0).getId().intValue())))
+                .andExpect(jsonPath("$[0].id", is(this.users.get(0).getId())))
                 .andExpect(jsonPath("$[0].uri", is("http://geelbrains.ru/1/" + userName)))
                 .andExpect(jsonPath("$[0].description", is("A description")))
-                .andExpect(jsonPath("$[1].id", is(this.users.get(1).getId().intValue())))
+                .andExpect(jsonPath("$[1].id", is(this.users.get(1).getId())))
                 .andExpect(jsonPath("$[1].uri", is("http://geelbrains.ru/2/" + userName)))
                 .andExpect(jsonPath("$[1].description", is("A description")));
     }

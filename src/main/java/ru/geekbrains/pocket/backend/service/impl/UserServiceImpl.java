@@ -1,5 +1,6 @@
 package ru.geekbrains.pocket.backend.service.impl;
 
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -32,7 +33,7 @@ public class UserServiceImpl implements UserService {
     private RoleRepository roleRepository;
 
     @Override
-    public void delete(Long id) {
+    public void delete(ObjectId id) {
         Optional<User> user = userRepository.findById(id);
         if (!user.isPresent()) {
             throw new UserNotFoundException("User with id = " + id + " not found");
@@ -41,7 +42,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Iterable<User> getAllUsers() {
+    public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
@@ -54,7 +55,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getUserById(Long id) {
+    public User getUserById(ObjectId id) {
         Optional<User> user = Optional.of(userRepository.findById(id).orElseThrow(
                 () -> new UserNotFoundException("User with id = " + id + " not found")));
         return user.get();
@@ -62,20 +63,22 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserByUsername(String username) {
+        //Optional<User> user1 = userRepository.findByUsername(username);
+        User user2 = userRepository.findFirstByUsername(username);
         Optional<User> user = Optional.of(userRepository.findByUsername(username).orElseThrow(
-                () -> new UserNotFoundException("User with username = " + username + " not found")));
+                () -> new UserNotFoundException("User with username = '" + username + "' not found")));
         return user.get();
     }
 
     @Override
     public List<Role> getRolesByUsername(String username) {
         Optional<User> user = Optional.of(userRepository.findByUsername(username).orElseThrow(
-                () -> new UserNotFoundException("User with username = " + username + " not found")));
+                () -> new UserNotFoundException("User with username = '" + username + "' not found")));
         return (List<Role>) user.get().getRoles();
     }
 
     @Override
-    public User insert(User user) {
+    public User insert(User user) throws RuntimeException {
         Optional<Role> role = Optional.of(roleRepository.findByName("ROLE_USER").orElseThrow(
                 () -> new RoleNotFoundException("Role with name = 'ROLE_USER' not found")));
 
@@ -100,7 +103,7 @@ public class UserServiceImpl implements UserService {
         return roles.stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
     }
 
-    public User validateUser(Long id) {
+    public User validateUser(ObjectId id) {
         return userRepository.findById(id).orElseThrow(
                 () -> new UserNotFoundException("User with id = " + id + " not found"));
     }
