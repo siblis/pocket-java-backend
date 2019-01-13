@@ -1,14 +1,14 @@
 package ru.geekbrains.pocket.backend.controller.rest;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.*;
-
 import org.bson.types.ObjectId;
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.web.bind.annotation.*;
-import ru.geekbrains.pocket.backend.resource.UserResource;
 import ru.geekbrains.pocket.backend.response.GreetingResponse;
 
 import java.util.concurrent.atomic.AtomicLong;
+
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("/api")
@@ -44,7 +44,7 @@ class RootRestController {
         return new GreetingResponse(counter.incrementAndGet(), String.format(template, name));
     }
 
-    @CrossOrigin(origins = "http://localhost:9001")
+    @CrossOrigin
     @GetMapping("/greeting2")
     public GreetingResponse greetingWithJavaconfig(@RequestParam(required = false, defaultValue = "World") String name) {
         System.out.println("==== in greeting2 ====");
