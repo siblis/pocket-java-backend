@@ -48,7 +48,7 @@ public class UserRestController {
         return new UserResource(userService.getUserByUsername(name));
     }
 
-    @GetMapping("/users2/{name}")
+    @GetMapping("/users/name/{name}")
     public Resource<User> getUserByName2(@PathVariable String name) {
         User user = userService.getUserByUsername(name);
         return new Resource<>(user,
@@ -56,9 +56,14 @@ public class UserRestController {
                 linkTo(methodOn(UserRestController.class).getAllUsers()).withRel("users"));
     }
 
-    @GetMapping("/usersall")
-    public UserResources getAllUsers3() {
+    @GetMapping("/users")
+    public UserResources getAllUsers() {
         return new UserResources(userService.getAllUsers());
+    }
+
+    @GetMapping("/usersall")
+    public List<User> getAllUsers1() {
+        return userService.getAllUsers();
     }
 
     @GetMapping("/usersall2")
@@ -67,7 +72,7 @@ public class UserRestController {
     }
 
     @GetMapping("/usersall3")
-    public Resources<Resource<User>> getAllUsers() {
+    public Resources<Resource<User>> getAllUsers3() {
         List<Resource<User>> users = userService.getAllUsers().stream()
                 .map(user -> new Resource<>(user,
                         linkTo(methodOn(UserRestController.class).getUserByName2(user.getUsername())).withSelfRel(),
@@ -78,12 +83,7 @@ public class UserRestController {
                 linkTo(methodOn(UserRestController.class).getAllUsers()).withSelfRel());
     }
 
-    @GetMapping("/users/all/")
-    public List<User> getAllUsers4() {
-        return userService.getAllUsers();
-    }
-
-    @PostMapping("/users/")
+    @PostMapping("/users")
     public ResponseEntity<?> addUser(@RequestBody User user) {
         //TODO вывод ошибки если юзер уже есть или не указан
         if (user == null) return null;
@@ -99,7 +99,7 @@ public class UserRestController {
         return new ResponseEntity<User>(null, httpHeaders, HttpStatus.CREATED);
     }
 
-    @PutMapping("/users/")
+    @PutMapping("/users")
     public User updateUser(Principal principal, @RequestBody User user) {
         //обновление доступно только текущего авторизованного юзера
         String username = principal.getName();
