@@ -1,6 +1,7 @@
 package ru.geekbrains.pocket.backend;
 
 import javafx.application.Application;
+import org.bson.types.ObjectId;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -81,6 +82,7 @@ public class RegisterRestControllerTest {
         this.userRepository.deleteAll();
 
         this.user = userRepository.save(new User("testUnit", "123", "Testev", "TestUnit", "t.@t.ru"));
+        user.setId(new ObjectId("6eye634erty3463"));
         users.add(user);
 
     }
