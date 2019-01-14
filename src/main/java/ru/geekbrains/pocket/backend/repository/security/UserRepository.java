@@ -1,9 +1,9 @@
-package ru.geekbrains.pocket.backend.repository;
+package ru.geekbrains.pocket.backend.repository.security;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
-import ru.geekbrains.pocket.backend.domain.User;
+import ru.geekbrains.pocket.backend.domain.Security.User;
 
 import java.util.List;
 import java.util.Optional;

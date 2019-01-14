@@ -10,9 +10,9 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
-import ru.geekbrains.pocket.backend.domain.SystemUser;
-import ru.geekbrains.pocket.backend.domain.User;
-import ru.geekbrains.pocket.backend.service.UserService;
+import ru.geekbrains.pocket.backend.domain.Security.SystemUser;
+import ru.geekbrains.pocket.backend.domain.Security.User;
+import ru.geekbrains.pocket.backend.service.security.UserService;
 
 import javax.validation.Valid;
 

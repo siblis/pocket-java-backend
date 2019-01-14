@@ -3,7 +3,7 @@ package ru.geekbrains.pocket.backend.controller.websocket;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
-import ru.geekbrains.pocket.backend.domain.User;
+import ru.geekbrains.pocket.backend.domain.Security.User;
 import ru.geekbrains.pocket.backend.response.GreetingResponse;
 
 @Controller

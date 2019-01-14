@@ -1,6 +1,6 @@
-package ru.geekbrains.pocket.backend.service;
+package ru.geekbrains.pocket.backend.service.security;
 
-import ru.geekbrains.pocket.backend.domain.Role;
+import ru.geekbrains.pocket.backend.domain.Security.Role;
 
 import java.util.Collection;
 

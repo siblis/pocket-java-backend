@@ -1,10 +1,9 @@
-package ru.geekbrains.pocket.backend.service;
+package ru.geekbrains.pocket.backend.service.security;
 
 import org.bson.types.ObjectId;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import ru.geekbrains.pocket.backend.domain.Role;
-import ru.geekbrains.pocket.backend.domain.SystemUser;
-import ru.geekbrains.pocket.backend.domain.User;
+import ru.geekbrains.pocket.backend.domain.Security.Role;
+import ru.geekbrains.pocket.backend.domain.Security.User;
 import ru.geekbrains.pocket.backend.resource.UserResource;
 
 import java.util.Collection;

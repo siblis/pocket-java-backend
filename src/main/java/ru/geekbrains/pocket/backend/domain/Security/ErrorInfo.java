@@ -1,4 +1,4 @@
-package ru.geekbrains.pocket.backend.domain;
+package ru.geekbrains.pocket.backend.domain.Security;
 
 public class ErrorInfo {
     public final String url;

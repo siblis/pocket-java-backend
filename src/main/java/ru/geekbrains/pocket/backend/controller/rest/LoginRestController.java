@@ -1,7 +1,7 @@
 package ru.geekbrains.pocket.backend.controller.rest;
 
 import org.springframework.web.bind.annotation.*;
-import ru.geekbrains.pocket.backend.domain.User;
+import ru.geekbrains.pocket.backend.domain.Security.User;
 
 @RestController
 @RequestMapping("/api")

@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import ru.geekbrains.pocket.backend.domain.ErrorInfo;
+import ru.geekbrains.pocket.backend.domain.Security.ErrorInfo;
 import ru.geekbrains.pocket.backend.exception.BadDataException;
 
 import javax.servlet.http.HttpServletRequest;

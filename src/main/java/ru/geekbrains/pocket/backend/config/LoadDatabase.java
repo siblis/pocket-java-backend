@@ -6,8 +6,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.Example;
-import ru.geekbrains.pocket.backend.domain.User;
-import ru.geekbrains.pocket.backend.repository.UserRepository;
+import ru.geekbrains.pocket.backend.domain.Security.User;
+import ru.geekbrains.pocket.backend.repository.security.UserRepository;
 
 @Configuration
 @Slf4j
