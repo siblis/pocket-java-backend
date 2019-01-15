@@ -6,6 +6,7 @@ import ru.geekbrains.pocket.backend.domain.entitiesDB.Users;
 
 
 import java.util.Date;
+import java.util.List;
 
 @Service
 public interface UserService {
@@ -18,13 +19,15 @@ public interface UserService {
 
     public Users findByEmail(String email);
 
+    public List<Users> findUsersByUsername(String username);
+
     public String updateUser(Users user);
 
     public String updateUserProfile(Users user, Profile profile);
 
-    public String updateUserFirstName(Users user, String firstName);
+    public String updateUserFullName(Users user, String firstName);
 
-    public String updateUserLastName(Users user, String lastName);
+    public String updateUserUsername(Users user, String lastName);
 
     public String updateUsersLastSeen(Users user, Date date);
 

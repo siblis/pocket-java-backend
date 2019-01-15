@@ -18,5 +18,7 @@ public class GroupsMembers {
 
     Group group;
 
-    List<Users> member;
+    Users member;
+
+    boolean administrator = false;
 }

@@ -13,10 +13,10 @@ import java.util.Date;
 @AllArgsConstructor
 @TypeAlias("profile")
 public class Profile {
-    String name;
+    String username;
 
-    @Field("last_name")
-    String lastName;
+    @Field("full_name")
+    String fullName;
 
     @Field("last_seen")
     Date lastSeen;

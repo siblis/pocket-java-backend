@@ -61,11 +61,11 @@ public class UserServiceImpl implements UserService {
     }
 
     public Users getTestUser1() {
-        return userRepository.findByProfile_NameAndProfile_LastName("test1","test1");
+        return userRepository.findByProfile_Username("tester1").get(0);
     }
 
     public Users getTestUser2() {
-        return userRepository.findByProfile_NameAndProfile_LastName("test2","test2");
+        return userRepository.findByProfile_Username("tester2").get(0);
     }
 
     public Users findUserByID(String id){
@@ -74,6 +74,11 @@ public class UserServiceImpl implements UserService {
 
     public Users findByEmail(String email){
         return userRepository.findByEmailMatches(email).get();
+    }
+
+    @Override
+    public List<Users> findUsersByUsername(String username) {
+        return userRepository.findByProfile_Username(username);
     }
 
     @Override
@@ -96,11 +101,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String updateUserFirstName(Users user,String firstName) {
+    public String updateUserFullName(Users user, String fullName) {
         Users updatingUser = userRepository.findByEmailMatches(user.getEmail()).get();
         if (updatingUser!=null) {
             Profile thisUserProfile = updatingUser.getProfile();
-            thisUserProfile.setName(firstName);
+            thisUserProfile.setFullName(fullName);
             updatingUser.setProfile(thisUserProfile);
             return userRepository.save(updatingUser).getId();
 
@@ -109,17 +114,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String updateUserLastName(Users user, String lastName) {
+    public String updateUserUsername(Users user, String username) {
         Users updatingUser = userRepository.findByEmailMatches(user.getEmail()).get();
         if (updatingUser!=null) {
             Profile thisUserProfile = updatingUser.getProfile();
-            thisUserProfile.setLastName(lastName);
+            thisUserProfile.setUsername(username);
             updatingUser.setProfile(thisUserProfile);
             return userRepository.save(updatingUser).getId();
 
         }
         else return "user not found";
     }
+
 
     @Override
     public String updateUsersLastSeen(Users user, Date date) {
