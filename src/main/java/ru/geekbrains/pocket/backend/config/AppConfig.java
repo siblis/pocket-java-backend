@@ -49,7 +49,7 @@ public class AppConfig extends WebMvcAutoConfiguration {
                         .allowedOrigins("http://localhost:9000")
                         .allowedMethods("*")
                         .allowedHeaders("*")
-                        .exposedHeaders("*")
+//                        .exposedHeaders("*")
                         .allowCredentials(true).maxAge(3600);
 //                registry.addMapping("/api/users/**")
 //                        .allowedOrigins("http://localhost:9000")
