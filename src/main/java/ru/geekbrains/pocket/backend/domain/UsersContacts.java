@@ -35,7 +35,7 @@ import javax.validation.constraints.Size;
         @Setter
         @Size(min = 1, max = 50)
         //@Pattern(regexp = "[^0-9]*")
-        @Field(value = "byName")
+        @Field(value = "byname")
         private String byName;
 
         @Getter
@@ -56,7 +56,7 @@ import javax.validation.constraints.Size;
                     "id=" + id +
                     ", userId=" + userId +
                     ", contact=" + contact +
-                    ", byName=" + byName +
+                    ", byname=" + byName +
                     ", added_at=" + addedAt +
                     '}';
         }
