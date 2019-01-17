@@ -8,6 +8,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+import java.util.Date;
 
 import javax.validation.constraints.Size;
 
@@ -40,14 +41,14 @@ import javax.validation.constraints.Size;
         @Getter
         @Setter
         @Field(value = "added_at")
-        private String added_at;
+        private Date addedAt;
 
-        public UsersContacts(ObjectId id, String userId, String contact, String byName, String added_at) {
+        public UsersContacts(ObjectId id, String userId, String contact, String byName, Date addedAt) {
             this.id = id;
             this.userId = userId;
             this.contact = contact;
             this.byName = byName;
-            this.added_at = added_at;
+            this.addedAt = addedAt;
         }
         @Override
         public String toString() {
@@ -56,7 +57,7 @@ import javax.validation.constraints.Size;
                     ", userId=" + userId +
                     ", contact=" + contact +
                     ", byName=" + byName +
-                    ", added_at=" + added_at +
+                    ", added_at=" + addedAt +
                     '}';
         }
     }
