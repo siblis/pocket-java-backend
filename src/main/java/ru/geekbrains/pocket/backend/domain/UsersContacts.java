@@ -18,14 +18,14 @@ import javax.validation.constraints.Size;
     @Document(collection = "users.contacts")
     public class UsersContacts {
         @Id
-        @Field(value = "id")
+        @Field(value = "_id")
         private ObjectId id;
 
         @Getter
         @Setter
         @Indexed(unique = true)
         @Field(value = "<users:_id>")
-        private String user_id;
+        private String userId;
 
         @Field(value = "<users:_id>")
         private String contact;
@@ -34,28 +34,28 @@ import javax.validation.constraints.Size;
         @Setter
         @Size(min = 1, max = 50)
         //@Pattern(regexp = "[^0-9]*")
-        @Field(value = "byname")
-        private String byname;
+        @Field(value = "byName")
+        private String byName;
 
         @Getter
         @Setter
         @Field(value = "added_at")
         private String added_at;
 
-        public UsersContacts(ObjectId id,String user_id,String contact,String byname,String added_at) {
+        public UsersContacts(ObjectId id, String userId, String contact, String byName, String added_at) {
             this.id = id;
-            this.user_id = user_id;
+            this.userId = userId;
             this.contact = contact;
-            this.byname = byname;
+            this.byName = byName;
             this.added_at = added_at;
         }
         @Override
         public String toString() {
             return "UsersContacts{" +
                     "id=" + id +
-                    ", user_id=" + user_id +
+                    ", userId=" + userId +
                     ", contact=" + contact +
-                    ", byname=" + byname +
+                    ", byName=" + byName +
                     ", added_at=" + added_at +
                     '}';
         }

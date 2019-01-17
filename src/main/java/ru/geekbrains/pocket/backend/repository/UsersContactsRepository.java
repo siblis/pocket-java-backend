@@ -14,13 +14,13 @@ public interface UsersContactsRepository extends MongoRepository<UsersContacts, 
 
     UsersContacts findFirstById(ObjectId id);
     //@Cacheable()
-    Optional<UsersContacts> findByUsername(ObjectId id);
+    Optional<UsersContacts> findByUsername(String byName);
 
     // Supports native JSON query string
     @Query("{<users:_id>:'?0'}")
-    List<UsersContacts> findCustomByUser_id(String user_id);
+    List<UsersContacts> findByUser_id(String user_id);
     @Query("{byname:'?0'}")
-    List<UsersContacts> FindByName(String byname);
+    List<UsersContacts> findByName(String byName);
 
 
 
