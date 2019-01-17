@@ -18,7 +18,7 @@ public interface UsersContactsRepository extends MongoRepository<UsersContacts, 
 
     // Supports native JSON query string
     @Query("{<users:_id>:'?0'}")
-    List<UsersContacts> findByUser_id(String user_id);
+    List<UsersContacts> findByUserId(String userId);
     @Query("{byname:'?0'}")
     List<UsersContacts> findByName(String byName);
 
