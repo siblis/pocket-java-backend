@@ -7,8 +7,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import ru.geekbrains.pocket.backend.domain.Security.User;
-import ru.geekbrains.pocket.backend.repository.security.UserRepository;
+import ru.geekbrains.pocket.backend.domain.User;
+import ru.geekbrains.pocket.backend.repository.UserRepository;
 
 import java.util.Optional;
 

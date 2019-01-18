@@ -4,7 +4,7 @@ import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.hateoas.Resources;
 import ru.geekbrains.pocket.backend.controller.rest.UserRestController;
-import ru.geekbrains.pocket.backend.domain.Security.User;
+import ru.geekbrains.pocket.backend.domain.User;
 
 import java.util.List;
 import java.util.stream.Collectors;

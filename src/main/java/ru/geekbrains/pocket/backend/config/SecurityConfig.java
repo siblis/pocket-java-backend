@@ -10,9 +10,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import ru.geekbrains.pocket.backend.service.security.UserService;
-
-import javax.sql.DataSource;
+import ru.geekbrains.pocket.backend.service.UserService;
 
 @Configuration
 @EnableWebSecurity

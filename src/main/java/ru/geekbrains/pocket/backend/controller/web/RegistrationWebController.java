@@ -10,9 +10,9 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
-import ru.geekbrains.pocket.backend.domain.Security.SystemUser;
-import ru.geekbrains.pocket.backend.domain.Security.User;
-import ru.geekbrains.pocket.backend.service.security.UserService;
+import ru.geekbrains.pocket.backend.domain.SystemUser;
+import ru.geekbrains.pocket.backend.domain.User;
+import ru.geekbrains.pocket.backend.service.UserService;
 
 import javax.validation.Valid;
 
@@ -60,11 +60,12 @@ public class RegistrationWebController {
         User user = new User();
         user.setUsername(systemUser.getUsername());
         user.setPassword(passwordEncoder.encode(systemUser.getPassword()));
-        user.setLastname(systemUser.getLastname());
-        user.setFirstname(systemUser.getFirstname());
         user.setEmail(systemUser.getEmail());
 
-        userService.insert(user);
+        user = userService.insert(user);
+        user.getProfile().setUsername(systemUser.getUsername());
+        userService.update(user);
+
         logger.debug("Successfully created user: " + userName);
         return "registration-confirmation";
     }

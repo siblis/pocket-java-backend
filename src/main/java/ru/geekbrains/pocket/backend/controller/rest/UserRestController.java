@@ -10,12 +10,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.geekbrains.pocket.backend.domain.Security.User;
+import ru.geekbrains.pocket.backend.domain.User;
 import ru.geekbrains.pocket.backend.exception.UserNotFoundException;
 import ru.geekbrains.pocket.backend.resource.UserResource;
 import ru.geekbrains.pocket.backend.resource.UserResources;
 import ru.geekbrains.pocket.backend.response.UsersErrorResponse;
-import ru.geekbrains.pocket.backend.service.security.UserService;
+import ru.geekbrains.pocket.backend.service.UserService;
 
 import java.net.URI;
 import java.security.Principal;

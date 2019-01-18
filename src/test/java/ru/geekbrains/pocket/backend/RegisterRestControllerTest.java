@@ -1,6 +1,5 @@
 package ru.geekbrains.pocket.backend;
 
-import javafx.application.Application;
 import org.bson.types.ObjectId;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,9 +16,9 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.mock.http.MockHttpOutputMessage;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
-import ru.geekbrains.pocket.backend.domain.Security.User;
-import ru.geekbrains.pocket.backend.repository.security.RoleRepository;
-import ru.geekbrains.pocket.backend.repository.security.UserRepository;
+import ru.geekbrains.pocket.backend.domain.User;
+import ru.geekbrains.pocket.backend.repository.RoleRepository;
+import ru.geekbrains.pocket.backend.repository.UserRepository;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -81,7 +80,7 @@ public class RegisterRestControllerTest {
         this.roleRepository.deleteAll();
         this.userRepository.deleteAll();
 
-        this.user = userRepository.save(new User("testUnit", "123", "Testev", "TestUnit", "t.@t.ru"));
+        this.user = userRepository.save(new User("t.@t.ru", "testUnit", "123"));
         user.setId(new ObjectId("6eye634erty3463"));
         users.add(user);
 

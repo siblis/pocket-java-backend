@@ -13,31 +13,41 @@ import ru.geekbrains.pocket.backend.repository.UserRepository;
 @Configuration
 @Slf4j
 class LoadDatabase {
+    private UserRepository userRepository;
+    private RoleRepository roleRepository;
 
     @Bean
     CommandLineRunner initDatabase(UserRepository userRepository, RoleRepository roleRepository) {
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+
         return args -> {
-            Role role = new Role("ROLE_ADMIN");
-            if (!roleRepository.exists(Example.of(role)))
-                log.info("Preloading " + roleRepository.save(role));
+            addRoleToDB(new Role("ROLE_ADMIN"));
+            addRoleToDB(new Role("ROLE_USER"));
 
-            role = new Role("ROLE_USER");
-            if (!roleRepository.exists(Example.of(role)))
-                log.info("Preloading " + roleRepository.save(role));
+            addUserToDB(new User("a@mail.ru", "Alex", "123"));
+            addUserToDB(new User("b@mail.ru", "Bob", "1234"));
+            addUserToDB(new User("i@mail.ru", "ivan", "1235"));
 
-            User user = new User("Alex", "123", "a@mail.ru");
-            Example<User> exampleQuery = Example.of(user);
-            if (!userRepository.exists(exampleQuery))
-                log.info("Preloading " + userRepository.save(user));
-
-            user = new User("Bob", "1234", "b@mail.ru");
-            if (!userRepository.exists(Example.of(user)))
-                log.info("Preloading " + userRepository.save(user));
-
-            user = new User("ivan", "1235", "i@mail.ru");
-            if (!userRepository.exists(Example.of(user)))
-                log.info("Preloading " + userRepository.save(user));
-
+//            addUserToDB(new User("a@mail.ru","Alex","123",
+//                    new ArrayList<Role>(Arrays.asList(new Role("ROLE_ADMIN"),new Role("ROLE_USER")))));
+//            addUserToDB(new User("b@mail.ru","Bob", "1234",
+//                    new ArrayList<Role>(Arrays.asList(new Role("ROLE_USER")))));
+//            addUserToDB(new User("i@mail.ru","ivan", "1235",
+//                    new ArrayList<Role>(Arrays.asList(new Role("ROLE_USER")))));
         };
+    }
+
+    private void addRoleToDB(Role role) {
+        if (!roleRepository.exists(Example.of(role)))
+            log.info("Preloading " + roleRepository.save(role));
+    }
+
+    private void addUserToDB(User user) {
+        if (userRepository.findByEmail(user.getEmail()) == null)
+            log.info("Preloading " + userRepository.save(user));
+
+//        if (!userRepository.exists(Example.of(user)))
+//            log.info("Preloading " + userRepository.save(user));
     }
 }

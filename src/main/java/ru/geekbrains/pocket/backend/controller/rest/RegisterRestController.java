@@ -11,10 +11,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import ru.geekbrains.pocket.backend.controller.web.RegistrationWebController;
-import ru.geekbrains.pocket.backend.domain.Security.SystemUser;
-import ru.geekbrains.pocket.backend.domain.Security.User;
+import ru.geekbrains.pocket.backend.domain.SystemUser;
+import ru.geekbrains.pocket.backend.domain.User;
 import ru.geekbrains.pocket.backend.resource.UserResource;
-import ru.geekbrains.pocket.backend.service.security.UserService;
+import ru.geekbrains.pocket.backend.service.UserService;
 
 import java.net.URI;
 
@@ -51,11 +51,12 @@ public class RegisterRestController {
         User user = new User();
         user.setUsername(systemUser.getUsername());
         user.setPassword(passwordEncoder.encode(systemUser.getPassword()));
-        user.setLastname(systemUser.getLastname());
-        user.setFirstname(systemUser.getFirstname());
         user.setEmail(systemUser.getEmail());
 
-        userService.insert(user);
+        user = userService.insert(user);
+        user.getProfile().setUsername(systemUser.getUsername());
+        userService.update(user);
+
         logger.debug("Successfully created user: " + userName);
 
         HttpHeaders httpHeaders = new HttpHeaders();
