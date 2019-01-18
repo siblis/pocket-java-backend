@@ -24,7 +24,7 @@ public class Group {
     String description;
 
     @Indexed
-    String inviting_code;
+    String invitation_code;
 
     @Field("public")
     boolean isPublic=false;

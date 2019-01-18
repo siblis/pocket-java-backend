@@ -5,21 +5,22 @@ import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Data
 @Document(collection = "users.chats")
-public class UserChats {
+public class UserChat {
 
     @Id
     String id;
 
-    @Indexed
-    User user_id;
+    UserProfile sender;
 
     @Nullable
     Group group = null;
-
-    User sender;
+    @Indexed
+    @Field(value = "user_id")
+    private User userId;
 
     String preview;
 

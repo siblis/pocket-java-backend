@@ -12,13 +12,8 @@ import java.util.Date;
 
 @Getter
 @Setter
-//@NoArgsConstructor
-//@AllArgsConstructor
 @TypeAlias("profile")
-public class Profile {
-//    @Id
-//    private ObjectId id;
-
+public class UserProfile {
     @Indexed//(unique = true)
             String username;
 
@@ -28,11 +23,11 @@ public class Profile {
     @Field("last_seen")
     Date lastSeen;
 
-    public Profile(String username) {
+    public UserProfile(String username) {
         this.username = username;
     }
 
-    public Profile(String username, String fullName, Date lastSeen) {
+    public UserProfile(String username, String fullName, Date lastSeen) {
         this.username = username;
         this.fullName = fullName;
         this.lastSeen = lastSeen;

@@ -2,7 +2,7 @@ package ru.geekbrains.pocket.backend.service;
 
 import org.bson.types.ObjectId;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import ru.geekbrains.pocket.backend.domain.Profile;
+import ru.geekbrains.pocket.backend.domain.UserProfile;
 import ru.geekbrains.pocket.backend.domain.Role;
 import ru.geekbrains.pocket.backend.domain.User;
 import ru.geekbrains.pocket.backend.resource.UserResource;
@@ -44,7 +44,7 @@ public interface UserService extends UserDetailsService {
 
     public String updateUser(User user);
 
-    public String updateUserProfile(User user, Profile profile);
+    public String updateUserProfile(User user, UserProfile userProfile);
 
     public String updateUserFullName(User user, String firstName);
 
