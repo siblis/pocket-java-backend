@@ -1,9 +1,8 @@
-package ru.geekbrains.pocket.backend.repository;
+package ru.geekbrains.pocket.backend.repository.security;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import ru.geekbrains.pocket.backend.domain.Role;
+import ru.geekbrains.pocket.backend.domain.Security.Role;
 
 import java.util.Optional;
 

@@ -1,4 +1,4 @@
-package ru.geekbrains.pocket.backend.domain;
+package ru.geekbrains.pocket.backend.domain.Security;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;

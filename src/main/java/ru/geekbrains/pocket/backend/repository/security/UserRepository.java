@@ -1,4 +1,4 @@
-package ru.geekbrains.pocket.backend.repository;
+package ru.geekbrains.pocket.backend.repository.security;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;

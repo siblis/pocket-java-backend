@@ -1,11 +1,11 @@
-package ru.geekbrains.pocket.backend.service.impl;
+package ru.geekbrains.pocket.backend.service.security.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.geekbrains.pocket.backend.domain.Role;
+import ru.geekbrains.pocket.backend.domain.Security.Role;
 import ru.geekbrains.pocket.backend.exception.RoleNotFoundException;
-import ru.geekbrains.pocket.backend.repository.RoleRepository;
-import ru.geekbrains.pocket.backend.service.RoleService;
+import ru.geekbrains.pocket.backend.repository.security.RoleRepository;
+import ru.geekbrains.pocket.backend.service.security.RoleService;
 
 import java.util.Optional;
 

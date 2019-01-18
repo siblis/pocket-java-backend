@@ -1,4 +1,4 @@
-package ru.geekbrains.pocket.backend.domain;
+package ru.geekbrains.pocket.backend.domain.Security;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

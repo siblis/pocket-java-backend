@@ -1,4 +1,4 @@
-package ru.geekbrains.pocket.backend.service.impl;
+package ru.geekbrains.pocket.backend.service.security.impl;
 
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -6,18 +6,15 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import ru.geekbrains.pocket.backend.domain.Role;
-import ru.geekbrains.pocket.backend.domain.SystemUser;
-import ru.geekbrains.pocket.backend.domain.User;
+import ru.geekbrains.pocket.backend.domain.Security.Role;
+import ru.geekbrains.pocket.backend.domain.Security.User;
 import ru.geekbrains.pocket.backend.exception.RoleNotFoundException;
 import ru.geekbrains.pocket.backend.exception.UserNotFoundException;
-import ru.geekbrains.pocket.backend.repository.RoleRepository;
-import ru.geekbrains.pocket.backend.repository.UserRepository;
+import ru.geekbrains.pocket.backend.repository.security.RoleRepository;
+import ru.geekbrains.pocket.backend.repository.security.UserRepository;
 import ru.geekbrains.pocket.backend.resource.UserResource;
-import ru.geekbrains.pocket.backend.service.UserService;
+import ru.geekbrains.pocket.backend.service.security.UserService;
 
 import java.util.Arrays;
 import java.util.Collection;
