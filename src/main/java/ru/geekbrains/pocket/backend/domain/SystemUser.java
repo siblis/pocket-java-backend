@@ -4,11 +4,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import ru.geekbrains.pocket.backend.validation.FieldMatch;
-import ru.geekbrains.pocket.backend.validation.ValidEmail;
+import ru.geekbrains.pocket.backend.util.validation.FieldMatch;
+import ru.geekbrains.pocket.backend.util.validation.ValidEmail;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+
+//this class for Spring Security
 
 @Getter
 @Setter

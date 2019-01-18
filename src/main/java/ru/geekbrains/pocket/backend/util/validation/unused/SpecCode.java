@@ -1,4 +1,4 @@
-package ru.geekbrains.pocket.backend.validation.unused;
+package ru.geekbrains.pocket.backend.util.validation.unused;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;

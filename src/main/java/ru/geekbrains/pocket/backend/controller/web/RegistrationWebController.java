@@ -60,11 +60,12 @@ public class RegistrationWebController {
         User user = new User();
         user.setUsername(systemUser.getUsername());
         user.setPassword(passwordEncoder.encode(systemUser.getPassword()));
-        user.setLastname(systemUser.getLastname());
-        user.setFirstname(systemUser.getFirstname());
         user.setEmail(systemUser.getEmail());
 
-        userService.insert(user);
+        user = userService.insert(user);
+        user.getProfile().setUsername(systemUser.getUsername());
+        userService.update(user);
+
         logger.debug("Successfully created user: " + userName);
         return "registration-confirmation";
     }

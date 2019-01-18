@@ -2,7 +2,7 @@ package ru.geekbrains.pocket.backend.service;
 
 import ru.geekbrains.pocket.backend.domain.Role;
 
-import java.util.Collection;
+//this class for Spring Security
 
 public interface RoleService {
     Role getRoleByName(String roleName);

@@ -1,83 +1,79 @@
 package ru.geekbrains.pocket.backend.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.mongodb.lang.Nullable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.CompoundIndex;
-import org.springframework.data.mongodb.core.index.CompoundIndexes;
+import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
-import ru.geekbrains.pocket.backend.validation.ValidEmail;
+import ru.geekbrains.pocket.backend.util.validation.ValidEmail;
 
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
 import java.util.Collection;
+import java.util.Date;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @Document(collection = "users")
-@CompoundIndexes({
-        @CompoundIndex(name = "name_email_idx", def = "{'username': 1, 'email': -1}")
-})
+@TypeAlias("users")
 public class User {
     @Id
-    @Field(value = "id")
     private ObjectId id;
 
-    @Indexed(unique = true)
-    @Field(value = "username")
-    private String username;
-
-    @JsonIgnore
-    @Field(value = "password")
-    private String password;
-
-    @Size(min = 1, max = 50)
-    //@Pattern(regexp = "[^0-9]*")
-    @Field(value = "lastname")
-    private String lastname;
-
-    @Size(min = 1, max = 50)
-    //@Pattern(regexp = "[^0-9]*")
-    @Field(value = "firstname")
-    private String firstname;
-
+    @Nullable
     @NotEmpty
     @ValidEmail
-    @Indexed
-    @Field(value = "email")
+    @Indexed(unique = true)
     private String email;
 
+    @NotEmpty
+    @JsonIgnore
+    private String password;
+
+    private Date created_at;
+
     @DBRef
+    @Field(value = "profile")
+    private Profile profile;// = new Profile();
+
+    @Nullable
+    @Indexed(unique = true)
+    private String username;
+
+    @DBRef
+    @Nullable
     @Field(value = "roles")
     private Collection<Role> roles;
 
-    public User(String username, String password, @NotEmpty String email) {
-        this.username = username;
-        this.password = password;
+    public User(String email, String password, Profile profile) {
         this.email = email;
+        this.username = profile.getUsername();
+        this.password = password;
+        this.created_at = new Date();
+        this.profile = profile;
     }
 
-    public User(String username, String password, String lastname, String firstname, String email) {
+    public User(String email, String username, String password) {
+        this.email = email;
         this.username = username;
         this.password = password;
-        this.lastname = lastname;
-        this.firstname = firstname;
-        this.email = email;
+        this.created_at = new Date();
+        //this.profile = new Profile(username);
     }
 
-    public User(String username, String password, String lastname, String firstname, String email, Collection<Role> roles) {
+    public User(String email, String username, String password, Collection<Role> roles) {
+        this.email = email;
         this.username = username;
         this.password = password;
-        this.lastname = lastname;
-        this.firstname = firstname;
-        this.email = email;
+        this.created_at = new Date();
+        //this.profile = new Profile(username);
         this.roles = roles;
     }
 
@@ -85,10 +81,8 @@ public class User {
     public String toString() {
         return "User{" +
                 "id=" + id +
-                ", username=" + username +
-                ", lastname=" + lastname +
-                ", firstname=" + firstname +
                 ", email=" + email +
+                ", username=" + username +
                 '}';
     }
 }

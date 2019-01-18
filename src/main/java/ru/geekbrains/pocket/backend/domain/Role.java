@@ -7,7 +7,8 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
+
+//this class for Spring Security
 
 @Getter
 @Setter
@@ -15,11 +16,9 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Document(collection = "roles")
 public class Role {
     @Id
-    @Field(value = "id")
     private ObjectId id;
 
     @Indexed(unique = true)
-    @Field(value = "name")
     private String name;
 
     public Role(String name) {

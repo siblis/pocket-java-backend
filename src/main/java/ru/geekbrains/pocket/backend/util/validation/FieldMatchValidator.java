@@ -1,4 +1,4 @@
-package ru.geekbrains.pocket.backend.validation;
+package ru.geekbrains.pocket.backend.util.validation;
 
 import org.springframework.beans.BeanWrapperImpl;
 

@@ -1,6 +1,5 @@
 package ru.geekbrains.pocket.backend;
 
-import javafx.application.Application;
 import org.bson.types.ObjectId;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -81,7 +80,7 @@ public class RegisterRestControllerTest {
         this.roleRepository.deleteAll();
         this.userRepository.deleteAll();
 
-        this.user = userRepository.save(new User("testUnit", "123", "Testev", "TestUnit", "t.@t.ru"));
+        this.user = userRepository.save(new User("t.@t.ru", "testUnit", "123"));
         user.setId(new ObjectId("6eye634erty3463"));
         users.add(user);
 

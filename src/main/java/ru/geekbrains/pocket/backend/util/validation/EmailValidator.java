@@ -1,4 +1,4 @@
-package ru.geekbrains.pocket.backend.validation;
+package ru.geekbrains.pocket.backend.util.validation;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
