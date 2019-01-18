@@ -41,7 +41,7 @@ public class User {
 
     @DBRef
     @Field(value = "profile")
-    private Profile profile;// = new Profile();
+    private UserProfile profile;// = new UserProfile();
 
     @Nullable
     @Indexed(unique = true)
@@ -52,12 +52,12 @@ public class User {
     @Field(value = "roles")
     private Collection<Role> roles;
 
-    public User(String email, String password, Profile profile) {
+    public User(String email, String password, UserProfile userProfile) {
         this.email = email;
-        this.username = profile.getUsername();
+        this.username = userProfile.getUsername();
         this.password = password;
         this.created_at = new Date();
-        this.profile = profile;
+        this.profile = userProfile;
     }
 
     public User(String email, String username, String password) {
@@ -65,7 +65,7 @@ public class User {
         this.username = username;
         this.password = password;
         this.created_at = new Date();
-        //this.profile = new Profile(username);
+        //this.profile = new UserProfile(username);
     }
 
     public User(String email, String username, String password, Collection<Role> roles) {
@@ -73,7 +73,7 @@ public class User {
         this.username = username;
         this.password = password;
         this.created_at = new Date();
-        //this.profile = new Profile(username);
+        //this.profile = new UserProfile(username);
         this.roles = roles;
     }
 

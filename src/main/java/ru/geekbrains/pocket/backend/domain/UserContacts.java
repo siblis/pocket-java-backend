@@ -20,7 +20,7 @@ public class UserContacts {
     private ObjectId id;
 
     @Indexed
-    @Field(value = "<users:_id>")
+    @Field(value = "user_id")
     private User userId;
 
     private User contact;

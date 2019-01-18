@@ -7,7 +7,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import ru.geekbrains.pocket.backend.domain.Profile;
+import ru.geekbrains.pocket.backend.domain.UserProfile;
 import ru.geekbrains.pocket.backend.domain.Role;
 import ru.geekbrains.pocket.backend.domain.User;
 import ru.geekbrains.pocket.backend.exception.RoleNotFoundException;
@@ -113,7 +113,7 @@ public class UserServiceImpl implements UserService {
         randomUser.setEmail(RandomStringUtil.randomString(10));
         randomUser.setPassword(RandomStringUtil.randomString(10));
         randomUser.setCreated_at(new Date());
-        randomUser.setProfile(new Profile(RandomStringUtil.randomString(5), RandomStringUtil.randomString(5), new Date()));
+        randomUser.setProfile(new UserProfile(RandomStringUtil.randomString(5), RandomStringUtil.randomString(5), new Date()));
         return userRepository.save(randomUser).getId().toString();
     }
 
@@ -154,10 +154,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String updateUserProfile(User user, Profile profile) {
+    public String updateUserProfile(User user, UserProfile userProfile) {
         User updatingUser = userRepository.findByEmailMatches(user.getEmail()).get();
         if (updatingUser != null) {
-            updatingUser.setProfile(profile);
+            updatingUser.setProfile(userProfile);
             return userRepository.save(updatingUser).getId().toString();
 
         } else return "user not found";
@@ -167,7 +167,7 @@ public class UserServiceImpl implements UserService {
     public String updateUserFullName(User user, String fullName) {
         User updatingUser = userRepository.findByEmailMatches(user.getEmail()).get();
         if (updatingUser != null) {
-            Profile thisUserProfile = updatingUser.getProfile();
+            UserProfile thisUserProfile = updatingUser.getProfile();
             thisUserProfile.setFullName(fullName);
             updatingUser.setProfile(thisUserProfile);
             return userRepository.save(updatingUser).getId().toString();
@@ -179,7 +179,7 @@ public class UserServiceImpl implements UserService {
     public String updateUserUsername(User user, String username) {
         User updatingUser = userRepository.findByEmailMatches(user.getEmail()).get();
         if (updatingUser != null) {
-            Profile thisUserProfile = updatingUser.getProfile();
+            UserProfile thisUserProfile = updatingUser.getProfile();
             thisUserProfile.setUsername(username);
             updatingUser.setProfile(thisUserProfile);
             return userRepository.save(updatingUser).getId().toString();
@@ -192,7 +192,7 @@ public class UserServiceImpl implements UserService {
     public String updateUsersLastSeen(User user, Date date) {
         User updatingUser = userRepository.findByEmailMatches(user.getEmail()).get();
         if (updatingUser != null) {
-            Profile thisUserProfile = updatingUser.getProfile();
+            UserProfile thisUserProfile = updatingUser.getProfile();
             thisUserProfile.setLastSeen(date);
             updatingUser.setProfile(thisUserProfile);
             return userRepository.save(updatingUser).getId().toString();
