@@ -1,4 +1,4 @@
-package ru.geekbrains.pocket.backend.controller.websocket;
+package ru.geekbrains.pocket.backend.config;
 
 import java.util.Map;
 
@@ -12,6 +12,8 @@ import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
+
+//for class WebSocketConfig
 
 @Component
 public class HttpHandshakeInterceptor implements HandshakeInterceptor {

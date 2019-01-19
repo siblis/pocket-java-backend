@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
 import ru.geekbrains.pocket.backend.service.UserService;
 
 @Configuration
@@ -36,7 +37,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
+        http
+                // See https://jira.springsource.org/browse/SPR-11496
+//                .headers().addHeaderWriter(
+//                    new XFrameOptionsHeaderWriter(
+//                            XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN))
+//                    .and()
+                .authorizeRequests()
                 .antMatchers("/register/**").permitAll()
                 .antMatchers("/**").permitAll()
                 //.antMatchers("/**").hasAnyRole("ADMIN", "USER")
