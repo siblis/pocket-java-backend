@@ -1,7 +1,9 @@
 package ru.geekbrains.pocket.backend.controller.rest;
 
 import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.ResourceSupport;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 import ru.geekbrains.pocket.backend.response.GreetingResponse;
 
@@ -15,6 +17,13 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 class RootRestController {
     private static final String template = "Hello, %s!";
     private final AtomicLong counter = new AtomicLong();
+
+    private SimpMessagingTemplate simpMessagingTemplate;
+
+    @Autowired
+    public RootRestController(SimpMessagingTemplate simpMessagingTemplate) {
+        this.simpMessagingTemplate = simpMessagingTemplate;
+    }
 
     @GetMapping
     ResourceSupport index() {
@@ -41,6 +50,11 @@ class RootRestController {
     @GetMapping("/greeting")
     public GreetingResponse greeting(@RequestParam(required = false, defaultValue = "World") String name) {
         System.out.println("==== in greeting ====");
+
+        //send message Websocket
+        this.simpMessagingTemplate.convertAndSend("/topic/greetings", String.format(template, name));
+
+        //send rest JSON
         return new GreetingResponse(counter.incrementAndGet(), String.format(template, name));
     }
 

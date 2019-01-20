@@ -7,9 +7,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import ru.geekbrains.pocket.backend.domain.UserProfile;
 import ru.geekbrains.pocket.backend.domain.Role;
 import ru.geekbrains.pocket.backend.domain.User;
+import ru.geekbrains.pocket.backend.domain.UserProfile;
 import ru.geekbrains.pocket.backend.exception.RoleNotFoundException;
 import ru.geekbrains.pocket.backend.exception.UserNotFoundException;
 import ru.geekbrains.pocket.backend.repository.RoleRepository;
@@ -77,6 +77,9 @@ public class UserServiceImpl implements UserService {
     public User insert(User user) throws RuntimeException {
         Optional<Role> role = Optional.of(roleRepository.findByName("ROLE_USER").orElseThrow(
                 () -> new RoleNotFoundException("Role with name = 'ROLE_USER' not found")));
+        User user1 = new User();
+        user1.setProfile(new UserProfile("ddd"));
+        userRepository.insert(user1);
 
         user.setRoles(Arrays.asList(role.get()));
         return userRepository.insert(user);

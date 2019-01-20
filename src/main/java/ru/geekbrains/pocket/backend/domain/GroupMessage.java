@@ -10,7 +10,7 @@ import java.util.Date;
 
 @Data
 @Document(collection = "groups.messages")
-public class GroupMessages {
+public class GroupMessage {
 
     @Id
     ObjectId id;

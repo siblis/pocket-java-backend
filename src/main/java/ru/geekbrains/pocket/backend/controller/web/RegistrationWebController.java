@@ -36,6 +36,12 @@ public class RegistrationWebController {
         dataBinder.registerCustomEditor(String.class, stringTrimmerEditor);
     }
 
+    @GetMapping
+    public String showLoginPage(Model model) {
+        model.addAttribute("systemUser", new SystemUser());
+        return "registration-form";
+    }
+
     @GetMapping("/showRegistrationForm")
     public String showMyLoginPage(Model model) {
         model.addAttribute("systemUser", new SystemUser());
