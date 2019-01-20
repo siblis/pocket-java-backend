@@ -48,7 +48,7 @@ public class User {
     private String username;
 
     @DBRef
-    @Nullable
+    //@Nullable
     @Field(value = "roles")
     private Collection<Role> roles;
 

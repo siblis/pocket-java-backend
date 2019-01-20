@@ -12,18 +12,16 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @Document(collection = "users.messages")
-public class Message {
+public class UserMessage {
 
     @Id
-    ObjectId _id;
+    ObjectId id;
 
     @Indexed
     User sender; //отправитель
 
     @Indexed
     User recepient; //получатель
-
-    Group group;
 
     String text;
 
@@ -33,9 +31,10 @@ public class Message {
 
     Date send_at;
 
-    public Message(User sender, User recepient, String text) {
+    public UserMessage(User sender, User recepient, String text) {
         this.sender = sender;
         this.recepient = recepient;
         this.text = text;
     }
+
 }

@@ -18,6 +18,7 @@ public class UserChat {
 
     @Nullable
     Group group = null;
+
     @Indexed
     @Field(value = "user_id")
     private User userId;

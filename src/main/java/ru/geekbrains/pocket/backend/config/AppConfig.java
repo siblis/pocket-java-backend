@@ -16,11 +16,14 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.resource.PathResourceResolver;
+import org.springframework.web.servlet.resource.WebJarsResourceResolver;
 
 @Configuration
 @EnableCaching
 @EnableMongoRepositories(basePackages = {"ru.geekbrains.pocket.backend.repository"})
 public class AppConfig extends WebMvcAutoConfiguration {
+//public class AppConfig implements WebMvcConfigurer { //extends WebMvcAutoConfiguration
 
     @Bean
     public MongoTemplate mongoTemplate(MongoDbFactory mongoDbFactory, MongoMappingContext context) {
@@ -51,6 +54,19 @@ public class AppConfig extends WebMvcAutoConfiguration {
                         .allowedHeaders("*")
 //                        .exposedHeaders("*")
                         .allowCredentials(true).maxAge(3600);
+//                registry.addMapping("/web/**")
+//                        .allowedOrigins("http://localhost:9000")
+//                        .allowedMethods("*")
+//                        .allowedHeaders("*");
+//                registry.addMapping("/test/**")
+//                        .allowedOrigins("http://localhost:9000")
+//                        .allowedMethods("*")
+//                        .allowedHeaders("*");
+//                registry.addMapping("/ws/**")
+//                        .allowedOrigins("http://localhost:9000")
+//                        .allowedMethods("*")
+//                        .allowedHeaders("*");
+
 //                registry.addMapping("/api/users/**")
 //                        .allowedOrigins("http://localhost:9000")
 //                        .allowedMethods("PUT", "DELETE")
@@ -75,12 +91,21 @@ public class AppConfig extends WebMvcAutoConfiguration {
 //        return new CorsFilter(source);
 //    }
 
+    //@Override
     public void addResourceHandler(ResourceHandlerRegistry registry) {
         if (!registry.hasMappingForPattern("/webjars/**")) {
             registry.addResourceHandler("/webjars/**")
-                    .addResourceLocations("classpath:/META-INF/resources/webjars/");
+                    .addResourceLocations("/webjars/")
+                    .resourceChain(false)
+                    .addResolver(new WebJarsResourceResolver())
+                    .addResolver(new PathResourceResolver());
         }
     }
+
+//    @Override
+//    public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
+//        configurer.enable();
+//    }
 
     //http://spring-projects.ru/guides/caching/
     //https://docs.spring.io/spring/docs/current/spring-framework-reference/integration.html#cache

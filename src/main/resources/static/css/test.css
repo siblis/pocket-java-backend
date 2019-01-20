@@ -9,10 +9,6 @@ html, body {
     overflow: hidden;
 }
 
-#login-page {
-    text-align: center;
-}
-
 .nickname  {
     color:blue;margin-right:20px;
 }
@@ -45,16 +41,24 @@ html, body {
 }
 
 
-#chat-container {
+#test-container {
     position: relative;
     height: 100%;
 }
 
-#chat-container #messageForm {
+#test-container #messageForm {
     padding: 20px;
 }
 
-#chat-container {
+#test-container #inputForm {
+    padding: 20px;
+}
+
+#test-container #inputForm2 {
+    padding: 20px;
+}
+
+#test-container {
     border: 2px solid #d5dbdb;
     background-color:  #d5dbdb ;
     max-width: 500px;
@@ -68,48 +72,55 @@ html, body {
 
 }
 
-#chat-container ul {
+#test-container ul {
     list-style-type: none;
     background-color: #fff;
     margin: 0;
     overflow: auto;
     overflow-y: scroll;
     padding: 0 20px 0px 20px;
-    height: calc(100% - 150px);
+    height: calc(90% - 120px);
 }
 
-#chat-container #messageForm {
-    padding: 20px;
-}
 
-#chat-container ul li {
+#test-container ul li {
     line-height: 1.5rem;
     padding: 10px 20px;
     margin: 0;
     border-bottom: 1px solid #f4f4f4;
 }
 
-#chat-container ul li p {
+#test-container ul li p {
     margin: 0;
 }
 
-#chat-container .event-message {
+#test-container .event-message {
     width: 100%;
     text-align: center;
     clear: both;
 }
 
-#chat-container .event-message p {
+#test-container .event-message p {
     color: #777;
     font-size: 14px;
     word-wrap: break-word;
 }
 
-#chat-container .chat-message {
+#test-container .test-message {
     position: relative;
 }
 
 #messageForm .input-message  {
+    float: left;
+    width: calc(100% - 85px);
+}
+
+#inputForm .input-message  {
+    float: left;
+    width: calc(100% - 85px);
+}
+
+#inputForm2 .input-message  {
     float: left;
     width: calc(100% - 85px);
 }

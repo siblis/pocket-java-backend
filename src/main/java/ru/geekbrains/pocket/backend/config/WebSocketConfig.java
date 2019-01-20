@@ -2,25 +2,19 @@ package ru.geekbrains.pocket.backend.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.messaging.Message;
-import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
-import org.springframework.messaging.simp.stomp.StompCommand;
-import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
-import org.springframework.messaging.support.ChannelInterceptor;
-import org.springframework.messaging.support.MessageHeaderAccessor;
-import org.springframework.security.core.Authentication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
-import org.springframework.web.socket.config.annotation.WebSocketTransportRegistration;
 import ru.geekbrains.pocket.backend.controller.websocket.MyChannelInterceptor;
 
 //https://o7planning.org/ru/10719/create-a-simple-chat-application-with-spring-boot-and-websocket
 //https://docs.spring.io/spring/docs/current/spring-framework-reference/web.html#websocket-server
 
 @Configuration
+@EnableScheduling
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
@@ -44,7 +38,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(new MyChannelInterceptor());
+        registration.interceptors(new MyChannelInterceptor()); //перехват всех сообщений
     }
 
     //Token Authentication
@@ -52,7 +46,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 //    public void configureClientInboundChannel(ChannelRegistration registration) {
 //        registration.interceptors(new ChannelInterceptor() {
 //            @Override
-//            public Message<?> preSend(Message<?> message, MessageChannel channel) {
+//            public UserMessage<?> preSend(UserMessage<?> message, MessageChannel channel) {
 //                StompHeaderAccessor accessor =
 //                        MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
 //                if (StompCommand.CONNECT.equals(accessor.getCommand())) {

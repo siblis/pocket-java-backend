@@ -7,7 +7,7 @@ import lombok.ToString;
 import org.springframework.data.annotation.TypeAlias;
 import org.springframework.messaging.handler.annotation.Payload;
 
-//this class for class Message.attachment
+//this class for class UserMessage.attachment
 
 @Getter
 @Setter

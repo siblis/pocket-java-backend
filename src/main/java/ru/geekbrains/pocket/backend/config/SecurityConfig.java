@@ -38,32 +38,37 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                // See https://jira.springsource.org/browse/SPR-11496
-//                .headers().addHeaderWriter(
-//                    new XFrameOptionsHeaderWriter(
-//                            XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN))
-//                    .and()
+                //See https://jira.springsource.org/browse/SPR-11496
+                .headers().addHeaderWriter(
+                new XFrameOptionsHeaderWriter(
+                        XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN))
+                .and()
                 .authorizeRequests()
                 .antMatchers("/register/**").permitAll()
-                .antMatchers("/**").permitAll()
+                .antMatchers("/test/**").permitAll()
                 //.antMatchers("/**").hasAnyRole("ADMIN", "USER")
                 .antMatchers("/web/**").hasAnyRole("ADMIN", "USER")
                 //.antMatchers("/api/**").hasAnyRole("ADMIN", "USER")
                 .antMatchers("/api/**").permitAll()
                 .antMatchers("/admin/**").hasRole("ADMIN")
-                //.anyRequest().authenticated()
-                .anyRequest().permitAll()
+                .antMatchers("/**").permitAll()
+                .anyRequest().authenticated()
+                //.anyRequest().permitAll()
                 .and()
                 .formLogin()
-                .loginPage("/web/login")
+                .defaultSuccessUrl("/")
+                .loginPage("/login")
+                .failureUrl("/login?error")
                 .loginProcessingUrl("/authenticateTheUser")
                 .successHandler(customAuthenticationSuccessHandler)
                 .permitAll()
                 .and()
                 .logout()
+                .logoutSuccessUrl("/login?logout")
+                .logoutUrl("/logout")
                 .permitAll()
                 .and()
-                .exceptionHandling().accessDeniedPage("/web/accessDenied");
+                .exceptionHandling().accessDeniedPage("/accessDenied");
     }
 
     @Bean
