@@ -9,27 +9,24 @@ import java.util.List;
 
 public interface GroupService {
 
-    public String createNewGroup(Group group);
+    Group createGroup(Group group);
 
-    public String deleteGroup(Group group);
+    void deleteGroup(Group group);
 
-    public Group getGroupByID(ObjectId id);
+    Group getGroup(ObjectId id);
 
-    public List<Group> getGroupByName(String name);
+    List<Group> getGroups(User creator);
 
-    public List<Group> getOpenedGroups();
+    List<Group> getGroups(String name);
 
-    public List<Group> getClosedGroups();
+    List<Group> getOpenedGroups();
 
-    public String updateGroupCreator(Group group, User newCreator);
+    List<Group> getClosedGroups();
 
-    public String updateGroupToBeloningForProject(Group group, Project project);
+    String setGroupToClose();
 
-    public String updateGroupName(Group group,String newName);
+    String setGroupToOpen();
 
-    public String updateGroupDescription(Group group, String newDescription);
+    Group updateGroup(Group group);
 
-    public String setGroupToClose();
-
-    public String setGroupToOpen();
 }

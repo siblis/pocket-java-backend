@@ -1,5 +1,6 @@
 package ru.geekbrains.pocket.backend.service;
 
+import org.bson.types.ObjectId;
 import ru.geekbrains.pocket.backend.domain.User;
 import ru.geekbrains.pocket.backend.domain.UserMessage;
 
@@ -7,16 +8,24 @@ import java.util.List;
 
 public interface UserMessageService {
 
-    UserMessage saveNewMessage(String text, User sender, User recepient);
+    UserMessage createMessage(UserMessage userMessage);
 
-    String sendMessageFromTo(User sender, User recepient, String message);
+    UserMessage createMessage(User sender, User recepient, String text);
 
-    List<UserMessage> getAllMessagesFromUser(User user);
+    void deleteMessage(UserMessage userMessage);
 
-    List<UserMessage> getAllMessagesToUser(User user);
+    UserMessage getMessage(ObjectId id);
 
-    List<UserMessage> getAllUnreadMessagesFromUser(User user);
+    List<UserMessage> getMessagesBySender(User sender);
 
-    List<UserMessage> getAllUnreadMessagesToUser(User user);
+    List<UserMessage> getMessagesByRecepient(User recepient);
+
+    List<UserMessage> getUnreadMessagesFromUser(User sender);
+
+    List<UserMessage> getUnreadMessagesToUser(User recepient);
+
+    UserMessage sendMessageFromTo(User sender, User recepient, String message);
+
+    UserMessage updateMessage(UserMessage userMessage);
 
 }

@@ -9,15 +9,14 @@ import ru.geekbrains.pocket.backend.domain.UserMessage;
 import java.util.List;
 
 @Repository
-public interface MessageRepository extends MongoRepository<UserMessage, ObjectId> {
+public interface UserMessageRepository extends MongoRepository<UserMessage, ObjectId> {
 
-    List<UserMessage> findAllByRecepient(User recepient);
+    List<UserMessage> findBySender(User sender);
 
-    List<UserMessage> findAllBySender(User recepient);
+    List<UserMessage> findByRecepient(User recepient);
 
-    List<UserMessage> findAllBySenderAndReadFalse(User recepient);
+    List<UserMessage> findBySenderAndReadFalse(User recepient);
 
-    List<UserMessage> findAllByRecepientAndReadFalse(User recepient);
-
+    List<UserMessage> findByRecepientAndReadFalse(User recepient);
 
 }
