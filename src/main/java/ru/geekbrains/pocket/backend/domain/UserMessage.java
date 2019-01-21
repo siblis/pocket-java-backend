@@ -1,35 +1,44 @@
 package ru.geekbrains.pocket.backend.domain;
 
-import lombok.Data;
+import com.mongodb.lang.Nullable;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @Document(collection = "users.messages")
 public class UserMessage {
 
     @Id
-    ObjectId id;
+    private ObjectId id;
 
     @Indexed
-    User sender; //отправитель
+    @NotNull
+    private User sender; //отправитель
 
     @Indexed
-    User recepient; //получатель
+    @NotNull
+    private User recepient; //получатель
 
-    String text;
+    @NotEmpty
+    private String text;
 
-    Attachment attachment = null;
+    @Nullable
+    private Attachment attachment = null;
 
-    boolean read;
+    private boolean read;
 
-    Date send_at;
+    private Date sent_at;
 
     public UserMessage(User sender, User recepient, String text) {
         this.sender = sender;
@@ -37,4 +46,14 @@ public class UserMessage {
         this.text = text;
     }
 
+    @Override
+    public String toString() {
+        return "UserMessage{" +
+                "id=" + id +
+                ", sender=" + sender.getUsername() +
+                ", recepient=" + recepient.getUsername() +
+                ", text=" + text +
+                ", sent_at=" + sent_at +
+                '}';
+    }
 }

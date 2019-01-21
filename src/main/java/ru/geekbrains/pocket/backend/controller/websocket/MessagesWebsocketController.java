@@ -128,7 +128,7 @@ public class MessagesWebsocketController implements ApplicationListener<BrokerAv
             } else if (!message.getRecipicent().equals("")) {
                 User recepient = userService.findUserByID(new ObjectId(message.getRecipicent()));
                 if (recepient != null) {
-                    UserMessage userMessage = userMessageService.saveNewMessage(message.getText(), sender, recepient);
+                    UserMessage userMessage = userMessageService.createMessage(sender, recepient, message.getText());
                     messageId = userMessage.getId().toString();
 
                     //TODO отправить сообщение получателю
