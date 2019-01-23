@@ -28,7 +28,7 @@ public class UserMessage {
 
     @Indexed
     @NotNull
-    private User recepient; //получатель
+    private User recipient; //получатель
 
     @NotEmpty
     private String text;
@@ -40,9 +40,9 @@ public class UserMessage {
 
     private Date sent_at;
 
-    public UserMessage(User sender, User recepient, String text) {
+    public UserMessage(User sender, User recipient, String text) {
         this.sender = sender;
-        this.recepient = recepient;
+        this.recipient = recipient;
         this.text = text;
     }
 
@@ -51,7 +51,7 @@ public class UserMessage {
         return "UserMessage{" +
                 "id=" + id +
                 ", sender=" + sender.getUsername() +
-                ", recepient=" + recepient.getUsername() +
+                ", recipient=" + recipient.getUsername() +
                 ", text=" + text +
                 ", sent_at=" + sent_at +
                 '}';

@@ -31,7 +31,7 @@ public interface UserRepository extends MongoRepository<User, ObjectId> {
 
     Optional<User> findByEmailMatches(String email);
 
-    User findByProfile_Username(String _Username);
+    User findByProfileUsername(String Username);
 
 }
 

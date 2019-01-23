@@ -13,10 +13,10 @@ public interface UserMessageRepository extends MongoRepository<UserMessage, Obje
 
     List<UserMessage> findBySender(User sender);
 
-    List<UserMessage> findByRecepient(User recepient);
+    List<UserMessage> findByRecipient(User recipient);
 
-    List<UserMessage> findBySenderAndReadFalse(User recepient);
+    List<UserMessage> findBySenderAndReadFalse(User recipient);
 
-    List<UserMessage> findByRecepientAndReadFalse(User recepient);
+    List<UserMessage> findByRecipientAndReadFalse(User recipient);
 
 }
