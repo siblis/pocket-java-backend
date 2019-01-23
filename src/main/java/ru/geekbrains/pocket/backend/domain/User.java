@@ -1,7 +1,6 @@
 package ru.geekbrains.pocket.backend.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.mongodb.lang.Nullable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -36,6 +35,7 @@ public class User {
 
     @NotEmpty
     @JsonIgnore
+    //@Pattern()
     private String password;
 
     private Date created_at;
@@ -50,6 +50,7 @@ public class User {
 
     @DBRef
     //@NotNull
+    @JsonIgnore
     @Field(value = "roles")
     private Collection<Role> roles;
 

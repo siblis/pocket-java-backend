@@ -23,10 +23,14 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
-    @Autowired
     private UserRepository userRepository;
-    @Autowired
     private RoleRepository roleRepository;
+
+    @Autowired
+    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository) {
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+    }
 
     @Override
     public void delete(ObjectId id) {
@@ -59,8 +63,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserByUsername(String username) {
-        //Optional<User> user1 = userRepository.findByUsername(username);
-        User user2 = userRepository.findFirstByUsername(username);
+        //User user2 = userRepository.findFirstByUsername(username);
         Optional<User> user = Optional.of(userRepository.findByUsername(username).orElseThrow(
                 () -> new UserNotFoundException("User with username = '" + username + "' not found")));
         return user.get();
@@ -128,11 +131,11 @@ public class UserServiceImpl implements UserService {
     }
 
     public User getTestUser1() {
-        return userRepository.findByProfile_Username("tester1");
+        return userRepository.findByProfileUsername("tester1");
     }
 
     public User getTestUser2() {
-        return userRepository.findByProfile_Username("tester2");
+        return userRepository.findByProfileUsername("tester2");
     }
 
     public User findUserByID(ObjectId id) {
@@ -145,7 +148,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findUsersByUsername(String username) {
-        return userRepository.findByProfile_Username(username);
+        return userRepository.findByProfileUsername(username);
     }
 
     @Override

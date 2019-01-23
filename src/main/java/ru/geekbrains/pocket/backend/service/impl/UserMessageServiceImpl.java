@@ -25,8 +25,8 @@ public class UserMessageServiceImpl implements UserMessageService {
         return repository.insert(message);
     }
 
-    public UserMessage createMessage(User sender, User recepient, String text) {
-        UserMessage messageNew = new UserMessage(sender, recepient, text);
+    public UserMessage createMessage(User sender, User recipient, String text) {
+        UserMessage messageNew = new UserMessage(sender, recipient, text);
         messageNew.setSent_at(new Date());
         messageNew.setRead(false);
         return repository.insert(messageNew);
@@ -50,8 +50,8 @@ public class UserMessageServiceImpl implements UserMessageService {
     }
 
     @Override
-    public List<UserMessage> getMessagesByRecepient(User recepient) {
-        return repository.findByRecepient(recepient);
+    public List<UserMessage> getMessagesByRecipient(User recipient) {
+        return repository.findByRecipient(recipient);
     }
 
     @Override
@@ -60,12 +60,12 @@ public class UserMessageServiceImpl implements UserMessageService {
     }
 
     @Override
-    public List<UserMessage> getUnreadMessagesToUser(User recepient) {
-        return repository.findByRecepientAndReadFalse(recepient);
+    public List<UserMessage> getUnreadMessagesToUser(User recipient) {
+        return repository.findByRecipientAndReadFalse(recipient);
     }
 
-    public UserMessage sendMessageFromTo(User sender, User recepient, String message) {
-        UserMessage messageNew = new UserMessage(sender, recepient, message);
+    public UserMessage sendMessageFromTo(User sender, User recipient, String message) {
+        UserMessage messageNew = new UserMessage(sender, recipient, message);
         messageNew.setSent_at(new Date());
         messageNew.setRead(false);
         return repository.save(messageNew);

@@ -2,9 +2,9 @@ package ru.geekbrains.pocket.backend.service;
 
 import org.bson.types.ObjectId;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import ru.geekbrains.pocket.backend.domain.UserProfile;
 import ru.geekbrains.pocket.backend.domain.Role;
 import ru.geekbrains.pocket.backend.domain.User;
+import ru.geekbrains.pocket.backend.domain.UserProfile;
 import ru.geekbrains.pocket.backend.resource.UserResource;
 
 import java.util.Date;

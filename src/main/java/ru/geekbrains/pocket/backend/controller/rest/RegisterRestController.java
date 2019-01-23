@@ -1,8 +1,6 @@
 package ru.geekbrains.pocket.backend.controller.rest;
 
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
 import org.springframework.http.HttpHeaders;
@@ -10,7 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import ru.geekbrains.pocket.backend.controller.web.RegistrationWebController;
 import ru.geekbrains.pocket.backend.domain.SystemUser;
 import ru.geekbrains.pocket.backend.domain.User;
 import ru.geekbrains.pocket.backend.resource.UserResource;
@@ -22,7 +19,6 @@ import java.net.URI;
 @RequestMapping("/api")
 @Slf4j
 public class RegisterRestController {
-    private final Logger logger = LoggerFactory.getLogger(RegistrationWebController.class);
     private UserService userService;
 
     @Autowired
@@ -42,10 +38,10 @@ public class RegisterRestController {
     @PostMapping("/register/")
     public ResponseEntity<?> processRegistrationForm(@RequestBody SystemUser systemUser) {
         String userName = systemUser.getUsername();
-        logger.debug("Processing registration form for: " + userName);
+        log.debug("Processing registration form for: " + userName);
         User existing = userService.getUserByUsername(userName);
         if (existing != null) {
-            logger.debug("User name already exists.");
+            log.debug("User name already exists.");
         }
 
         User user = new User();
@@ -57,7 +53,7 @@ public class RegisterRestController {
         user.getProfile().setUsername(systemUser.getUsername());
         userService.update(user);
 
-        logger.debug("Successfully created user: " + userName);
+        log.debug("Successfully created user: " + userName);
 
         HttpHeaders httpHeaders = new HttpHeaders();
 

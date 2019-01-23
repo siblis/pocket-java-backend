@@ -37,17 +37,17 @@ public class MessagesWebsocketController implements ApplicationListener<BrokerAv
 
     private AtomicBoolean brokerAvailable = new AtomicBoolean(); //доступность брокера
 
-    @Autowired
-    private UserService userService;
-
     private SimpMessagingTemplate simpMessagingTemplate;
     private UserMessageService userMessageService;
+    private UserService userService;
 
     @Autowired
     public MessagesWebsocketController(SimpMessagingTemplate simpMessagingTemplate,
-                                       UserMessageService userMessageService) {
+                                       UserMessageService userMessageService,
+                                       UserService userService) {
         this.simpMessagingTemplate = simpMessagingTemplate;
         this.userMessageService = userMessageService;
+        this.userService = userService;
     }
 
     @Override
@@ -65,12 +65,13 @@ public class MessagesWebsocketController implements ApplicationListener<BrokerAv
     }
 
     @SubscribeMapping("/testsubscribe")
-    @SendTo("/topic/testsubscribe")
-    public TestMessage testSubscribe(@Payload TestMessage testMessage) { //Principal principal,
+    //@SendTo("/topic/testsubscribe")
+    public TestMessage testSubscribe(Principal principal, @Payload TestMessage testMessage) {
         log.debug("testSubscribe: " + testMessage.getUsername());
-        System.out.println("testSubscribe: " + testMessage.getUsername() + ", " + testMessage);
-        return new TestMessage(testMessage.getUsername(),
-                testMessage.getEmail(), "testSubscribe: " + testMessage.getText());
+        System.out.println("testSubscribe: " + testMessage.getUsername() + ", " + testMessage + ", " + principal);
+//        return new TestMessage(testMessage.getUsername(),
+//                testMessage.getEmail(), "testSubscribe: " + testMessage.getText());
+        return new TestMessage("Bob", "b@b.com", "message from bob");
     }
 
     //@Scheduled(fixedDelay=7000)
@@ -116,28 +117,28 @@ public class MessagesWebsocketController implements ApplicationListener<BrokerAv
     @MessageMapping("/send") //Отправить новое сообщение
     @SendToUser("/topic/send") //Событие "Новое сообщение"
     public String clientSendMessage(Principal principal, @Payload ClientSendMessage message) {
-        if (message.getText().equals("") || message.getGroup().equals("")) {
+        String response = "Error";
+        if (message == null || message.getText() == null || message.getText().equals("")) {
             //TODO проверка на ошибки
-            return "Error";
         } else {
-            String messageId = "Error";
             User sender = userService.getUserByUsername(principal.getName());
-            if (!message.getGroup().equals("")) {
+            if (message.getGroup() != null && !message.getGroup().equals("")) {
                 //TODO запись сообщения для группы в бд
                 //TODO отправить сообщение группе
-            } else if (!message.getRecipicent().equals("")) {
-                User recepient = userService.findUserByID(new ObjectId(message.getRecipicent()));
-                if (recepient != null) {
-                    UserMessage userMessage = userMessageService.createMessage(sender, recepient, message.getText());
-                    messageId = userMessage.getId().toString();
+                response = "messageId";
+            } else if (message.getRecipient() != null && !message.getRecipient().equals("")) {
+                User recipient = userService.getUserById(new ObjectId(message.getRecipient()));
+                if (recipient != null) {
+                    UserMessage userMessage = userMessageService.createMessage(sender, recipient, message.getText());
+                    response = userMessage.getId().toString();
 
                     //TODO отправить сообщение получателю
                     //send message Websocket
                     this.simpMessagingTemplate.convertAndSend("/queue/new", message.getText());
                 }
             }
-            return messageId;
         }
+        return response;
     }
 
     @MessageMapping("/read") //Прочитал сообщение
@@ -164,7 +165,7 @@ public class MessagesWebsocketController implements ApplicationListener<BrokerAv
     @NoArgsConstructor
     @AllArgsConstructor
     @ToString
-    private static class TestMessage {
+    public static class TestMessage {
         private String username;
         private String email;
         private String text;
@@ -174,10 +175,10 @@ public class MessagesWebsocketController implements ApplicationListener<BrokerAv
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
-    private static class ClientSendMessage {
+    public static class ClientSendMessage {
         private String text;
         private String group;
-        private String recipicent;
+        private String recipient;
     }
 
     @Getter

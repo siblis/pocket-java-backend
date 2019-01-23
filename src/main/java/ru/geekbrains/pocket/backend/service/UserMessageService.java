@@ -10,7 +10,7 @@ public interface UserMessageService {
 
     UserMessage createMessage(UserMessage userMessage);
 
-    UserMessage createMessage(User sender, User recepient, String text);
+    UserMessage createMessage(User sender, User recipient, String text);
 
     void deleteMessage(UserMessage userMessage);
 
@@ -18,13 +18,13 @@ public interface UserMessageService {
 
     List<UserMessage> getMessagesBySender(User sender);
 
-    List<UserMessage> getMessagesByRecepient(User recepient);
+    List<UserMessage> getMessagesByRecipient(User recipient);
 
     List<UserMessage> getUnreadMessagesFromUser(User sender);
 
-    List<UserMessage> getUnreadMessagesToUser(User recepient);
+    List<UserMessage> getUnreadMessagesToUser(User recipient);
 
-    UserMessage sendMessageFromTo(User sender, User recepient, String message);
+    UserMessage sendMessageFromTo(User sender, User recipient, String message);
 
     UserMessage updateMessage(UserMessage userMessage);
 

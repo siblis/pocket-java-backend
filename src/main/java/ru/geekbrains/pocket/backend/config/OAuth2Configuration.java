@@ -1,15 +1,8 @@
 package ru.geekbrains.pocket.backend.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
-import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
-import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 
 //Авторизация и аутентификация клиента в Open Web с использование Spring Security OAuth
@@ -29,7 +22,7 @@ class OAuth2Configuration extends AuthorizationServerConfigurerAdapter {
 
     // This is required for password grants, which we specify below as one of the
     // {@literal authorizedGrantTypes()}.
-    @Autowired
+    //@Autowired
     AuthenticationManagerBuilder authenticationManager;
 
     @Override
