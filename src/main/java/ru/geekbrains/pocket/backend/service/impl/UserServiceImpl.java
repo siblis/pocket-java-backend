@@ -6,6 +6,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.geekbrains.pocket.backend.domain.db.Role;
 import ru.geekbrains.pocket.backend.domain.db.User;
@@ -61,9 +62,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserById(ObjectId id) {
-        Optional<User> user = Optional.of(userRepository.findById(id).orElseThrow(
-                () -> new UserNotFoundException("User with id = " + id + " not found")));
-        return user.get();
+        User user = userRepository.findById(id).orElseThrow(
+                () -> new UserNotFoundException("User with id = " + id + " not found"));
+        return user;
+    }
+
+    @Override
+    public User getUserByEmail(String email) {
+        User user = Optional.of(userRepository.findByEmail(email)).orElseThrow(
+                () -> new UserNotFoundException("User with email = " + email + " not found"));
+        return user;
     }
 
     @Override
@@ -220,14 +228,12 @@ public class UserServiceImpl implements UserService {
         } else return "user not found";
     }
 
-
-
-
+    //Spring Security - Authentication via email
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = Optional.of(userRepository.findByUsername(username)).orElseThrow(
-                () -> new UserNotFoundException("Invalid username or password"));
-        return new org.springframework.security.core.userdetails.User(user.getUsername(),
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        User user = Optional.of(userRepository.findByEmail(email)).orElseThrow(
+                () -> new UserNotFoundException("Invalid email or password"));
+        return new org.springframework.security.core.userdetails.User(user.getEmail(),
                 user.getPassword(), mapRolesToAuthorities(user.getRoles()));
     }
 

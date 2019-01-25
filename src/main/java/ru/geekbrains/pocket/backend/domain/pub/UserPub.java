@@ -1,10 +1,9 @@
-package ru.geekbrains.pocket.backend.domain.data;
+package ru.geekbrains.pocket.backend.domain.pub;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.geekbrains.pocket.backend.domain.db.UserProfile;
 import ru.geekbrains.pocket.backend.util.validation.ValidEmail;
 
 import javax.validation.constraints.NotEmpty;
@@ -13,16 +12,16 @@ import javax.validation.constraints.NotEmpty;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class UserPub {
     private String id;
 
     @NotEmpty
     @ValidEmail
     private String email;
 
-    private UserProfile profile;
+    private UserProfilePub profile;
 
-    public User(String email, UserProfile userProfile) {
+    public UserPub(String email, UserProfilePub userProfile) {
         this.email = email;
         this.profile = userProfile;
     }
@@ -30,8 +29,8 @@ public class User {
     @Override
     public String toString() {
         return "User{" +
-                "'id':" + id +
-                ", 'email':" + email +
+                "'id':'" + id + "'" +
+                ", 'email':'" + email + "'" +
                 ", " + profile +
                 '}';
     }

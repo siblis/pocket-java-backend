@@ -37,8 +37,8 @@ public class User {
 
     @NotEmpty
     @JsonIgnore
-    @Pattern(regexp = "^\\S*(?=\\S{6,})(?=\\S*[a-z])(?=\\S*[A-Z])(?=\\S*[\\d])\\S*$",
-            message = "Enter a password containing 6 characters with at least one capital letter and one number.")
+//    @Pattern(regexp = "^\\S*(?=\\S{6,})(?=\\S*[a-z])(?=\\S*[A-Z])(?=\\S*[\\d])\\S*$",
+//            message = "Enter a password containing 6 characters with at least one capital letter and one number.")
     private String password;
 
     private Date created_at;

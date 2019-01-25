@@ -1,15 +1,9 @@
-package ru.geekbrains.pocket.backend.domain.data;
+package ru.geekbrains.pocket.backend.domain.pub;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.annotation.TypeAlias;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Field;
-
-import javax.validation.constraints.NotNull;
-import java.util.Date;
 
 //this class for class User (collection = "users")
 
@@ -17,7 +11,7 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserProfile {
+public class UserProfilePub {
     private String id;
 
     private String name;
@@ -26,11 +20,11 @@ public class UserProfile {
 
     private String full_name;
 
-    public UserProfile(String username) {
+    public UserProfilePub(String username) {
         this.username = username;
     }
 
-    public UserProfile(String id, String username) {
+    public UserProfilePub(String id, String username) {
         this.id = id;
         this.username = username;
     }

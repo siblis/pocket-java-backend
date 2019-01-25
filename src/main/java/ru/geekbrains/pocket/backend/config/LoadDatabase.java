@@ -1,10 +1,12 @@
 package ru.geekbrains.pocket.backend.config;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.Example;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import ru.geekbrains.pocket.backend.domain.db.Role;
 import ru.geekbrains.pocket.backend.domain.db.User;
 import ru.geekbrains.pocket.backend.repository.RoleRepository;
@@ -17,6 +19,9 @@ import java.util.Arrays;
 class LoadDatabase {
     private UserRepository userRepository;
     private RoleRepository roleRepository;
+
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 
     @Bean
     CommandLineRunner initDatabase(UserRepository userRepository, RoleRepository roleRepository) {
@@ -35,11 +40,11 @@ class LoadDatabase {
             Role roleUser = roleRepository.findByName("ROLE_USER");
 
 
-            addUserToDB(new User("a@mail.ru", "123", "Alex",
+            addUserToDB(new User("a@mail.ru", passwordEncoder.encode("Abc123"), "Alex",
                     Arrays.asList(roleAdmin, roleUser)));
-            addUserToDB(new User("b@mail.ru", "1234", "Bob",
+            addUserToDB(new User("b@mail.ru", passwordEncoder.encode("Abc345"), "Bob",
                     Arrays.asList(roleUser)));
-            addUserToDB(new User("i@mail.ru", "1235", "ivan",
+            addUserToDB(new User("i@mail.ru", passwordEncoder.encode("Abc567"), "ivan",
                     Arrays.asList(roleUser)));
         };
     }
