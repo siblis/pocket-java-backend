@@ -4,7 +4,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.geekbrains.pocket.backend.domain.User;
+import ru.geekbrains.pocket.backend.domain.db.User;
 
 @RestController
 @RequestMapping("/api")

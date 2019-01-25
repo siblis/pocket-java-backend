@@ -2,7 +2,7 @@ package ru.geekbrains.pocket.backend.resource;
 
 import org.springframework.hateoas.ResourceSupport;
 import ru.geekbrains.pocket.backend.controller.rest.UserRestController;
-import ru.geekbrains.pocket.backend.domain.User;
+import ru.geekbrains.pocket.backend.domain.db.User;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;

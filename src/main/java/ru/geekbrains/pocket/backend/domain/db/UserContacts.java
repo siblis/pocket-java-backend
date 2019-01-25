@@ -1,4 +1,4 @@
-package ru.geekbrains.pocket.backend.domain;
+package ru.geekbrains.pocket.backend.domain.db;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

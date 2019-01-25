@@ -11,6 +11,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import ru.geekbrains.pocket.backend.repository.UserRepository;
 
+import java.util.Optional;
+
 @Configuration
 class WebSecurityConfiguration extends GlobalAuthenticationConfigurerAdapter {
 
@@ -24,8 +26,7 @@ class WebSecurityConfiguration extends GlobalAuthenticationConfigurerAdapter {
 
     @Bean
     UserDetailsService userDetailsService() {
-        return (username) -> userRepository
-                .findByUsername(username)
+        return (username) -> Optional.of(userRepository.findByUsername(username))
                 .map(u -> new User(u.getUsername(), u.getPassword(), true, true, true, true,
                         AuthorityUtils.createAuthorityList("USER", "write")))
                 .orElseThrow(

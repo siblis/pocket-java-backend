@@ -1,6 +1,6 @@
 package ru.geekbrains.pocket.backend.service;
 
-import ru.geekbrains.pocket.backend.domain.UserTokens;
+import ru.geekbrains.pocket.backend.domain.db.UserTokens;
 
 public interface UserTokensService {
 

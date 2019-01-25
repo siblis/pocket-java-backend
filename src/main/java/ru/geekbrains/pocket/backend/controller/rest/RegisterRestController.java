@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import ru.geekbrains.pocket.backend.domain.SystemUser;
-import ru.geekbrains.pocket.backend.domain.User;
+import ru.geekbrains.pocket.backend.domain.db.User;
 import ru.geekbrains.pocket.backend.resource.UserResource;
 import ru.geekbrains.pocket.backend.service.UserService;
 

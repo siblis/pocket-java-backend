@@ -7,9 +7,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import ru.geekbrains.pocket.backend.domain.Role;
-import ru.geekbrains.pocket.backend.domain.User;
-import ru.geekbrains.pocket.backend.domain.UserProfile;
+import ru.geekbrains.pocket.backend.domain.db.Role;
+import ru.geekbrains.pocket.backend.domain.db.User;
+import ru.geekbrains.pocket.backend.domain.db.UserProfile;
 import ru.geekbrains.pocket.backend.exception.RoleNotFoundException;
 import ru.geekbrains.pocket.backend.exception.UserNotFoundException;
 import ru.geekbrains.pocket.backend.repository.RoleRepository;
@@ -42,6 +42,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void delete(String email) {
+        userRepository.deleteByEmail(email);
+    }
+
+    @Override
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
@@ -64,27 +69,27 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUserByUsername(String username) {
         //User user2 = userRepository.findFirstByUsername(username);
-        Optional<User> user = Optional.of(userRepository.findByUsername(username).orElseThrow(
-                () -> new UserNotFoundException("User with username = '" + username + "' not found")));
-        return user.get();
+        User user = Optional.of(userRepository.findByUsername(username)).orElseThrow(
+                () -> new UserNotFoundException("User with username = '" + username + "' not found"));
+        return user;
     }
 
     @Override
     public List<Role> getRolesByUsername(String username) {
-        Optional<User> user = Optional.of(userRepository.findByUsername(username).orElseThrow(
-                () -> new UserNotFoundException("User with username = '" + username + "' not found")));
-        return (List<Role>) user.get().getRoles();
+        User user = Optional.of(userRepository.findByUsername(username)).orElseThrow(
+                () -> new UserNotFoundException("User with username = '" + username + "' not found"));
+        return (List<Role>) user.getRoles();
     }
 
     @Override
     public User insert(User user) throws RuntimeException {
-        Optional<Role> role = Optional.of(roleRepository.findByName("ROLE_USER").orElseThrow(
-                () -> new RoleNotFoundException("Role with name = 'ROLE_USER' not found")));
+        Role role = Optional.of(roleRepository.findByName("ROLE_USER")).orElseThrow(
+                () -> new RoleNotFoundException("Role with name = 'ROLE_USER' not found."));
         User user1 = new User();
         user1.setProfile(new UserProfile("ddd"));
         userRepository.insert(user1);
 
-        user.setRoles(Arrays.asList(role.get()));
+        user.setRoles(Arrays.asList(role));
         return userRepository.insert(user);
     }
 
@@ -96,10 +101,10 @@ public class UserServiceImpl implements UserService {
 
     public String addNewUser(User user) {
 
-        User compare = userRepository.findByEmailMatches(user.getEmail()).get();
+        User compare = userRepository.findByEmailMatches(user.getEmail());
         if (compare == null) {
             userRepository.save(user);
-            return userRepository.findByEmailMatches(user.getEmail()).get().getId().toString();
+            return userRepository.findByEmailMatches(user.getEmail()).getId().toString();
         }
         return "user already exists in DB";
     }
@@ -143,7 +148,7 @@ public class UserServiceImpl implements UserService {
     }
 
     public User findByEmail(String email) {
-        return userRepository.findByEmailMatches(email).get();
+        return userRepository.findByEmailMatches(email);
     }
 
     @Override
@@ -153,7 +158,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String updateUser(User user) {
-        User updatingUser = userRepository.findByEmailMatches(user.getEmail()).get();
+        User updatingUser = userRepository.findByEmailMatches(user.getEmail());
         if (updatingUser != null)
             return userRepository.save(updatingUser).getId().toString();
         else return "user not found";
@@ -161,7 +166,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String updateUserProfile(User user, UserProfile userProfile) {
-        User updatingUser = userRepository.findByEmailMatches(user.getEmail()).get();
+        User updatingUser = userRepository.findByEmailMatches(user.getEmail());
         if (updatingUser != null) {
             updatingUser.setProfile(userProfile);
             return userRepository.save(updatingUser).getId().toString();
@@ -171,7 +176,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String updateUserFullName(User user, String fullName) {
-        User updatingUser = userRepository.findByEmailMatches(user.getEmail()).get();
+        User updatingUser = userRepository.findByEmailMatches(user.getEmail());
         if (updatingUser != null) {
             UserProfile thisUserProfile = updatingUser.getProfile();
             thisUserProfile.setFullName(fullName);
@@ -183,7 +188,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String updateUserUsername(User user, String username) {
-        User updatingUser = userRepository.findByEmailMatches(user.getEmail()).get();
+        User updatingUser = userRepository.findByEmailMatches(user.getEmail());
         if (updatingUser != null) {
             UserProfile thisUserProfile = updatingUser.getProfile();
             thisUserProfile.setUsername(username);
@@ -196,7 +201,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String updateUsersLastSeen(User user, Date date) {
-        User updatingUser = userRepository.findByEmailMatches(user.getEmail()).get();
+        User updatingUser = userRepository.findByEmailMatches(user.getEmail());
         if (updatingUser != null) {
             UserProfile thisUserProfile = updatingUser.getProfile();
             thisUserProfile.setLastSeen(date);
@@ -208,7 +213,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String updateUsersPassword(User user, String password) {
-        User updatingUser = userRepository.findByEmailMatches(user.getEmail()).get();
+        User updatingUser = userRepository.findByEmailMatches(user.getEmail());
         if (updatingUser != null) {
             updatingUser.setPassword(password);
             return userRepository.save(updatingUser).getId().toString();
@@ -220,10 +225,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> user = Optional.of(userRepository.findByUsername(username).orElseThrow(
-                () -> new UserNotFoundException("Invalid username or password")));
-        return new org.springframework.security.core.userdetails.User(user.get().getUsername(),
-                user.get().getPassword(), mapRolesToAuthorities(user.get().getRoles()));
+        User user = Optional.of(userRepository.findByUsername(username)).orElseThrow(
+                () -> new UserNotFoundException("Invalid username or password"));
+        return new org.springframework.security.core.userdetails.User(user.getUsername(),
+                user.getPassword(), mapRolesToAuthorities(user.getRoles()));
     }
 
     private Collection<? extends GrantedAuthority> mapRolesToAuthorities(Collection<Role> roles) {
@@ -236,7 +241,7 @@ public class UserServiceImpl implements UserService {
     }
 
     public User validateUser(String username) {
-        return userRepository.findByUsername(username).orElseThrow(
+        return Optional.of(userRepository.findByUsername(username)).orElseThrow(
                 () -> new UserNotFoundException("User with username = " + username + " not found"));
     }
 

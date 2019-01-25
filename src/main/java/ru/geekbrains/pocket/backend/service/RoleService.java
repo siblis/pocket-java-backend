@@ -1,6 +1,6 @@
 package ru.geekbrains.pocket.backend.service;
 
-import ru.geekbrains.pocket.backend.domain.Role;
+import ru.geekbrains.pocket.backend.domain.db.Role;
 
 //this class for Spring Security
 
