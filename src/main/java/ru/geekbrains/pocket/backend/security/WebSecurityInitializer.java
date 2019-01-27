@@ -1,4 +1,4 @@
-package ru.geekbrains.pocket.backend.config;
+package ru.geekbrains.pocket.backend.security;
 
 import org.springframework.security.web.context.AbstractSecurityWebApplicationInitializer;
 import org.springframework.stereotype.Component;

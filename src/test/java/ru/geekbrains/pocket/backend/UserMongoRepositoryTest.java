@@ -7,7 +7,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import ru.geekbrains.pocket.backend.domain.User;
+import ru.geekbrains.pocket.backend.domain.db.User;
 import ru.geekbrains.pocket.backend.repository.UserRepository;
 
 import java.util.Optional;
@@ -37,7 +37,7 @@ public class UserMongoRepositoryTest {
     @Test
     public void testFetchData() {
         /*Test data retrieval*/
-        Optional<User> userA = userMongoRepository.findByUsername("Bob");
+        User userA = userMongoRepository.findByUsername("Bob");
         assertNotNull(userA);
         /*Get all products, list should only have two*/
         Iterable<User> users = userMongoRepository.findAll();
@@ -51,12 +51,12 @@ public class UserMongoRepositoryTest {
     @Test
     public void testDataUpdate() {
         /*Test update*/
-        Optional<User> userB = userMongoRepository.findByUsername("Bob");
-        userB.get().setEmail("bob@mail.ru");
-        userMongoRepository.save(userB.get());
-        Optional<User> userC = userMongoRepository.findByUsername("Bob");
+        User userB = userMongoRepository.findByUsername("Bob");
+        userB.setEmail("bob@mail.ru");
+        userMongoRepository.save(userB);
+        User userC = userMongoRepository.findByUsername("Bob");
         assertNotNull(userC);
-        assertEquals("bob@mail.ru", userC.get().getEmail());
+        assertEquals("bob@mail.ru", userC.getEmail());
     }
 
     @After

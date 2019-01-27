@@ -8,52 +8,59 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import ru.geekbrains.pocket.backend.domain.SystemUser;
-import ru.geekbrains.pocket.backend.domain.User;
+import ru.geekbrains.pocket.backend.domain.pub.UserPub;
+import ru.geekbrains.pocket.backend.domain.db.Role;
+import ru.geekbrains.pocket.backend.domain.db.User;
+import ru.geekbrains.pocket.backend.domain.db.UserProfile;
 import ru.geekbrains.pocket.backend.resource.UserResource;
+import ru.geekbrains.pocket.backend.service.RoleService;
 import ru.geekbrains.pocket.backend.service.UserService;
 
 import java.net.URI;
+import java.util.Arrays;
 
 @RestController
 @RequestMapping("/api")
 @Slf4j
 public class RegisterRestController {
-    private UserService userService;
-
     @Autowired
-    public void setUserService(UserService userService) {
-        this.userService = userService;
-    }
-
+    private UserService userService;
+    @Autowired
+    private RoleService roleService;
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
     @CrossOrigin(origins = "http://localhost:9000")
     @GetMapping("/register/{name}")
     public UserResource getUserByName(@PathVariable String name) {
-        return new UserResource(userService.getUserByUsername(name));
+        return new UserResource(userService.getUserByEmail(name));
     }
 
     @PostMapping("/register/")
-    public ResponseEntity<?> processRegistrationForm(@RequestBody SystemUser systemUser) {
-        String userName = systemUser.getUsername();
-        log.debug("Processing registration form for: " + userName);
-        User existing = userService.getUserByUsername(userName);
+    public ResponseEntity<?> processRegistrationForm(@RequestBody String email, String password, String name) {
+        log.debug("Processing registration form for: " + email);
+        User existing = userService.getUserByEmail(email);
         if (existing != null) {
-            log.debug("User name already exists.");
+            log.debug("Email already exists.");
         }
 
+        Role roleUser = roleService.getRole("ROLE_USER");
+        if (roleUser == null)
+            roleUser = roleService.insert(roleUser);
+
+        UserProfile userProfile = new UserProfile();
+        userProfile.setUsername(name);
+
         User user = new User();
-        user.setUsername(systemUser.getUsername());
-        user.setPassword(passwordEncoder.encode(systemUser.getPassword()));
-        user.setEmail(systemUser.getEmail());
+        user.setEmail(email);
+        user.setPassword(passwordEncoder.encode("123")); //TODO
+        user.setUsername(name);
+        user.setProfile(userProfile);
+        user.setRoles(Arrays.asList(roleUser));
 
         user = userService.insert(user);
-        user.getProfile().setUsername(systemUser.getUsername());
-        userService.update(user);
 
-        log.debug("Successfully created user: " + userName);
+        log.debug("Successfully created user: " + user.getEmail());
 
         HttpHeaders httpHeaders = new HttpHeaders();
 

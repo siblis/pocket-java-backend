@@ -1,7 +1,6 @@
 package ru.geekbrains.pocket.backend.controller.web;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -11,22 +10,23 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import ru.geekbrains.pocket.backend.domain.SystemUser;
-import ru.geekbrains.pocket.backend.domain.User;
+import ru.geekbrains.pocket.backend.domain.db.Role;
+import ru.geekbrains.pocket.backend.domain.db.User;
+import ru.geekbrains.pocket.backend.domain.db.UserProfile;
+import ru.geekbrains.pocket.backend.service.RoleService;
 import ru.geekbrains.pocket.backend.service.UserService;
 
 import javax.validation.Valid;
+import java.util.Arrays;
 
 @Controller
 @RequestMapping("/register")
+@Slf4j
 public class RegistrationWebController {
-    private final Logger logger = LoggerFactory.getLogger(RegistrationWebController.class);
-    private UserService userService;
-
     @Autowired
-    public void setUserService(UserService userService) {
-        this.userService = userService;
-    }
-
+    private UserService userService;
+    @Autowired
+    private RoleService roleService;
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
@@ -37,42 +37,46 @@ public class RegistrationWebController {
     }
 
     @GetMapping
-    public String showLoginPage(Model model) {
+    public String showRegistrationForm(Model model) {
         model.addAttribute("systemUser", new SystemUser());
         return "registration-form";
     }
 
     @GetMapping("/showRegistrationForm")
-    public String showMyLoginPage(Model model) {
+    public String showMyRegistrationForm(Model model) {
         model.addAttribute("systemUser", new SystemUser());
         return "registration-form";
     }
 
     @PostMapping("/processRegistrationForm")
     public String processRegistrationForm(@Valid @ModelAttribute("systemUser") SystemUser systemUser, BindingResult bindingResult, Model model) {
-        String userName = systemUser.getUsername();
-        logger.debug("Processing registration form for: " + userName);
+        String emailUser = systemUser.getEmail();
+        log.debug("Processing registration form for: " + emailUser);
         if (bindingResult.hasErrors()) {
             return "registration-form";
         }
-        User existing = userService.getUserByUsername(userName);
+        User existing = userService.getUserByEmail(emailUser);
         if (existing != null) {
             model.addAttribute("systemUser", new SystemUser());
-            model.addAttribute("registrationError", "User name already exists.");
-            logger.debug("User name already exists.");
+            model.addAttribute("registrationError", "Email already exists.");
+            log.debug("Email already exists.");
             return "registration-form";
         }
+
+        Role roleUser = roleService.getRole("ROLE_USER");
+        if (roleUser == null)
+            roleUser = roleService.insert(roleUser);
 
         User user = new User();
         user.setUsername(systemUser.getUsername());
         user.setPassword(passwordEncoder.encode(systemUser.getPassword()));
         user.setEmail(systemUser.getEmail());
+        user.setProfile(new UserProfile(systemUser.getUsername()));
+        user.setRoles(Arrays.asList(roleUser));
 
         user = userService.insert(user);
-        user.getProfile().setUsername(systemUser.getUsername());
-        userService.update(user);
 
-        logger.debug("Successfully created user: " + userName);
+        log.debug("Successfully created user: " + user.getEmail());
         return "registration-confirmation";
     }
 

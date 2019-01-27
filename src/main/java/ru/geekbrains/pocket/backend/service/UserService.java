@@ -2,9 +2,9 @@ package ru.geekbrains.pocket.backend.service;
 
 import org.bson.types.ObjectId;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import ru.geekbrains.pocket.backend.domain.Role;
-import ru.geekbrains.pocket.backend.domain.User;
-import ru.geekbrains.pocket.backend.domain.UserProfile;
+import ru.geekbrains.pocket.backend.domain.db.Role;
+import ru.geekbrains.pocket.backend.domain.db.User;
+import ru.geekbrains.pocket.backend.domain.db.UserProfile;
 import ru.geekbrains.pocket.backend.resource.UserResource;
 
 import java.util.Date;
@@ -13,11 +13,15 @@ import java.util.List;
 public interface UserService extends UserDetailsService {
     void delete(ObjectId id);
 
+    void delete(String email);
+
     List<User> getAllUsers();
 
     List<UserResource> getAllUserResources();
 
     User getUserById(ObjectId id);
+
+    User getUserByEmail(String email);
 
     User getUserByUsername(String userName);
 

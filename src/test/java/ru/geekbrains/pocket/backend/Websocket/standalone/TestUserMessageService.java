@@ -17,8 +17,8 @@
 package ru.geekbrains.pocket.backend.Websocket.standalone;
 
 import org.bson.types.ObjectId;
-import ru.geekbrains.pocket.backend.domain.User;
-import ru.geekbrains.pocket.backend.domain.UserMessage;
+import ru.geekbrains.pocket.backend.domain.db.User;
+import ru.geekbrains.pocket.backend.domain.db.UserMessage;
 import ru.geekbrains.pocket.backend.service.UserMessageService;
 
 import java.util.ArrayList;

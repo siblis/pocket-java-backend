@@ -1,9 +1,9 @@
 package ru.geekbrains.pocket.backend.service;
 
 import org.bson.types.ObjectId;
-import ru.geekbrains.pocket.backend.domain.Group;
-import ru.geekbrains.pocket.backend.domain.GroupMessage;
-import ru.geekbrains.pocket.backend.domain.User;
+import ru.geekbrains.pocket.backend.domain.db.Group;
+import ru.geekbrains.pocket.backend.domain.db.GroupMessage;
+import ru.geekbrains.pocket.backend.domain.db.User;
 
 import java.util.List;
 

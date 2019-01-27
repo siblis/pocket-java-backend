@@ -1,44 +1,44 @@
-package ru.geekbrains.pocket.backend.domain;
+package ru.geekbrains.pocket.backend.domain.db;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 //this class for class User (collection = "users")
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @TypeAlias("profile")
 public class UserProfile {
-    @Indexed//(unique = true)
-            String username;
+    @NotNull
+    @Indexed(unique = true)
+    private String username;
 
     @Field("full_name")
-    String fullName;
+    private String fullName;
 
     @Field("last_seen")
-    Date lastSeen;
+    private Date lastSeen;
 
     public UserProfile(String username) {
         this.username = username;
     }
 
-    public UserProfile(String username, String fullName, Date lastSeen) {
-        this.username = username;
-        this.fullName = fullName;
-        this.lastSeen = lastSeen;
-    }
-
     @Override
     public String toString() {
-        return "User.profile{" +
-                "username=" + username +
-                ", fullName=" + fullName +
-                ", lastSeen=" + lastSeen +
+        return "profile{" +
+                "'username':" + username +
+                ", 'fullName':" + fullName +
+                ", 'lastSeen':" + lastSeen +
                 '}';
     }
 }

@@ -1,10 +1,10 @@
-package ru.geekbrains.pocket.backend.config;
+package ru.geekbrains.pocket.backend.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-import ru.geekbrains.pocket.backend.domain.User;
+import ru.geekbrains.pocket.backend.domain.db.User;
 import ru.geekbrains.pocket.backend.service.UserService;
 
 import javax.servlet.ServletException;
@@ -24,11 +24,11 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 
         System.out.println("\n\nIn customAuthenticationSuccessHandler\n\n");
 
-        String userName = authentication.getName();
+        String emailUser = authentication.getName();
 
-        System.out.println("userName=" + userName);
+        System.out.println("userName=" + emailUser);
 
-        User user = userService.getUserByUsername(userName);
+        User user = userService.getUserByEmail(emailUser);
 
         // now place in the session
         HttpSession session = request.getSession();
