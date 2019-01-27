@@ -1,4 +1,4 @@
-package ru.geekbrains.pocket.backend.domain;
+package ru.geekbrains.pocket.backend.domain.db;
 
 import com.mongodb.lang.Nullable;
 import lombok.Getter;

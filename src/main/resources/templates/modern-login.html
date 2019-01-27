@@ -25,7 +25,7 @@
                             <div>
                                 <div th:if="${param.error} != null">
                                     <div class="alert alert-danger col-xs-offset-1 col-xs-10">
-                                        Invalid username and password.
+                                        Invalid email and password.
                                     </div>
                                 </div>
                                 <div th:if="${param.logout} != null">
@@ -38,7 +38,7 @@
                     </div>
                     <div class="input-group" style="margin-bottom: 25px">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
-                        <input class="form-control" name="username" placeholder="username" type="text">
+                        <input class="form-control" name="username" placeholder="email" type="text">
                     </div>
                     <div class="input-group" style="margin-bottom: 25px">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>

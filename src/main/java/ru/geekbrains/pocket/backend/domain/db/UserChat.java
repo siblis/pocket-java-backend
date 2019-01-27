@@ -1,4 +1,4 @@
-package ru.geekbrains.pocket.backend.domain;
+package ru.geekbrains.pocket.backend.domain.db;
 
 import com.mongodb.lang.Nullable;
 import lombok.Data;
@@ -6,6 +6,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+
+import javax.validation.Valid;
 
 @Data
 @Document(collection = "users.chats")
@@ -20,8 +22,9 @@ public class UserChat {
     Group group = null;
 
     @Indexed
+    @Valid
     @Field(value = "user_id")
-    private User userId;
+    private User user;
 
     String preview;
 

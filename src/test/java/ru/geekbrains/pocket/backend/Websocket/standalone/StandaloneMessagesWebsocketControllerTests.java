@@ -38,7 +38,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.util.JsonPathExpectationsHelper;
 import ru.geekbrains.pocket.backend.Websocket.support.TestPrincipal;
 import ru.geekbrains.pocket.backend.controller.websocket.MessagesWebsocketController;
-import ru.geekbrains.pocket.backend.domain.UserMessage;
+import ru.geekbrains.pocket.backend.domain.db.UserMessage;
 import ru.geekbrains.pocket.backend.service.UserService;
 
 import java.nio.charset.Charset;

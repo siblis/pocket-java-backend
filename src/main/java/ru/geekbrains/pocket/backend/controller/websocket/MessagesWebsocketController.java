@@ -18,8 +18,8 @@ import org.springframework.messaging.simp.broker.BrokerAvailabilityEvent;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.util.HtmlUtils;
-import ru.geekbrains.pocket.backend.domain.User;
-import ru.geekbrains.pocket.backend.domain.UserMessage;
+import ru.geekbrains.pocket.backend.domain.db.User;
+import ru.geekbrains.pocket.backend.domain.db.UserMessage;
 import ru.geekbrains.pocket.backend.service.UserMessageService;
 import ru.geekbrains.pocket.backend.service.UserService;
 
