@@ -37,10 +37,9 @@ public class RegisterRestController {
     }
 
     @PostMapping("/register/")
-    public ResponseEntity<?> processRegistrationForm(@RequestBody UserPub userPub) {
-        String emailUser = userPub.getEmail();
-        log.debug("Processing registration form for: " + emailUser);
-        User existing = userService.getUserByEmail(emailUser);
+    public ResponseEntity<?> processRegistrationForm(@RequestBody String email, String password, String name) {
+        log.debug("Processing registration form for: " + email);
+        User existing = userService.getUserByEmail(email);
         if (existing != null) {
             log.debug("Email already exists.");
         }
@@ -50,12 +49,12 @@ public class RegisterRestController {
             roleUser = roleService.insert(roleUser);
 
         UserProfile userProfile = new UserProfile();
-        userProfile.setUsername(userPub.getProfile().getUsername());
+        userProfile.setUsername(name);
 
         User user = new User();
-        user.setEmail(userPub.getEmail());
+        user.setEmail(email);
         user.setPassword(passwordEncoder.encode("123")); //TODO
-        user.setUsername(userPub.getProfile().getUsername());
+        user.setUsername(name);
         user.setProfile(userProfile);
         user.setRoles(Arrays.asList(roleUser));
 

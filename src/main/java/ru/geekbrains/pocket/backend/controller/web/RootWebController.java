@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @Slf4j
-public class MainWebController {
+public class RootWebController {
 
     @RequestMapping("/")
     public String showHomePage() {

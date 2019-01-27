@@ -7,6 +7,8 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import javax.validation.Valid;
+
 @Data
 @Document(collection = "users.chats")
 public class UserChat {
@@ -20,8 +22,9 @@ public class UserChat {
     Group group = null;
 
     @Indexed
+    @Valid
     @Field(value = "user_id")
-    private User userId;
+    private User user;
 
     String preview;
 

@@ -6,6 +6,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.Valid;
 import java.util.Date;
 
 @Data
@@ -15,7 +16,8 @@ public class UserTokens {
     @Id
     ObjectId id;
 
-    User user_id;
+    @Valid
+    User user;
 
     @Indexed
     String unique_token;

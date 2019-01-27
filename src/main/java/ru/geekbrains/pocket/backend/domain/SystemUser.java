@@ -8,7 +8,6 @@ import ru.geekbrains.pocket.backend.util.validation.FieldMatch;
 import ru.geekbrains.pocket.backend.util.validation.ValidEmail;
 
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 //this class for Spring Security
@@ -27,23 +26,23 @@ public class SystemUser {
     private String username;
 
     @NotNull(message = "is required")
-    @Size(min = 1, message = "is required")
+    @Size(min = 3, message = "is required")
     private String password;
 
     @NotNull(message = "is required")
-    @Size(min = 1, message = "is required")
+    @Size(min = 3, message = "is required")
     private String matchingPassword;
 
     @NotNull(message = "is required")
-    @Size(min = 1, message = "is required")
+    @Size(min = 3, message = "is required")
     private String lastname;
 
     @NotNull(message = "is required")
-    @Size(min = 1, message = "is required")
+    @Size(min = 3, message = "is required")
     private String firstname;
 
     @ValidEmail
     @NotNull(message = "is required")
-    @Size(min = 1, message = "is required")
+    @Size(min = 6, message = "is required")
     private String email;
 }

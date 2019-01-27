@@ -1,4 +1,4 @@
-package ru.geekbrains.pocket.backend.config;
+package ru.geekbrains.pocket.backend.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;

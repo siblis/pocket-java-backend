@@ -13,10 +13,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import ru.geekbrains.pocket.backend.util.validation.ValidEmail;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
@@ -44,6 +43,7 @@ public class User {
     private Date created_at;
 
     @NotNull
+    @Valid
     @Field(value = "profile")
     private UserProfile profile;
 
@@ -53,6 +53,7 @@ public class User {
 
     @DBRef
     @NotNull
+    @Valid
     @JsonIgnore
     @Field(value = "roles")
     private Collection<Role> roles;

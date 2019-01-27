@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Size;
 import java.util.Date;
 
@@ -20,8 +21,9 @@ public class UserContacts {
     private ObjectId id;
 
     @Indexed
+    @Valid
     @Field(value = "user_id")
-    private User userId;
+    private User user;
 
     private User contact;
 
@@ -32,8 +34,8 @@ public class UserContacts {
     @Field(value = "added_at")
     private Date addedAt;
 
-    public UserContacts(User userId, User contact, String byName, Date addedAt) {
-        this.userId = userId;
+    public UserContacts(User user, User contact, String byName, Date addedAt) {
+        this.user = user;
         this.contact = contact;
         this.byName = byName;
         this.addedAt = addedAt;
@@ -43,7 +45,7 @@ public class UserContacts {
     public String toString() {
         return "UsersContacts{" +
                 "id=" + id +
-                ", userId=" + userId +
+                ", user=" + user +
                 ", contact=" + contact +
                 ", byname=" + byName +
                 ", added_at=" + addedAt +
