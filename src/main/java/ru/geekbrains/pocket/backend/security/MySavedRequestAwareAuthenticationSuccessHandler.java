@@ -7,6 +7,7 @@ import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.security.web.savedrequest.RequestCache;
 import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import ru.geekbrains.pocket.backend.domain.db.User;
 import ru.geekbrains.pocket.backend.service.UserService;
 
@@ -35,12 +36,12 @@ public class MySavedRequestAwareAuthenticationSuccessHandler extends SimpleUrlAu
         String emailUser = authentication.getName();
         System.out.println("authentication user name (email) = " + emailUser);
 
-        User user = userService.getUserByEmail(emailUser);
-        user.setUsername(user.getEmail());
+        //User user = userService.getUserByEmail(emailUser);
+        //user.setUsername(user.getEmail());
 
         // now place in the session
-        HttpSession session = request.getSession();
-        session.setAttribute("user", user);
+        //HttpSession session = request.getSession();
+        //session.setAttribute("user", user);
 
         if (savedRequest == null) {
             String uri = request.getRequestURI();
@@ -55,18 +56,27 @@ public class MySavedRequestAwareAuthenticationSuccessHandler extends SimpleUrlAu
             }
             return;
         }
-//        final String targetUrlParameter = getTargetUrlParameter();
-//        if (isAlwaysUseDefaultTargetUrl() || (targetUrlParameter != null && StringUtils.hasText(request.getParameter(targetUrlParameter)))) {
-//            requestCache.removeRequest(request, response);
-//            String uri = request.getRequestURI();
-//            if (uri.equals("/login") || uri.equals("/authenticateTheUser") || uri.startsWith("/authenticateTheUser"))
-//                super.onAuthenticationSuccess(request, response, authentication);
-//            else
-//                clearAuthenticationAttributes(request);
-//            return;
-//        }
-//
-//        clearAuthenticationAttributes(request);
+        final String targetUrlParameter = getTargetUrlParameter();
+        if (isAlwaysUseDefaultTargetUrl() || (targetUrlParameter != null && StringUtils.hasText(request.getParameter(targetUrlParameter)))) {
+            requestCache.removeRequest(request, response);
+            String uri = request.getRequestURI();
+            if (uri.equals("/login") || uri.equals("/authenticateTheUser"))
+                super.onAuthenticationSuccess(request, response, authentication);
+            else
+                clearAuthenticationAttributes(request);
+            return;
+        }
+
+        String uri = request.getRequestURI();
+        if (uri.equals("/login") || uri.equals("/authenticateTheUser")) {
+            response.sendRedirect(request.getContextPath() + "/web");
+            clearAuthenticationAttributes(request);
+            //this.handle(request, response, authentication);
+            //super.onAuthenticationSuccess(request, response, authentication);
+        } else {
+            //response.setStatus(HttpStatus.OK.value());
+            clearAuthenticationAttributes(request);
+        }
 
         // Use the DefaultSavedRequest URL
         // final String targetUrl = savedRequest.getRedirectUrl();

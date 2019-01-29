@@ -29,19 +29,11 @@ public class CustomLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler im
             System.out.println("User logout: " + authentication.getName());
         }
 
-        String uri = request.getRequestURI();
-        if (uri.startsWith("/api")) {
-            //request.getSession(false);
-            //response.getOutputStream().print("Logout");
-            response.setStatus(HttpStatus.OK.value());
-            response.getWriter().flush();
-        } else {
-            request.getSession(false);
-            response.getOutputStream().print("Logout");
-            response.sendRedirect(request.getContextPath() + "/login");
-            response.setStatus(HttpStatus.OK.value());
-            super.onLogoutSuccess(request, response, authentication);
-        }
+        request.getSession(false);
+        response.getOutputStream().print("Logout");
+        response.sendRedirect(request.getContextPath() + "/login");
+        response.setStatus(HttpStatus.OK.value());
+        super.onLogoutSuccess(request, response, authentication);
     }
 
 }

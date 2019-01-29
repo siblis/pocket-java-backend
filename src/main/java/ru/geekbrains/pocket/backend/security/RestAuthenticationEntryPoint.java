@@ -25,14 +25,16 @@ public final class RestAuthenticationEntryPoint implements AuthenticationEntryPo
         if (uri.equals("/") || uri.equals("/authenticateTheUser")
                 || uri.equals("/js/main.js") || uri.equals("/css/main.css")
                 || uri.startsWith("/web") || uri.startsWith("/admin")
+                //|| uri.startsWith("/error")
                 || uri.startsWith("/accessDenied")) {
-            response.addHeader("WWW-Authenticate", "");
+            response.addHeader("WWW-Authenticate", "");//"Basic realm=\"Realm\"");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            final PrintWriter writer = response.getWriter();
-            writer.println("HTTP Status " + HttpServletResponse.SC_UNAUTHORIZED + " - " + authException.getMessage());
-            //response.sendRedirect(request.getContextPath() + "/login");
+            //final PrintWriter writer = response.getWriter();
+            //writer.println("HTTP Status " + HttpServletResponse.SC_UNAUTHORIZED + " - " + authException.getMessage());
+            //response.sendRedirect(request.getContextPath() + "/accessDenied");
+            response.sendRedirect(request.getContextPath() + "/login");
         } else {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized"); //(401)
         }
 
     }

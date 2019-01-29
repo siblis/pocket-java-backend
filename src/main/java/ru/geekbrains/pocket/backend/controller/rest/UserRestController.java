@@ -25,8 +25,8 @@ public class UserRestController {
 
     //@ResponseStatus(HttpStatus.OK)
     @GetMapping("/users/{id}") //Получить информацию о пользователе
-    public ResponseEntity<?> getUserProfileById(@PathVariable ObjectId id) {
-        User user = userService.getUserById(id);
+    public ResponseEntity<?> getUserProfileById(@PathVariable String id) {
+        User user = userService.getUserById(new ObjectId(id));
         if (user != null)
             return new ResponseEntity<>(new UserProfilePub(user), HttpStatus.OK);
         else

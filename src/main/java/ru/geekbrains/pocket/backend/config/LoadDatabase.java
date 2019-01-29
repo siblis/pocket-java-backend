@@ -21,10 +21,7 @@ class LoadDatabase {
     private RoleRepository roleRepository;
 
     @Autowired
-    PasswordEncoder passwordEncoder;
-
-//    @Autowired
-//    SecurityConfig securityConfig;
+    private PasswordEncoder passwordEncoder;
 
     @Bean
     CommandLineRunner initDatabase(UserRepository userRepository, RoleRepository roleRepository) {
@@ -42,8 +39,6 @@ class LoadDatabase {
             Role roleAdmin = roleRepository.findByName("ROLE_ADMIN");
             Role roleUser = roleRepository.findByName("ROLE_USER");
 
-
-            //addUserToDB(new User("a@mail.ru", securityConfig.passwordEncoder().encode("Abc123"), "Alex",
             addUserToDB(new User("a@mail.ru", passwordEncoder.encode("Abc123"), "Alex",
                     Arrays.asList(roleAdmin, roleUser)));
             addUserToDB(new User("b@mail.ru", passwordEncoder.encode("Abc345"), "Bob",

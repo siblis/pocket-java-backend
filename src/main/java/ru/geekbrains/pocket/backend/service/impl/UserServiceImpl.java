@@ -33,7 +33,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void delete(ObjectId id) {
+    public void delete(ObjectId id) throws RuntimeException {
         Optional<User> user = userRepository.findById(id);
         if (!user.isPresent()) {
             throw new UserNotFoundException("User with id = " + id + " not found");
@@ -60,21 +60,27 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getUserById(ObjectId id) {
-        User user = userRepository.findById(id).orElseThrow(
-                () -> new UserNotFoundException("User with id = " + id + " not found"));
+    public User getUserById(ObjectId id) throws RuntimeException {
+        //TODO исправить
+        if (userRepository.findById(id).isPresent()) {
+            User user = userRepository.findById(id)
+                    .orElseThrow(
+                            () -> new UserNotFoundException("User with id = " + id + " not found"));
+            return user;
+        }
+        return null;
+    }
+
+    @Override
+    public User getUserByEmail(String email) throws UsernameNotFoundException {
+        User user = userRepository.findByEmail(email);
+//        user = Optional.of(user).orElseThrow(
+//                () -> new UserNotFoundException("User with email = " + email + " not found"));
         return user;
     }
 
     @Override
-    public User getUserByEmail(String email) {
-        User user = Optional.of(userRepository.findByEmail(email)).orElseThrow(
-                () -> new UserNotFoundException("User with email = " + email + " not found"));
-        return user;
-    }
-
-    @Override
-    public User getUserByUsername(String username) {
+    public User getUserByUsername(String username) throws RuntimeException {
         //User user2 = userRepository.findFirstByUsername(username);
         User user = Optional.of(userRepository.findByUsername(username)).orElseThrow(
                 () -> new UserNotFoundException("User with username = '" + username + "' not found"));
@@ -82,7 +88,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<Role> getRolesByUsername(String username) {
+    public List<Role> getRolesByUsername(String username) throws RuntimeException {
         User user = Optional.of(userRepository.findByUsername(username)).orElseThrow(
                 () -> new UserNotFoundException("User with username = '" + username + "' not found"));
         return (List<Role>) user.getRoles();
@@ -123,31 +129,6 @@ public class UserServiceImpl implements UserService {
             return "user_id :" + onDelete.getId() + " removed successful";
         }
         return "user not found in DB";
-    }
-
-
-    public String addNewTestUser() {
-        User randomUser = new User();
-        randomUser.setEmail(RandomStringUtil.randomString(10));
-        randomUser.setPassword(RandomStringUtil.randomString(10));
-        randomUser.setCreated_at(new Date());
-        randomUser.setProfile(new UserProfile(RandomStringUtil.randomString(5), RandomStringUtil.randomString(5), new Date()));
-        return userRepository.save(randomUser).getId().toString();
-    }
-
-    public User getRandomUserFromDB() {
-        List<User> users = userRepository.findAll();
-        int length = users.size();
-        Random random = new Random();
-        return users.get(random.nextInt(length - 1));
-    }
-
-    public User getTestUser1() {
-        return userRepository.findByProfileUsername("tester1");
-    }
-
-    public User getTestUser2() {
-        return userRepository.findByProfileUsername("tester2");
     }
 
     public User findUserByID(ObjectId id) {
@@ -240,12 +221,12 @@ public class UserServiceImpl implements UserService {
         return roles.stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
     }
 
-    public User validateUser(ObjectId id) {
+    public User validateUser(ObjectId id) throws UsernameNotFoundException {
         return userRepository.findById(id).orElseThrow(
                 () -> new UserNotFoundException("User with id = " + id + " not found"));
     }
 
-    public User validateUser(String username) {
+    public User validateUser(String username) throws UsernameNotFoundException {
         return Optional.of(userRepository.findByUsername(username)).orElseThrow(
                 () -> new UserNotFoundException("User with username = " + username + " not found"));
     }

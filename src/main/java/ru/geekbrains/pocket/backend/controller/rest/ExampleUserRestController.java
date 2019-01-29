@@ -43,7 +43,7 @@ public class ExampleUserRestController {
         return new UserResource(user);
     }
 
-    @GetMapping("/users/{name}")
+    @GetMapping("/userst/{name}")
     public UserResource getUserByName(@PathVariable String name) {
         return new UserResource(userService.getUserByUsername(name));
     }
@@ -83,7 +83,7 @@ public class ExampleUserRestController {
                 linkTo(methodOn(ExampleUserRestController.class).getAllUsers()).withSelfRel());
     }
 
-    @PostMapping("/users")
+    @PostMapping("/userst")
     public ResponseEntity<?> addUser(@RequestBody User user) {
         //TODO вывод ошибки если юзер уже есть или не указан
         if (user == null) return null;
@@ -99,7 +99,7 @@ public class ExampleUserRestController {
         return new ResponseEntity<User>(null, httpHeaders, HttpStatus.CREATED);
     }
 
-    @PutMapping("/users")
+    @PutMapping("/userst")
     public User updateUser(Principal principal, @RequestBody User user) {
         //обновление доступно только текущего авторизованного юзера
         String username = principal.getName();
@@ -108,7 +108,7 @@ public class ExampleUserRestController {
         return userService.update(user);
     }
 
-    @DeleteMapping("/users/{id}")
+    @DeleteMapping("/userst/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable ObjectId id) {
         userService.delete(id);
         return ResponseEntity.noContent().build();

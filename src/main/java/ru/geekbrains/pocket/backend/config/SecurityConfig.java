@@ -14,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
+import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
 import ru.geekbrains.pocket.backend.security.CustomAccessDeniedHandler;
 import ru.geekbrains.pocket.backend.security.CustomLogoutSuccessHandler;
 import ru.geekbrains.pocket.backend.security.MySavedRequestAwareAuthenticationSuccessHandler;
@@ -55,9 +56,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                //.csrf().disable()   //Межсайтовая подделка запроса
-                //.authorizeRequests()
-                //.and()
+                .csrf().disable()   //Межсайтовая подделка запроса
                 .exceptionHandling()
                 .accessDeniedHandler(accessDeniedHandler)
                 .authenticationEntryPoint(restAuthenticationEntryPoint)
@@ -91,12 +90,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .deleteCookies("JSESSIONID")
                 .permitAll()
                 .and()
-                .httpBasic();
-//                .and()
-        //See https://jira.springsource.org/browse/SPR-11496
-//                .headers().addHeaderWriter(
-//                new XFrameOptionsHeaderWriter(
-//                        XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN));
+                .httpBasic()
+                .and()
+                //See https://jira.springsource.org/browse/SPR-11496
+                .headers().addHeaderWriter(
+                new XFrameOptionsHeaderWriter(
+                        XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN));
     }
 
     @Bean
