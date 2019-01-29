@@ -6,7 +6,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.Example;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.geekbrains.pocket.backend.domain.db.Role;
 import ru.geekbrains.pocket.backend.domain.db.User;
@@ -21,13 +20,11 @@ class LoadDatabase {
     private UserRepository userRepository;
     private RoleRepository roleRepository;
 
-    //private BCryptPasswordEncoder passwordEncoder;
-
     @Autowired
     PasswordEncoder passwordEncoder;
 
-    @Autowired
-    SecurityConfig securityConfig;
+//    @Autowired
+//    SecurityConfig securityConfig;
 
     @Bean
     CommandLineRunner initDatabase(UserRepository userRepository, RoleRepository roleRepository) {
@@ -46,7 +43,8 @@ class LoadDatabase {
             Role roleUser = roleRepository.findByName("ROLE_USER");
 
 
-            addUserToDB(new User("a@mail.ru", securityConfig.passwordEncoder().encode("Abc123"), "Alex",
+            //addUserToDB(new User("a@mail.ru", securityConfig.passwordEncoder().encode("Abc123"), "Alex",
+            addUserToDB(new User("a@mail.ru", passwordEncoder.encode("Abc123"), "Alex",
                     Arrays.asList(roleAdmin, roleUser)));
             addUserToDB(new User("b@mail.ru", passwordEncoder.encode("Abc345"), "Bob",
                     Arrays.asList(roleUser)));

@@ -19,9 +19,9 @@ import ru.geekbrains.pocket.backend.service.UserService;
 import javax.validation.Valid;
 import java.util.Arrays;
 
+@Slf4j
 @Controller
 @RequestMapping("/register")
-@Slf4j
 public class RegistrationWebController {
     @Autowired
     private UserService userService;

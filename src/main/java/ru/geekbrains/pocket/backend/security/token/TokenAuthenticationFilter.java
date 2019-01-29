@@ -1,17 +1,5 @@
 package ru.geekbrains.pocket.backend.security.token;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
-
-import javax.servlet.*;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-
 //https://habr.com/ru/post/278411/
 
 public class TokenAuthenticationFilter { //extends AbstractAuthenticationProcessingFilter {

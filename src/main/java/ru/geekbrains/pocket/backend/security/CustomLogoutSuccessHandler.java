@@ -1,5 +1,6 @@
 package ru.geekbrains.pocket.backend.security;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
@@ -24,7 +25,23 @@ public class CustomLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler im
         final String refererUrl = request.getHeader("Referer");
         System.out.println("CustomLogoutSuccessHandler.onLogoutSuccess refererUrl : " + refererUrl);
 
-        super.onLogoutSuccess(request, response, authentication);
+        if (authentication != null) {
+            System.out.println("User logout: " + authentication.getName());
+        }
+
+        String uri = request.getRequestURI();
+        if (uri.startsWith("/api")) {
+            //request.getSession(false);
+            //response.getOutputStream().print("Logout");
+            response.setStatus(HttpStatus.OK.value());
+            response.getWriter().flush();
+        } else {
+            request.getSession(false);
+            response.getOutputStream().print("Logout");
+            response.sendRedirect(request.getContextPath() + "/login");
+            response.setStatus(HttpStatus.OK.value());
+            super.onLogoutSuccess(request, response, authentication);
+        }
     }
 
 }
