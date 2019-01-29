@@ -16,7 +16,6 @@ import ru.geekbrains.pocket.backend.repository.RoleRepository;
 import ru.geekbrains.pocket.backend.repository.UserRepository;
 import ru.geekbrains.pocket.backend.resource.UserResource;
 import ru.geekbrains.pocket.backend.service.UserService;
-import ru.geekbrains.pocket.backend.util.RandomStringUtil;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -98,11 +97,7 @@ public class UserServiceImpl implements UserService {
     public User insert(User user) throws RuntimeException {
         Role role = Optional.of(roleRepository.findByName("ROLE_USER")).orElseThrow(
                 () -> new RoleNotFoundException("Role with name = 'ROLE_USER' not found."));
-        User user1 = new User();
-        user1.setProfile(new UserProfile("ddd"));
-        userRepository.insert(user1);
-
-        user.setRoles(Arrays.asList(role));
+        user.setRoles(Collections.singletonList(role));
         return userRepository.insert(user);
     }
 
@@ -110,7 +105,6 @@ public class UserServiceImpl implements UserService {
     public User update(User user) {
         return userRepository.save(user);
     }
-
 
     public String addNewUser(User user) {
 
@@ -120,28 +114,6 @@ public class UserServiceImpl implements UserService {
             return userRepository.findByEmailMatches(user.getEmail()).getId().toString();
         }
         return "user already exists in DB";
-    }
-
-    public String deleteUser(User user) {
-        User onDelete = findByEmail(user.getEmail());
-        if (onDelete != null) {
-            userRepository.delete(onDelete);
-            return "user_id :" + onDelete.getId() + " removed successful";
-        }
-        return "user not found in DB";
-    }
-
-    public User findUserByID(ObjectId id) {
-        return userRepository.findById(id).get();
-    }
-
-    public User findByEmail(String email) {
-        return userRepository.findByEmailMatches(email);
-    }
-
-    @Override
-    public User findUsersByUsername(String username) {
-        return userRepository.findByProfileUsername(username);
     }
 
     @Override

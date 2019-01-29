@@ -26,6 +26,7 @@ public class UserRestController {
     //@ResponseStatus(HttpStatus.OK)
     @GetMapping("/users/{id}") //Получить информацию о пользователе
     public ResponseEntity<?> getUserProfileById(@PathVariable String id) {
+        //TODO validate
         User user = userService.getUserById(new ObjectId(id));
         if (user != null)
             return new ResponseEntity<>(new UserProfilePub(user), HttpStatus.OK);
@@ -34,7 +35,8 @@ public class UserRestController {
     }
 
     @GetMapping("/users") //Поиск пользователя
-    public ResponseEntity<?> findUser(@RequestParam @Max(value = 32) String email) {
+    public ResponseEntity<?> findUser(@RequestParam("email") @Max(value = 32) String email) {
+        //TODO validate
         User user = userService.getUserByEmail(email);
         if (user != null)
             return new ResponseEntity<>(new UserProfilePub(user), HttpStatus.OK);
