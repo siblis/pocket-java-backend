@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import ru.geekbrains.pocket.backend.domain.db.User;
+
+import javax.validation.constraints.NotNull;
 
 //this class for class User (collection = "users")
 
@@ -14,26 +17,20 @@ import lombok.Setter;
 public class UserProfilePub {
     private String id;
 
-    private String name;
-
     private String username;
 
     private String full_name;
 
-    public UserProfilePub(String username) {
-        this.username = username;
-    }
-
-    public UserProfilePub(String id, String username) {
-        this.id = id;
-        this.username = username;
+    public UserProfilePub(@NotNull User user) {
+        this.id = user.getId().toString();
+        this.username = user.getProfile().getUsername();
+        this.full_name = user.getProfile().getFullName();
     }
 
     @Override
     public String toString() {
         return "profile{" +
                 "'id':" + id +
-                "'name':" + name +
                 "'username':" + username +
                 ", 'full_name':" + full_name +
                 '}';

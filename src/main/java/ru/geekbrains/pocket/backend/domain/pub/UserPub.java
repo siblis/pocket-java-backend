@@ -4,9 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import ru.geekbrains.pocket.backend.domain.db.User;
 import ru.geekbrains.pocket.backend.util.validation.ValidEmail;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
@@ -21,9 +23,13 @@ public class UserPub {
 
     private UserProfilePub profile;
 
-    public UserPub(String email, UserProfilePub userProfile) {
-        this.email = email;
-        this.profile = userProfile;
+    public UserPub(@NotNull User user) {
+        this.id = user.getId().toString();
+        this.email = user.getEmail();
+        this.profile = new UserProfilePub(
+                user.getId().toString(),
+                user.getProfile().getUsername(),
+                user.getProfile().getFullName());
     }
 
     @Override

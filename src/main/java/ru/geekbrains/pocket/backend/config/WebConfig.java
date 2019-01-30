@@ -3,19 +3,19 @@ package ru.geekbrains.pocket.backend.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.ViewResolver;
-import org.springframework.web.servlet.config.annotation.*;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.resource.PathResourceResolver;
 import org.springframework.web.servlet.resource.WebJarsResourceResolver;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.JstlView;
 
-import java.util.List;
-
 @Configuration
 @EnableWebMvc
 //@EnableAsync
 public class WebConfig implements WebMvcConfigurer {
-//public class WebConfig extends WebMvcAutoConfiguration {
 
     //===CORS===
 
@@ -25,7 +25,7 @@ public class WebConfig implements WebMvcConfigurer {
     //res.setHeader('Access-Control-Allow-Origin', '*'); - разрешает передачу данных на любой домен (включая тот же домен, но другой порт)
     //res.setHeader('Access-Control-Allow-Methods','OPTIONS, GET, POST, PUT, PATCH, DELETE, UNLINK, LINK'); - наименование разрешенных типов http-запросов
     //res.setHeader('Access-Control-Allow-Headers', 'Authentication'); - список разрешенных заголовков (только дополнительных, стандартные разрешены по умолчанию)
-    @Bean
+/*    @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
             @Override
@@ -56,7 +56,7 @@ public class WebConfig implements WebMvcConfigurer {
 //                        .exposedHeaders("header1", "header2")
             }
         };
-    }
+    }*/
 
 //    @Bean
 //    public CorsFilter corsFilter() {

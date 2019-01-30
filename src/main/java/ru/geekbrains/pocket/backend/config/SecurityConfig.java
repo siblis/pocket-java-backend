@@ -1,7 +1,6 @@
 package ru.geekbrains.pocket.backend.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -12,15 +11,14 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
-import ru.geekbrains.pocket.backend.security.*;
-import ru.geekbrains.pocket.backend.security.token.TokenAuthenticationFilter;
-import ru.geekbrains.pocket.backend.security.token.TokenAuthenticationManager;
+import ru.geekbrains.pocket.backend.security.CustomAccessDeniedHandler;
+import ru.geekbrains.pocket.backend.security.CustomLogoutSuccessHandler;
+import ru.geekbrains.pocket.backend.security.MySavedRequestAwareAuthenticationSuccessHandler;
+import ru.geekbrains.pocket.backend.security.RestAuthenticationEntryPoint;
 import ru.geekbrains.pocket.backend.service.UserService;
 
 @Configuration
@@ -59,8 +57,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()   //Межсайтовая подделка запроса
-                //.authorizeRequests()
-                //.and()
                 .exceptionHandling()
                 .accessDeniedHandler(accessDeniedHandler)
                 .authenticationEntryPoint(restAuthenticationEntryPoint)
@@ -69,41 +65,37 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //                .and()
 //                .addFilterAfter(restTokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
-                .antMatchers("/").permitAll()
-                .antMatchers("/hello").permitAll()
-                .antMatchers("/test/**").permitAll()
-                .antMatchers("/register/**").permitAll() //web
-                .antMatchers("/api/auth/**").permitAll() //rest api
-                .antMatchers("/web/**").hasAnyRole("ADMIN", "USER")
-                .antMatchers("/api/**").hasAnyRole("ADMIN", "USER")
                 .antMatchers("/admin/**").hasRole("ADMIN")
+                .antMatchers("/api/**").hasAnyRole("ADMIN", "USER")
+                .antMatchers("/web/**").hasAnyRole("ADMIN", "USER")
+                .antMatchers("/register/**").permitAll() //web
+                .antMatchers("/webjars/**").permitAll() //web
+                .antMatchers("/static/**").permitAll() //web
+                .antMatchers("/test/**").permitAll()
+                .antMatchers("/").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
                 //.passwordParameter("")
-                .defaultSuccessUrl("/main")
+                .defaultSuccessUrl("/web")
                 .loginPage("/login")
                 .loginProcessingUrl("/authenticateTheUser")
-                .loginProcessingUrl("/api/auth/login")
-                //.successHandler(customAuthenticationSuccessHandler) //web ???
-                .successHandler(mySuccessHandler) //rest ???
-                //.failureUrl("/login?error")
-                //.failureHandler(customAuthenticationFailureHandler)
+                .successHandler(mySuccessHandler)
                 .failureHandler(myFailureHandler)
                 .permitAll()
                 .and()
                 .logout()
                 .logoutUrl("/logout")
-                //.logoutSuccessUrl("/login?logout")
                 .logoutSuccessHandler(customLogoutSuccessHandler)
+                .deleteCookies("JSESSIONID")
                 .permitAll()
+                .and()
+                .httpBasic()
                 .and()
                 //See https://jira.springsource.org/browse/SPR-11496
                 .headers().addHeaderWriter(
                 new XFrameOptionsHeaderWriter(
-                        XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN))
-                .and()
-                .httpBasic();
+                        XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN));
     }
 
     @Bean

@@ -1,8 +1,6 @@
 package ru.geekbrains.pocket.backend.security;
 
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,15 +12,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@Component
 @Slf4j
+@Component
 public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException exc) throws IOException, ServletException {
-        response.getOutputStream().print("Error Message Goes Here");
         response.setStatus(403);
-        // response.sendRedirect("/my-error-page");
 
         Authentication auth = SecurityContextHolder.getContext()
                 .getAuthentication();
@@ -30,7 +26,13 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
             log.warn("User: " + auth.getName() + " attempted to access the protected URL: " + request.getRequestURI());
         }
 
-        response.sendRedirect(request.getContextPath() + "/accessDenied");
+        String uri = request.getRequestURI();
+        if (uri.startsWith("/api")) {
+            response.getWriter().flush();
+        } else {
+            //response.getOutputStream().print("Error Message Goes Here");
+            response.sendRedirect(request.getContextPath() + "/accessDenied");
+        }
     }
 
 }

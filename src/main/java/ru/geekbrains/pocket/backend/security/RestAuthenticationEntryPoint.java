@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.security.Principal;
+import java.io.PrintWriter;
 
 /**
  * The Entry Point will not redirect to any sort of Login - it will return the 401
@@ -22,10 +22,20 @@ public final class RestAuthenticationEntryPoint implements AuthenticationEntryPo
             final AuthenticationException authException) throws IOException {
 
         String uri = request.getRequestURI();
-        if (uri.equals("/") || uri.equals("/authenticateTheUser") || uri.startsWith("/web") || uri.startsWith("/admin"))
+        if (uri.equals("/") || uri.equals("/authenticateTheUser")
+                || uri.equals("/js/main.js") || uri.equals("/css/main.css")
+                || uri.startsWith("/web") || uri.startsWith("/admin")
+                //|| uri.startsWith("/error")
+                || uri.startsWith("/accessDenied")) {
+            response.addHeader("WWW-Authenticate", "");//"Basic realm=\"Realm\"");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            //final PrintWriter writer = response.getWriter();
+            //writer.println("HTTP Status " + HttpServletResponse.SC_UNAUTHORIZED + " - " + authException.getMessage());
+            //response.sendRedirect(request.getContextPath() + "/accessDenied");
             response.sendRedirect(request.getContextPath() + "/login");
-        else
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+        } else {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized"); //(401)
+        }
 
     }
 
