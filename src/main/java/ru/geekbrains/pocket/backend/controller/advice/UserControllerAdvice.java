@@ -28,32 +28,4 @@ public class UserControllerAdvice {
         return new VndErrors("error", ex.getMessage());
     }
 
-    @ExceptionHandler(value = {ConstraintViolationException.class})
-    @ResponseBody
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<Map> handleValidationFailure(ConstraintViolationException ex) {
-        final Map<String, Object> response = new HashMap<>();
-        response.put("message", "Your request contains errors");
-        response.put("errors", ex.getConstraintViolations()
-                .stream()
-                .map(it -> new HashMap<String, String>() {{
-                    put(it.getPropertyPath().toString(), it.getMessage());
-                }})
-                .collect(Collectors.toList())
-        );
-
-        return ResponseEntity.badRequest().body(response);
-    }
-
-    @ExceptionHandler
-    @ResponseBody
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public List handle(MethodArgumentNotValidException exception) {
-        //do your stuff here
-        return exception.getBindingResult().getFieldErrors()
-                .stream()
-                .map(FieldError::getDefaultMessage)
-                .collect(Collectors.toList());
-    }
-
 }

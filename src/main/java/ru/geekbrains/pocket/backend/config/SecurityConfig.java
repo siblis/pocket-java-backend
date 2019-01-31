@@ -24,7 +24,7 @@ import ru.geekbrains.pocket.backend.service.UserService;
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
-@ComponentScan("ru.geekbrains.pocket.backend.security")
+//@ComponentScan("ru.geekbrains.pocket.backend.security")
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private UserService userService;
@@ -65,6 +65,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //                .and()
 //                .addFilterAfter(restTokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
+                .antMatchers("/api/auth/**").permitAll()
                 .antMatchers("/admin/**").hasRole("ADMIN")
                 .antMatchers("/api/**").hasAnyRole("ADMIN", "USER")
                 .antMatchers("/web/**").hasAnyRole("ADMIN", "USER")
