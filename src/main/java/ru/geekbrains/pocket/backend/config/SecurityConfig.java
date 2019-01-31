@@ -66,7 +66,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //                .addFilterAfter(restTokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
                 .antMatchers("/admin/**").hasRole("ADMIN")
-                .antMatchers("/api/**").hasAnyRole("ADMIN", "USER")
+                .antMatchers("/api/auth/**").permitAll()
+                //.antMatchers("/api/**").hasAnyRole("ADMIN", "USER")
                 .antMatchers("/web/**").hasAnyRole("ADMIN", "USER")
                 .antMatchers("/register/**").permitAll() //web
                 .antMatchers("/webjars/**").permitAll() //web

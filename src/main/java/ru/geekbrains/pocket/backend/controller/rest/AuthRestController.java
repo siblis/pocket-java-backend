@@ -56,9 +56,6 @@ public class AuthRestController {
 
     @PostMapping("/login2")
     public ResponseEntity login2(@RequestBody LoginRequest loginRequest) {
-        //public ResponseEntity login(@Valid @ModelAttribute LoginRequest loginRequest) {
-//    public ResponseEntity<?> login(@Valid @Size(max = 10, message = "name should at most 10 characters long") @RequestParam("email") String email,
-//                                   @Valid @Max(value = 32) @RequestParam("password") String password) {
         //TODO validate
         User user = userService.getUserByEmail(loginRequest.getEmail());
         if (user == null) {
