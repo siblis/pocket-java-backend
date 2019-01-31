@@ -5,13 +5,7 @@ package ru.geekbrains.pocket.backend.security.token;
 //import io.jsonwebtoken.SignatureAlgorithm;
 //import io.jsonwebtoken.impl.crypto.MacProvider;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
-
-import java.util.*;
 
 //https://habr.com/ru/post/278411/
 

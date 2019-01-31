@@ -1,7 +1,7 @@
 package ru.geekbrains.pocket.backend.resource;
 
 import org.springframework.hateoas.ResourceSupport;
-import ru.geekbrains.pocket.backend.controller.rest.UserRestController;
+import ru.geekbrains.pocket.backend.controller.rest.ExampleUserRestController;
 import ru.geekbrains.pocket.backend.domain.db.User;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
@@ -15,8 +15,8 @@ public class UserResource extends ResourceSupport {
 
     public UserResource(User user) {
         this.user = user;
-        this.add(linkTo(methodOn(UserRestController.class).getUserByName(user.getUsername())).withSelfRel());
-        this.add(linkTo(methodOn(UserRestController.class).getAllUsers()).withRel("users"));
+        this.add(linkTo(methodOn(ExampleUserRestController.class).getUserByName(user.getUsername())).withSelfRel());
+        this.add(linkTo(methodOn(ExampleUserRestController.class).getAllUsers()).withRel("users"));
     }
 
     public User getUser() {

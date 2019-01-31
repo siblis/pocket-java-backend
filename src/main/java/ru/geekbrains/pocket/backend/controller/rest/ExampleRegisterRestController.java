@@ -8,7 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import ru.geekbrains.pocket.backend.domain.pub.UserPub;
 import ru.geekbrains.pocket.backend.domain.db.Role;
 import ru.geekbrains.pocket.backend.domain.db.User;
 import ru.geekbrains.pocket.backend.domain.db.UserProfile;
@@ -19,10 +18,10 @@ import ru.geekbrains.pocket.backend.service.UserService;
 import java.net.URI;
 import java.util.Arrays;
 
+@Slf4j
 @RestController
 @RequestMapping("/api")
-@Slf4j
-public class RegisterRestController {
+public class ExampleRegisterRestController {
     @Autowired
     private UserService userService;
     @Autowired

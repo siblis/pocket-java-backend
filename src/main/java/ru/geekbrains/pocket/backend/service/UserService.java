@@ -38,14 +38,6 @@ public interface UserService extends UserDetailsService {
 
     public String addNewUser(User user);
 
-    public String deleteUser(User user);
-
-    public User findUserByID(ObjectId id);
-
-    public User findByEmail(String email);
-
-    public User findUsersByUsername(String username);
-
     public String updateUser(User user);
 
     public String updateUserProfile(User user, UserProfile userProfile);

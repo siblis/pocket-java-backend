@@ -1,15 +1,5 @@
 package ru.geekbrains.pocket.backend.security.token;
 
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
 public class TokenAuthentication { //implements Authentication {
 //    private String token;
 //    private Collection<? extends GrantedAuthority> authorities;

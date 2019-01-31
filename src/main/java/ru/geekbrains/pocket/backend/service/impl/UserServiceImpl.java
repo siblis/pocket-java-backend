@@ -6,7 +6,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.geekbrains.pocket.backend.domain.db.Role;
 import ru.geekbrains.pocket.backend.domain.db.User;
@@ -17,7 +16,6 @@ import ru.geekbrains.pocket.backend.repository.RoleRepository;
 import ru.geekbrains.pocket.backend.repository.UserRepository;
 import ru.geekbrains.pocket.backend.resource.UserResource;
 import ru.geekbrains.pocket.backend.service.UserService;
-import ru.geekbrains.pocket.backend.util.RandomStringUtil;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -34,7 +32,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void delete(ObjectId id) {
+    public void delete(ObjectId id) throws RuntimeException {
         Optional<User> user = userRepository.findById(id);
         if (!user.isPresent()) {
             throw new UserNotFoundException("User with id = " + id + " not found");
@@ -61,21 +59,27 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getUserById(ObjectId id) {
-        User user = userRepository.findById(id).orElseThrow(
-                () -> new UserNotFoundException("User with id = " + id + " not found"));
+    public User getUserById(ObjectId id) throws RuntimeException {
+        //TODO исправить
+        if (userRepository.findById(id).isPresent()) {
+            User user = userRepository.findById(id)
+                    .orElseThrow(
+                            () -> new UserNotFoundException("User with id = " + id + " not found"));
+            return user;
+        }
+        return null;
+    }
+
+    @Override
+    public User getUserByEmail(String email) throws UsernameNotFoundException {
+        User user = userRepository.findByEmail(email);
+//        user = Optional.of(user).orElseThrow(
+//                () -> new UserNotFoundException("User with email = " + email + " not found"));
         return user;
     }
 
     @Override
-    public User getUserByEmail(String email) {
-        User user = Optional.of(userRepository.findByEmail(email)).orElseThrow(
-                () -> new UserNotFoundException("User with email = " + email + " not found"));
-        return user;
-    }
-
-    @Override
-    public User getUserByUsername(String username) {
+    public User getUserByUsername(String username) throws RuntimeException {
         //User user2 = userRepository.findFirstByUsername(username);
         User user = Optional.of(userRepository.findByUsername(username)).orElseThrow(
                 () -> new UserNotFoundException("User with username = '" + username + "' not found"));
@@ -83,7 +87,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<Role> getRolesByUsername(String username) {
+    public List<Role> getRolesByUsername(String username) throws RuntimeException {
         User user = Optional.of(userRepository.findByUsername(username)).orElseThrow(
                 () -> new UserNotFoundException("User with username = '" + username + "' not found"));
         return (List<Role>) user.getRoles();
@@ -93,11 +97,7 @@ public class UserServiceImpl implements UserService {
     public User insert(User user) throws RuntimeException {
         Role role = Optional.of(roleRepository.findByName("ROLE_USER")).orElseThrow(
                 () -> new RoleNotFoundException("Role with name = 'ROLE_USER' not found."));
-        User user1 = new User();
-        user1.setProfile(new UserProfile("ddd"));
-        userRepository.insert(user1);
-
-        user.setRoles(Arrays.asList(role));
+        user.setRoles(Collections.singletonList(role));
         return userRepository.insert(user);
     }
 
@@ -105,7 +105,6 @@ public class UserServiceImpl implements UserService {
     public User update(User user) {
         return userRepository.save(user);
     }
-
 
     public String addNewUser(User user) {
 
@@ -115,53 +114,6 @@ public class UserServiceImpl implements UserService {
             return userRepository.findByEmailMatches(user.getEmail()).getId().toString();
         }
         return "user already exists in DB";
-    }
-
-    public String deleteUser(User user) {
-        User onDelete = findByEmail(user.getEmail());
-        if (onDelete != null) {
-            userRepository.delete(onDelete);
-            return "user_id :" + onDelete.getId() + " removed successful";
-        }
-        return "user not found in DB";
-    }
-
-
-    public String addNewTestUser() {
-        User randomUser = new User();
-        randomUser.setEmail(RandomStringUtil.randomString(10));
-        randomUser.setPassword(RandomStringUtil.randomString(10));
-        randomUser.setCreated_at(new Date());
-        randomUser.setProfile(new UserProfile(RandomStringUtil.randomString(5), RandomStringUtil.randomString(5), new Date()));
-        return userRepository.save(randomUser).getId().toString();
-    }
-
-    public User getRandomUserFromDB() {
-        List<User> users = userRepository.findAll();
-        int length = users.size();
-        Random random = new Random();
-        return users.get(random.nextInt(length - 1));
-    }
-
-    public User getTestUser1() {
-        return userRepository.findByProfileUsername("tester1");
-    }
-
-    public User getTestUser2() {
-        return userRepository.findByProfileUsername("tester2");
-    }
-
-    public User findUserByID(ObjectId id) {
-        return userRepository.findById(id).get();
-    }
-
-    public User findByEmail(String email) {
-        return userRepository.findByEmailMatches(email);
-    }
-
-    @Override
-    public User findUsersByUsername(String username) {
-        return userRepository.findByProfileUsername(username);
     }
 
     @Override
@@ -241,12 +193,12 @@ public class UserServiceImpl implements UserService {
         return roles.stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
     }
 
-    public User validateUser(ObjectId id) {
+    public User validateUser(ObjectId id) throws UsernameNotFoundException {
         return userRepository.findById(id).orElseThrow(
                 () -> new UserNotFoundException("User with id = " + id + " not found"));
     }
 
-    public User validateUser(String username) {
+    public User validateUser(String username) throws UsernameNotFoundException {
         return Optional.of(userRepository.findByUsername(username)).orElseThrow(
                 () -> new UserNotFoundException("User with username = " + username + " not found"));
     }
