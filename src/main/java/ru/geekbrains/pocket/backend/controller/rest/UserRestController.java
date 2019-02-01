@@ -14,7 +14,7 @@ import javax.validation.constraints.Max;
 
 @Slf4j
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/v1")
 public class UserRestController {
     private UserService userService;
 

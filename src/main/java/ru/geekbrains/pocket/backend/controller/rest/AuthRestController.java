@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 @Slf4j
 //@Validated
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/v1/auth")
 public class AuthRestController {
     private final static String ROLE_USER = "ROLE_USER";
 
@@ -123,10 +123,10 @@ public class AuthRestController {
     @AllArgsConstructor
     private static class LoginRequest {
 
-        @Size(max = 32)//, message = "email should at most 32 characters long")
+        //@Size(max = 32)//, message = "email should at most 32 characters long")
         private String email;
-        @Min(value = 8)
-        @Max(value = 32)//, message = "password should at most 32 characters long")
+        //@Min(value = 8)
+        //@Max(value = 32)//, message = "password should at most 32 characters long")
         private String password;
     }
 
