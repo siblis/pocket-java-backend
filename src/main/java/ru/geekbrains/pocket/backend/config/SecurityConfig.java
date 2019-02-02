@@ -1,27 +1,26 @@
 package ru.geekbrains.pocket.backend.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
+import org.springframework.security.web.authentication.rememberme.InMemoryTokenRepositoryImpl;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
-import ru.geekbrains.pocket.backend.security.CustomAccessDeniedHandler;
-import ru.geekbrains.pocket.backend.security.CustomLogoutSuccessHandler;
-import ru.geekbrains.pocket.backend.security.MySavedRequestAwareAuthenticationSuccessHandler;
-import ru.geekbrains.pocket.backend.security.RestAuthenticationEntryPoint;
-import ru.geekbrains.pocket.backend.service.UserService;
+import ru.geekbrains.pocket.backend.security.*;
 
 @Configuration
 @EnableWebSecurity
@@ -29,7 +28,7 @@ import ru.geekbrains.pocket.backend.service.UserService;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    private UserService userService;
+    private UserDetailsService userDetailsService;
     @Autowired
     private CustomAccessDeniedHandler accessDeniedHandler;
     @Autowired
@@ -37,7 +36,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private RestAuthenticationEntryPoint restAuthenticationEntryPoint;
     @Autowired
-    private MySavedRequestAwareAuthenticationSuccessHandler mySuccessHandler;
+    private CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
+    @Autowired
+    private CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
 
     private SimpleUrlAuthenticationFailureHandler myFailureHandler = new SimpleUrlAuthenticationFailureHandler();
 
@@ -52,7 +53,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Override
+    public void configure(final WebSecurity web) throws Exception {
+        web.ignoring().antMatchers("/resources/**");
+    }
+
+    @Override
     protected void configure(HttpSecurity http) throws Exception {
+        // @formatter:off
         http
                 .csrf().disable()   //Межсайтовая подделка запроса
                 .exceptionHandling()
@@ -63,15 +70,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //                .and()
 //                .addFilterAfter(restTokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
-                .antMatchers("/admin/**").hasRole("ADMIN")
                 .antMatchers("/v1/auth/**").permitAll()
-                .antMatchers("/v1/**").hasAnyRole("ADMIN", "USER")
-                .antMatchers("/web/**").hasAnyRole("ADMIN", "USER")
                 .antMatchers("/register/**").permitAll() //web
-                .antMatchers("/webjars/**").permitAll() //web
-                .antMatchers("/static/**").permitAll() //web
+                .antMatchers("/webjars/**", "/static/**").permitAll() //web
                 .antMatchers("/test/**").permitAll()
                 .antMatchers("/").permitAll()
+                .antMatchers("/invalidSession*").anonymous()
+                .antMatchers("/admin/**").hasRole("ADMIN")
+                .antMatchers("/web/**", "/v1/**").hasAnyRole("ADMIN", "USER")
+//                .antMatchers("/user/updatePassword*","/user/savePassword*","/updatePassword*").hasAuthority("CHANGE_PASSWORD_PRIVILEGE")
+//                .anyRequest().hasAuthority("READ_PRIVILEGE")
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
@@ -79,23 +87,33 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .defaultSuccessUrl("/web")
                 .loginPage("/login")
                 .loginProcessingUrl("/authenticateTheUser")
-                .successHandler(mySuccessHandler)
-                .failureHandler(myFailureHandler)
+                .successHandler(customAuthenticationSuccessHandler)
+                .failureHandler(customAuthenticationFailureHandler)
+                //.authenticationDetailsSource(authenticationDetailsSource)
                 .permitAll()
                 .and()
+//                .sessionManagement()
+//                .invalidSessionUrl("/invalidSession.html")
+//                .maximumSessions(1).sessionRegistry(sessionRegistry()).and()
+//                .sessionFixation().none()
+//                .and()
                 .logout()
                 .logoutUrl("/logout")
                 .logoutSuccessHandler(customLogoutSuccessHandler)
+                .invalidateHttpSession(false)
+                //.logoutSuccessUrl("/logout.html?logSucc=true")
                 .deleteCookies("JSESSIONID")
                 .permitAll()
                 .and()
                 .httpBasic()
+//                .and()
+//                .rememberMe().rememberMeServices(rememberMeServices()).key("theKey")
                 .and()
                 //See https://jira.springsource.org/browse/SPR-11496
                 .headers().addHeaderWriter(
                 new XFrameOptionsHeaderWriter(
                         XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN));
-
+        // @formatter:on
     }
 
     @Bean
@@ -106,9 +124,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider auth = new DaoAuthenticationProvider();
-        auth.setUserDetailsService(userService);
+        auth.setUserDetailsService(userDetailsService);
         auth.setPasswordEncoder(passwordEncoder());
         return auth;
+    }
+
+    @Bean
+    public SessionRegistry sessionRegistry() {
+        return new SessionRegistryImpl();
+    }
+
+    @Bean
+    public RememberMeServices rememberMeServices() {
+        CustomRememberMeServices rememberMeServices = new CustomRememberMeServices("theKey", userDetailsService, new InMemoryTokenRepositoryImpl());
+        return rememberMeServices;
     }
 
 //    @Bean(name = "restTokenAuthenticationFilter")

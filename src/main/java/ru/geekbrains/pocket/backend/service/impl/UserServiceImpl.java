@@ -2,18 +2,21 @@ package ru.geekbrains.pocket.backend.service.impl;
 
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import ru.geekbrains.pocket.backend.domain.db.Role;
-import ru.geekbrains.pocket.backend.domain.db.User;
-import ru.geekbrains.pocket.backend.domain.db.UserProfile;
+import ru.geekbrains.pocket.backend.domain.db.*;
 import ru.geekbrains.pocket.backend.exception.RoleNotFoundException;
+import ru.geekbrains.pocket.backend.exception.UserAlreadyExistException;
 import ru.geekbrains.pocket.backend.exception.UserNotFoundException;
+import ru.geekbrains.pocket.backend.repository.PasswordResetTokenRepository;
 import ru.geekbrains.pocket.backend.repository.RoleRepository;
 import ru.geekbrains.pocket.backend.repository.UserRepository;
+import ru.geekbrains.pocket.backend.repository.VerificationTokenRepository;
 import ru.geekbrains.pocket.backend.resource.UserResource;
 import ru.geekbrains.pocket.backend.service.UserService;
 
@@ -22,13 +25,45 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
-    private UserRepository userRepository;
-    private RoleRepository roleRepository;
+    public static final String TOKEN_INVALID = "invalidToken";
+    public static final String TOKEN_EXPIRED = "expired";
+    public static final String TOKEN_VALID = "valid";
+    private final static String ROLE_USER = "ROLE_USER";
+    public static String APP_NAME = "Pocket";
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository) {
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
+    private VerificationTokenRepository tokenRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private RoleRepository roleRepository;
+    @Autowired
+    private PasswordResetTokenRepository passwordTokenRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+
+    @Override
+    public void changeUserPassword(User user, String password) {
+        user.setPassword(passwordEncoder.encode(password));
+        userRepository.save(user);
+    }
+
+    @Override
+    public boolean checkIfValidOldPassword(User user, String oldPassword) {
+        return passwordEncoder.matches(oldPassword, user.getPassword());
+    }
+
+    @Override
+    public void createPasswordResetTokenForUser(User user, String token) {
+        final PasswordResetToken myToken = new PasswordResetToken(token, user);
+        passwordTokenRepository.save(myToken);
+    }
+
+    @Override
+    public void createVerificationTokenForUser(User user, String token) {
+        final VerificationToken myToken = new VerificationToken(token, user);
+        tokenRepository.save(myToken);
     }
 
     @Override
@@ -79,11 +114,33 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User getUserByToken(String token) {
+        final VerificationToken verificationToken = tokenRepository.findByToken(token);
+        if (verificationToken != null) {
+            return verificationToken.getUser();
+        }
+        return null;
+    }
+
+    @Override
     public User getUserByUsername(String username) throws RuntimeException {
         //User user2 = userRepository.findFirstByUsername(username);
         User user = Optional.of(userRepository.findByUsername(username)).orElseThrow(
                 () -> new UserNotFoundException("User with username = '" + username + "' not found"));
         return user;
+    }
+
+    @Override
+    public VerificationToken getVerificationToken(String token) {
+        return tokenRepository.findByToken(token);
+    }
+
+    @Override
+    public VerificationToken generateNewVerificationToken(final String token) {
+        VerificationToken vToken = tokenRepository.findByToken(token);
+        vToken.updateToken(UUID.randomUUID().toString());
+        vToken = tokenRepository.save(vToken);
+        return vToken;
     }
 
     @Override
@@ -102,27 +159,32 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User registerNewUserAccount(String email, String password, String name) throws UserAlreadyExistException {
+        if (userRepository.findByEmail(email) != null) {
+            throw new UserAlreadyExistException("There is an account with that email adress: " + email);
+        }
+
+        Role roleUser = roleRepository.findByName(ROLE_USER);
+        if (roleUser == null)
+            roleUser = roleRepository.insert(new Role(ROLE_USER));
+
+        final User user = new User();
+
+        user.setEmail(email);
+        //user.setPassword(password); //если приходит в зашифрованном виде
+        user.setPassword(passwordEncoder.encode(password)); //шифруем
+        //user.setUsing2FA(account.isUsing2FA());
+        user.setUsername(name);
+        user.setProfile(new UserProfile(name));
+        user.setRoles(Arrays.asList(roleUser));
+        return userRepository.insert(user);
+    }
+
+    @Override
     public User update(User user) {
         return userRepository.save(user);
     }
 
-    public String addNewUser(User user) {
-
-        User compare = userRepository.findByEmailMatches(user.getEmail());
-        if (compare == null) {
-            userRepository.save(user);
-            return userRepository.findByEmailMatches(user.getEmail()).getId().toString();
-        }
-        return "user already exists in DB";
-    }
-
-    @Override
-    public String updateUser(User user) {
-        User updatingUser = userRepository.findByEmailMatches(user.getEmail());
-        if (updatingUser != null)
-            return userRepository.save(updatingUser).getId().toString();
-        else return "user not found";
-    }
 
     @Override
     public String updateUserProfile(User user, UserProfile userProfile) {
@@ -158,7 +220,6 @@ public class UserServiceImpl implements UserService {
         } else return "user not found";
     }
 
-
     @Override
     public String updateUsersLastSeen(User user, Date date) {
         User updatingUser = userRepository.findByEmailMatches(user.getEmail());
@@ -180,18 +241,43 @@ public class UserServiceImpl implements UserService {
         } else return "user not found";
     }
 
-    //Spring Security - Authentication via email
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = Optional.of(userRepository.findByEmail(email)).orElseThrow(
-                () -> new UserNotFoundException("Invalid email or password"));
-        return new org.springframework.security.core.userdetails.User(user.getEmail(),
-                user.getPassword(), mapRolesToAuthorities(user.getRoles()));
+    public String validatePasswordResetToken(ObjectId id, String token) {
+        final PasswordResetToken passToken = passwordTokenRepository.findByToken(token);
+        if ((passToken == null) || (passToken.getUser().getId() != id)) {
+            return "invalidToken";
+        }
+
+        final Calendar cal = Calendar.getInstance();
+        if ((passToken.getExpiryDate().getTime() - cal.getTime().getTime()) <= 0) {
+            return "expired";
+        }
+
+        final User user = passToken.getUser();
+        final Authentication auth = new UsernamePasswordAuthenticationToken(user, null, Arrays.asList(new SimpleGrantedAuthority("CHANGE_PASSWORD_PRIVILEGE")));
+        SecurityContextHolder.getContext().setAuthentication(auth);
+        return null;
     }
 
-    private Collection<? extends GrantedAuthority> mapRolesToAuthorities(Collection<Role> roles) {
-        return roles.stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
-    }
+    //Spring Security - Authentication via email
+//    @Override
+//    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+//        User user = Optional.of(userRepository.findByEmail(email)).orElseThrow(
+//                () -> new UserNotFoundException("Invalid email or password"));
+//        boolean accountNonExpired = true;
+//        boolean credentialsNonExpired = true;
+//        boolean accountNonLocked = true;
+//        return new org.springframework.security.core.userdetails.User(
+//                user.getEmail(),
+//                user.getPassword(),
+//                user.isEnabled(),
+//                accountNonExpired, credentialsNonExpired, accountNonLocked,
+//                getAuthorities(user.getRoles()));
+//    }
+
+//    private Collection<? extends GrantedAuthority> getAuthorities(Collection<Role> roles) {
+//        return roles.stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
+//    }
 
     public User validateUser(ObjectId id) throws UsernameNotFoundException {
         return userRepository.findById(id).orElseThrow(
@@ -201,6 +287,29 @@ public class UserServiceImpl implements UserService {
     public User validateUser(String username) throws UsernameNotFoundException {
         return Optional.of(userRepository.findByUsername(username)).orElseThrow(
                 () -> new UserNotFoundException("User with username = " + username + " not found"));
+    }
+
+    @Override
+    public String validateVerificationToken(String token) {
+        final VerificationToken verificationToken = tokenRepository.findByToken(token);
+        if (verificationToken == null) {
+            return TOKEN_INVALID;
+        }
+
+        final User user = verificationToken.getUser();
+        final Calendar cal = Calendar.getInstance();
+        if ((verificationToken.getExpiryDate()
+                .getTime()
+                - cal.getTime()
+                .getTime()) <= 0) {
+            tokenRepository.delete(verificationToken);
+            return TOKEN_EXPIRED;
+        }
+
+        user.setEnabled(true);
+        // tokenRepository.delete(verificationToken);
+        userRepository.save(user);
+        return TOKEN_VALID;
     }
 
 }
