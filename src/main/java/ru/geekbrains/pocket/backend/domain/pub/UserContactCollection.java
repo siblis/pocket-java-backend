@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.geekbrains.pocket.backend.domain.db.UserChat;
 
 import java.util.List;
 
@@ -12,16 +11,16 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserChatCollectionPub {
-
+public class UserContactCollection {
+    private String user;
     private Integer offset;
-
-    private List<UserChat> data;
+    private List<UserContactPub> data;
 
     @Override
     public String toString() {
-        return "UserChatCollection{" +
-                "'offset':'" + offset + "'" +
+        return "UserContactCollection{" +
+                "'user':'" + user + "'" +
+                ", 'offset':'" + offset + "'" +
                 ", " + data +
                 '}';
     }

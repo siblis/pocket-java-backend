@@ -30,16 +30,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private UserService userService;
-
     @Autowired
     private CustomAccessDeniedHandler accessDeniedHandler;
-
     @Autowired
     private CustomLogoutSuccessHandler customLogoutSuccessHandler;
-
     @Autowired
     private RestAuthenticationEntryPoint restAuthenticationEntryPoint;
-
     @Autowired
     private MySavedRequestAwareAuthenticationSuccessHandler mySuccessHandler;
 

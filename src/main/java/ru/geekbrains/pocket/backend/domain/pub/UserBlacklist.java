@@ -1,26 +1,26 @@
 package ru.geekbrains.pocket.backend.domain.pub;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import ru.geekbrains.pocket.backend.domain.db.UserChat;
+
+import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class GroupMemberPub {
+public class UserBlacklist {
 
-    private String role;
-
-    private UserProfilePub userProfile;
+    private UserProfilePub user;
 
     @Override
     public String toString() {
-        return "GroupMemberPub{" +
-                "role='" + role + '\'' +
-                ", userProfile=" + userProfile +
+        return "UserBlacklist{" +
+                "" + user +
                 '}';
     }
+
 }
