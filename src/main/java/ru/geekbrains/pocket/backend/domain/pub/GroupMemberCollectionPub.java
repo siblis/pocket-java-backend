@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -17,10 +18,15 @@ public class GroupMemberCollectionPub {
 
     private int offset;
 
-    private ArrayList<GroupMemberPub> data;
+    private List<GroupMemberPub> data;
 
-    public GroupMemberCollectionPub(String group_id, int offset) {
-        this.group_id = group_id;
-        this.offset = offset;
+    @Override
+    public String toString() {
+        return "GroupPub{" +
+                "'group_id':'" + group_id + "'" +
+                ", 'offset':'" + offset + "'" +
+                ", 'data':'" + data + "'" +
+                '}';
     }
+
 }

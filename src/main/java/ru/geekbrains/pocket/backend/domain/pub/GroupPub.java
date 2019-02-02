@@ -6,7 +6,6 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-
 public class GroupPub {
 
     private String id;
@@ -32,13 +31,13 @@ public class GroupPub {
     @Override
     public String toString() {
         return "GroupPub{" +
-                "id='" + id + '\'' +
-                ", creator='" + creator + '\'' +
-                ", space='" + space + '\'' +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", invitation_code='" + invitation_code + '\'' +
-                ", isPublic=" + isPublic +
+                "'id':'" + id + "'" +
+                ", 'creator':'" + creator + "'" +
+                ", 'space':'" + space + "'" +
+                ", 'name +':'" + name + "'" +
+                ", 'description':'" + description + "'" +
+                ", 'invitation_code':'" + invitation_code + "'" +
+                ", 'isPublic':'" + isPublic + "'" +
                 '}';
     }
 }
