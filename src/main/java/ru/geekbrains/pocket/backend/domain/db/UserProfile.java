@@ -8,6 +8,7 @@ import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 
@@ -20,9 +21,11 @@ import java.util.Date;
 @TypeAlias("profile")
 public class UserProfile {
     @NotNull
+    @NotEmpty
     @Indexed(unique = true)
     private String username;
 
+    @NotEmpty
     @Field("full_name")
     private String fullName;
 

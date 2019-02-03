@@ -45,7 +45,7 @@ public class User {
 
     private boolean enabled = false;
 
-    private boolean isUsing2FA;
+    private boolean isUsing2FA = false;
 
     private String secret = Base32.random();
 

@@ -10,19 +10,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 public class RootWebController {
 
-    @RequestMapping("/")
+    //@RequestMapping("/")
     public String showHomePage() {
-        return "index";
-    }
-
-    @RequestMapping("/hello")
-    public String test() {
-        log.info("/hello");
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         return "index";
     }
 

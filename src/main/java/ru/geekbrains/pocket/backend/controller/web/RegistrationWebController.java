@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Controller
-@RequestMapping("/register")
+@RequestMapping("/auth")
 public class RegistrationWebController {
     @Autowired
     private UserService userService;
@@ -60,18 +60,14 @@ public class RegistrationWebController {
         dataBinder.registerCustomEditor(String.class, stringTrimmerEditor);
     }
 
-    @GetMapping
-    public String showRegistrationForm(Model model) {
+    //old
+    @GetMapping("/reg")
+    public String showRegistrationFormOLD(Model model) {
         model.addAttribute("systemUser", new SystemUser());
         return "registration-form";
     }
 
-    @GetMapping("/showRegistrationForm")
-    public String showMyRegistrationForm(Model model) {
-        model.addAttribute("systemUser", new SystemUser());
-        return "registration-form";
-    }
-
+    //old
     @PostMapping("/processRegistrationForm")
     public String processRegistrationForm(@Valid @ModelAttribute("systemUser") SystemUser systemUser, BindingResult bindingResult, Model model) {
         String emailUser = systemUser.getEmail();
@@ -105,10 +101,19 @@ public class RegistrationWebController {
     }
 
 
+    // === NEW ===
+
+    @GetMapping("/registration")
+    public String showRegistrationForm(final Model model) {
+        log.debug("Rendering registration page.");
+        model.addAttribute("systemUser", new SystemUser());
+        return "registration";
+    }
+
     //https://www.baeldung.com/registration-verify-user-by-email
-    @RequestMapping(value = "/user/registration", method = RequestMethod.POST)
+    @PostMapping("/registration")
     @ResponseBody
-    public GenericResponse registerUserAccount(@Valid @ModelAttribute("systemUser") SystemUser account, final HttpServletRequest request) {
+    public GenericResponse registerUserAccount(@Valid SystemUser account, final HttpServletRequest request) { //@ModelAttribute("user")
         log.debug("Registering user account with information: {}", account);
 
         final User registered = userService.registerNewUserAccount(account.getEmail(), account.getPassword(), account.getUsername());
@@ -145,7 +150,7 @@ public class RegistrationWebController {
 
     // user activation - verification
 
-    @RequestMapping(value = "/user/resendRegistrationToken", method = RequestMethod.GET)
+    @RequestMapping(value = "/resendRegistrationToken", method = RequestMethod.GET)
     @ResponseBody
     public GenericResponse resendRegistrationToken(final HttpServletRequest request, @RequestParam("token") final String existingToken) {
         final VerificationToken newToken = userService.generateNewVerificationToken(existingToken);

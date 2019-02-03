@@ -21,6 +21,7 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationFa
 import org.springframework.security.web.authentication.rememberme.InMemoryTokenRepositoryImpl;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
 import ru.geekbrains.pocket.backend.security.*;
+import ru.geekbrains.pocket.backend.security.google2fa.CustomWebAuthenticationDetailsSource;
 
 @Configuration
 @EnableWebSecurity
@@ -39,8 +40,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
     @Autowired
     private CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
-
-    private SimpleUrlAuthenticationFailureHandler myFailureHandler = new SimpleUrlAuthenticationFailureHandler();
+    @Autowired
+    private CustomWebAuthenticationDetailsSource authenticationDetailsSource;
 
     public SecurityConfig() {
         super();
@@ -59,7 +60,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        // @formatter:off
         http
                 .csrf().disable()   //Межсайтовая подделка запроса
                 .exceptionHandling()
@@ -70,11 +70,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //                .and()
 //                .addFilterAfter(restTokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
-                .antMatchers("/v1/auth/**").permitAll()
-                .antMatchers("/register/**").permitAll() //web
-                .antMatchers("/webjars/**", "/static/**").permitAll() //web
+                .antMatchers("/login*", "/logout*", "/signin/**", "/signup/**", "/customLogin",
+                        "/expiredAccount*", "/badUser*", "/forgetPassword*", "/user/resetPassword*",
+                        "/user/changePassword*", "/emailError*", "/successRegister*","/qrcode*").permitAll()
+//                .antMatchers("/auth/registration*", "/auth/registrationConfirm*", "/auth/registration*",
+//                        "/auth/resendRegistrationToken*").permitAll()
+                .antMatchers("/v1/auth/**").permitAll() //rest
+                .antMatchers("/auth/**").permitAll() //web
+                .antMatchers("/resources/**", "/webjars/**", "/static/**").permitAll() //web
                 .antMatchers("/test/**").permitAll()
-                .antMatchers("/").permitAll()
                 .antMatchers("/invalidSession*").anonymous()
                 .antMatchers("/admin/**").hasRole("ADMIN")
                 .antMatchers("/web/**", "/v1/**").hasAnyRole("ADMIN", "USER")
@@ -83,29 +87,30 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
-                //.passwordParameter("")
-                .defaultSuccessUrl("/web")
-                .loginPage("/login")
-                .loginProcessingUrl("/authenticateTheUser")
-                .successHandler(customAuthenticationSuccessHandler)
-                .failureHandler(customAuthenticationFailureHandler)
-                //.authenticationDetailsSource(authenticationDetailsSource)
-                .permitAll()
+                    //.passwordParameter("")
+                    .defaultSuccessUrl("/homepage.html")
+                    .loginPage("/login")
+                    .loginProcessingUrl("/authenticateTheUser")
+                    .failureUrl("/login?error=true")
+                    .successHandler(customAuthenticationSuccessHandler)
+                    .failureHandler(customAuthenticationFailureHandler)
+                    .authenticationDetailsSource(authenticationDetailsSource)
+                    .permitAll()
                 .and()
-//                .sessionManagement()
-//                .invalidSessionUrl("/invalidSession.html")
-//                .maximumSessions(1).sessionRegistry(sessionRegistry()).and()
-//                .sessionFixation().none()
-//                .and()
+                    .sessionManagement()
+                    .invalidSessionUrl("/invalidSession.html")
+                    .maximumSessions(1).sessionRegistry(sessionRegistry()).and()
+                    .sessionFixation().none()
+                .and()
                 .logout()
-                .logoutUrl("/logout")
-                .logoutSuccessHandler(customLogoutSuccessHandler)
-                .invalidateHttpSession(false)
-                //.logoutSuccessUrl("/logout.html?logSucc=true")
-                .deleteCookies("JSESSIONID")
-                .permitAll()
+                    //.logoutUrl("/logout")
+                    .logoutSuccessHandler(customLogoutSuccessHandler)
+                    .invalidateHttpSession(false)
+                    .logoutSuccessUrl("/logout.html?logSucc=true")
+                    .deleteCookies("JSESSIONID")
+                    .permitAll()
                 .and()
-                .httpBasic()
+                    .httpBasic()
 //                .and()
 //                .rememberMe().rememberMeServices(rememberMeServices()).key("theKey")
                 .and()
@@ -113,7 +118,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .headers().addHeaderWriter(
                 new XFrameOptionsHeaderWriter(
                         XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN));
-        // @formatter:on
     }
 
     @Bean

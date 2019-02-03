@@ -6,17 +6,17 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
 public class LoginWebController {
-    @GetMapping("/login")
+    //@GetMapping("/login")
     public String showMyLoginPage() {
         return "modern-login";
     }
 
-    @GetMapping("/logout")
+    //@GetMapping("/logout")
     public String showLogout() {
         return "modern-login";
     }
 
-    @PostMapping("/logout")
+    //@PostMapping("/logout")
     public String showMyLogout() {
         return "modern-login";
     }
