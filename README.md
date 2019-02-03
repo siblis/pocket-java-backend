@@ -1,15 +1,15 @@
 ### pocket-java-backend
 
 ## RESTfull backend api
-###with MVC App implementation 
 
 are used 
 \
 Spring Boot, Spring Data MongoDB, 
 \
-Spring Web, Spring Data Rest, Spring HATEOAS, Spring Websocket, 
+Spring Web, 
+Spring Data Rest, Spring HATEOAS, Spring Websocket, 
 \
-Spring Security, Spring Actuator, Spring Devtools, Spring Thymeleaf,
+Spring Security
 \
 Lombok, Slf4j,
 \

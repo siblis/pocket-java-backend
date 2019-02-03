@@ -3,7 +3,6 @@ package ru.geekbrains.pocket.backend.security;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.RedirectStrategy;
-import org.springframework.security.web.WebAttributes;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.security.web.savedrequest.RequestCache;
@@ -18,8 +17,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-
-//https://www.baeldung.com/securing-a-restful-web-service-with-spring-security
 
 @Component
 public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
@@ -49,39 +46,18 @@ public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         //session.setAttribute("user", user);
 
         if (savedRequest == null) {
-            String uri = request.getRequestURI();
-            if (uri.equals("/login") || uri.equals("/authenticateTheUser")) {
-                response.sendRedirect(request.getContextPath() + "/web");
-                //clearAuthenticationAttributes(request);
-                //this.handle(request, response, authentication);
-                super.onAuthenticationSuccess(request, response, authentication);
-            } else {
-                //response.setStatus(HttpStatus.OK.value());
-                clearAuthenticationAttributes(request);
-            }
+            //response.setStatus(HttpStatus.OK.value());
+            clearAuthenticationAttributes(request);
             return;
         }
         final String targetUrlParameter = getTargetUrlParameter();
         if (isAlwaysUseDefaultTargetUrl() || (targetUrlParameter != null && StringUtils.hasText(request.getParameter(targetUrlParameter)))) {
             requestCache.removeRequest(request, response);
-            String uri = request.getRequestURI();
-            if (uri.equals("/login") || uri.equals("/authenticateTheUser"))
-                super.onAuthenticationSuccess(request, response, authentication);
-            else
-                clearAuthenticationAttributes(request);
-            return;
+            clearAuthenticationAttributes(request);
         }
 
-        String uri = request.getRequestURI();
-        if (uri.equals("/login") || uri.equals("/authenticateTheUser")) {
-            response.sendRedirect(request.getContextPath() + "/web");
-            clearAuthenticationAttributes(request);
-            //this.handle(request, response, authentication);
-            //super.onAuthenticationSuccess(request, response, authentication);
-        } else {
-            //response.setStatus(HttpStatus.OK.value());
-            clearAuthenticationAttributes(request);
-        }
+        //response.setStatus(HttpStatus.OK.value());
+        clearAuthenticationAttributes(request);
 
         // Use the DefaultSavedRequest URL
         // final String targetUrl = savedRequest.getRedirectUrl();

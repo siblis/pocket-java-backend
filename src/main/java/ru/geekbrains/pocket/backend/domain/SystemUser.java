@@ -3,13 +3,10 @@ package ru.geekbrains.pocket.backend.domain;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
-import ru.geekbrains.pocket.backend.util.validation.FieldMatch;
 import ru.geekbrains.pocket.backend.util.validation.PasswordMatches;
 import ru.geekbrains.pocket.backend.util.validation.ValidEmail;
 import ru.geekbrains.pocket.backend.util.validation.ValidPassword;
 
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
