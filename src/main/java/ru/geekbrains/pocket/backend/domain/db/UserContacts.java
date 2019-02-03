@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -20,11 +21,13 @@ public class UserContacts {
     @Id
     private ObjectId id;
 
+    @DBRef
     @Indexed
     @Valid
     @Field(value = "user_id")
     private User user;
 
+    @DBRef
     private User contact;
 
     @Size(min = 1, max = 50)

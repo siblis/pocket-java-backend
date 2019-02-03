@@ -1,11 +1,11 @@
 package ru.geekbrains.pocket.backend.service;
 
-import ru.geekbrains.pocket.backend.domain.db.UserTokens;
+import ru.geekbrains.pocket.backend.domain.db.UserToken;
 
 public interface UserTokensService {
 
-    public String newUserDBToken(UserTokens newToken);
+    public String newUserDBToken(UserToken newToken);
 
-    public String deleteUserDBToken(UserTokens tokenOnDelete);
+    public String deleteUserDBToken(UserToken tokenOnDelete);
 
 }

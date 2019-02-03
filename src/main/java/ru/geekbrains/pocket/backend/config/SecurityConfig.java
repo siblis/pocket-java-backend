@@ -1,11 +1,8 @@
 package ru.geekbrains.pocket.backend.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -15,13 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
-import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
-import ru.geekbrains.pocket.backend.security.CustomAccessDeniedHandler;
-import ru.geekbrains.pocket.backend.security.CustomLogoutSuccessHandler;
-import ru.geekbrains.pocket.backend.security.MySavedRequestAwareAuthenticationSuccessHandler;
-import ru.geekbrains.pocket.backend.security.RestAuthenticationEntryPoint;
-import ru.geekbrains.pocket.backend.service.UserService;
+import ru.geekbrains.pocket.backend.security.*;
 
 @Configuration
 @EnableWebSecurity
@@ -29,7 +20,7 @@ import ru.geekbrains.pocket.backend.service.UserService;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    private UserService userService;
+    private MyUserDetailsService userDetailsService;
     @Autowired
     private CustomAccessDeniedHandler accessDeniedHandler;
     @Autowired
@@ -37,9 +28,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private RestAuthenticationEntryPoint restAuthenticationEntryPoint;
     @Autowired
-    private MySavedRequestAwareAuthenticationSuccessHandler mySuccessHandler;
-
-    private SimpleUrlAuthenticationFailureHandler myFailureHandler = new SimpleUrlAuthenticationFailureHandler();
+    private CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
+    @Autowired
+    private CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
 
     public SecurityConfig() {
         super();
@@ -55,47 +46,34 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()   //Межсайтовая подделка запроса
-                .exceptionHandling()
-                .accessDeniedHandler(accessDeniedHandler)
-                .authenticationEntryPoint(restAuthenticationEntryPoint)
-                .and()
+                    .exceptionHandling()
+                    .accessDeniedHandler(accessDeniedHandler)
+                    .authenticationEntryPoint(restAuthenticationEntryPoint)
+                    .and()
 //            .headers().frameOptions().sameOrigin()
 //                .and()
 //                .addFilterAfter(restTokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
-                .antMatchers("/admin/**").hasRole("ADMIN")
-                .antMatchers("/v1/auth/**").permitAll()
-                .antMatchers("/v1/**").hasAnyRole("ADMIN", "USER")
-                .antMatchers("/web/**").hasAnyRole("ADMIN", "USER")
-                .antMatchers("/register/**").permitAll() //web
-                .antMatchers("/webjars/**").permitAll() //web
-                .antMatchers("/static/**").permitAll() //web
-                .antMatchers("/test/**").permitAll()
-                .antMatchers("/").permitAll()
-                .anyRequest().authenticated()
+                    .antMatchers("/v1/auth/**").permitAll() //rest
+                    .antMatchers("/test/**").permitAll() //websocket
+                    .antMatchers("/invalidSession*").anonymous()
+                    .antMatchers("/v1/**").hasAnyRole("ADMIN", "USER")
+                    //.anyRequest().hasAuthority("READ_PRIVILEGE")
+                    .anyRequest().authenticated()
                 .and()
                 .formLogin()
-                //.passwordParameter("")
-                .defaultSuccessUrl("/web")
-                .loginPage("/login")
-                .loginProcessingUrl("/authenticateTheUser")
-                .successHandler(mySuccessHandler)
-                .failureHandler(myFailureHandler)
-                .permitAll()
+                    //.passwordParameter("")
+                    .defaultSuccessUrl("/homepage.html")
+                    .loginPage("/login")
+                    .successHandler(customAuthenticationSuccessHandler)
+                    .failureHandler(customAuthenticationFailureHandler)
+                    .permitAll()
                 .and()
                 .logout()
-                .logoutUrl("/logout")
-                .logoutSuccessHandler(customLogoutSuccessHandler)
-                .deleteCookies("JSESSIONID")
-                .permitAll()
-                .and()
-                .httpBasic()
-                .and()
-                //See https://jira.springsource.org/browse/SPR-11496
-                .headers().addHeaderWriter(
-                new XFrameOptionsHeaderWriter(
-                        XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN));
-
+                    .logoutSuccessHandler(customLogoutSuccessHandler)
+                    .invalidateHttpSession(false)
+                    .deleteCookies("JSESSIONID")
+                    .permitAll();
     }
 
     @Bean
@@ -106,7 +84,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider auth = new DaoAuthenticationProvider();
-        auth.setUserDetailsService(userService);
+        auth.setUserDetailsService(userDetailsService);
         auth.setPasswordEncoder(passwordEncoder());
         return auth;
     }

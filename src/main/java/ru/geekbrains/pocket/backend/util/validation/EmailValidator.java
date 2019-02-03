@@ -13,10 +13,11 @@ public class EmailValidator implements ConstraintValidator<ValidEmail, String> {
 
     @Override
     public boolean isValid(final String email, final ConstraintValidatorContext context) {
+        return (validateEmail(email));
+    }
+
+    private boolean validateEmail(final String email) {
         pattern = Pattern.compile(EMAIL_PATTERN);
-        if (email == null) {
-            return false;
-        }
         matcher = pattern.matcher(email);
         return matcher.matches();
     }

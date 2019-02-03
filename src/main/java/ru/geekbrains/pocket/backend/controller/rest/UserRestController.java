@@ -16,12 +16,8 @@ import javax.validation.constraints.Max;
 @RestController
 @RequestMapping("/v1")
 public class UserRestController {
-    private UserService userService;
-
     @Autowired
-    public void setUserService(UserService userService) {
-        this.userService = userService;
-    }
+    private UserService userService;
 
     //@ResponseStatus(HttpStatus.OK)
     @GetMapping("/users/{id}") //Получить информацию о пользователе
