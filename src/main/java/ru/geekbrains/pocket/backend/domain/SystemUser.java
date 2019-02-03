@@ -3,9 +3,9 @@ package ru.geekbrains.pocket.backend.domain;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
-import ru.geekbrains.pocket.backend.util.validation.FieldMatch;
+import ru.geekbrains.pocket.backend.util.validation.PasswordMatches;
 import ru.geekbrains.pocket.backend.util.validation.ValidEmail;
+import ru.geekbrains.pocket.backend.util.validation.ValidPassword;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -14,35 +14,46 @@ import javax.validation.constraints.Size;
 
 @Getter
 @Setter
-@ToString
 @NoArgsConstructor
-@FieldMatch(first = "password", second = "matchingPassword", message = "The password fields must match")
+//@FieldMatch(first = "password", second = "matchingPassword", message = "The password fields must match")
+@PasswordMatches
 public class SystemUser {
-    @NotNull(message = "is required")
-    @Size(min = 6, message = "username length must be greater than 3 symbols")
+    @NotNull
+    @Size(min = 3, message = "{Size.userDto.firstName}")
     //@Pattern(regexp = "^[a-zA-Z0-9]{4}", message = "only 4 letters/digits")
 //    @Pattern(regexp = "^\\S*(?=\\S{6,})(?=\\S*[a-z])(?=\\S*[A-Z])(?=\\S*[\\d])\\S*$",
-//            message = "Enter a password containing 6 characters with at least one capital letter and one number.")
-    private String username;
-
-    @NotNull(message = "is required")
-    @Size(min = 3, message = "is required")
-    private String password;
-
-    @NotNull(message = "is required")
-    @Size(min = 3, message = "is required")
-    private String matchingPassword;
-
-    @NotNull(message = "is required")
-    @Size(min = 3, message = "is required")
-    private String lastname;
-
-    @NotNull(message = "is required")
-    @Size(min = 3, message = "is required")
     private String firstname;
 
+    @NotNull
+    @Size(min = 1, message = "{Size.userDto.lastName}")
+    private String lastname;
+
+    @ValidPassword
+    private String password;
+
+    @NotNull
+    @Size(min = 3)
+    private String matchingPassword;
+
     @ValidEmail
-    @NotNull(message = "is required")
-    @Size(min = 6, message = "is required")
+    @NotNull
+    @Size(min = 6, message = "{Size.userDto.email}")
     private String email;
+
+    private boolean isUsing2FA;
+
+    private Integer role;
+
+    @Override
+    public String toString() {
+        final StringBuilder builder = new StringBuilder();
+        builder.append("UserDto [username=").append(firstname)
+                .append(", lastName=").append(lastname)
+                .append(", password=").append(password)
+                .append(", matchingPassword=").append(matchingPassword)
+                .append(", email=").append(email)
+                .append(", isUsing2FA=").append(isUsing2FA)
+                .append(", role=").append(role).append("]");
+        return builder.toString();
+    }
 }

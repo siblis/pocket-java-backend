@@ -2,7 +2,7 @@ package ru.geekbrains.pocket.backend.security;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.ServletException;
@@ -12,13 +12,16 @@ import java.io.IOException;
 import java.util.Calendar;
 
 @Component
-public class CustomAuthenticationFailureHandler implements AuthenticationFailureHandler {
-
+public class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {
     @Override
-    public void onAuthenticationFailure(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AuthenticationException e) throws IOException, ServletException {
-        httpServletResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
+    public void onAuthenticationFailure(final HttpServletRequest request, final HttpServletResponse response, final AuthenticationException exception)
+            throws IOException, ServletException {
+
+        super.onAuthenticationFailure(request, response, exception);
+
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
 
         String jsonPayload = "{\"message\" : \"%s\", \"timestamp\" : \"%s\" }";
-        httpServletResponse.getOutputStream().println(String.format(jsonPayload, e.getMessage(), Calendar.getInstance().getTime()));
+        response.getOutputStream().println(String.format(jsonPayload, exception.getMessage(), Calendar.getInstance().getTime()));
     }
 }

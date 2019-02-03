@@ -31,7 +31,7 @@ public class CustomLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler im
 
         request.getSession(false);
         response.getOutputStream().print("Logout");
-        response.sendRedirect(request.getContextPath() + "/login");
+        //response.sendRedirect(request.getContextPath() + "/login");
         response.setStatus(HttpStatus.OK.value());
         super.onLogoutSuccess(request, response, authentication);
     }
