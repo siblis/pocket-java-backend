@@ -19,7 +19,7 @@ color:#000;
         <div >
             <h1 th:text="#{label.form.title}">form</h1>
             <br/>
-            <form action="/login" enctype="utf8" method="POST" >
+            <form action="/" enctype="utf8" method="POST" >
                 <div class="form-group row" >
                     <label class="col-sm-3" th:text="#{label.user.firstName}">first</label>
                     <span class="col-sm-5"><input class="form-control" name="firstName" required="required" value=""/></span>
@@ -104,7 +104,7 @@ function register(event){
     	return;
     }
     var formData= $('form').serialize();
-    $.post(serverContext + "user/registration",formData ,function(data){
+    $.post(serverContext + "/registration",formData ,function(data){
         if(data.message == "success"){
             window.location.href = serverContext + "successRegister.html";
         }

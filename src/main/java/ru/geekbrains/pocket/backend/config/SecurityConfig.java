@@ -13,11 +13,9 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.RememberMeServices;
-import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.rememberme.InMemoryTokenRepositoryImpl;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
 import ru.geekbrains.pocket.backend.security.*;
@@ -29,7 +27,7 @@ import ru.geekbrains.pocket.backend.security.google2fa.CustomWebAuthenticationDe
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    private UserDetailsService userDetailsService;
+    private MyUserDetailsService userDetailsService;
     @Autowired
     private CustomAccessDeniedHandler accessDeniedHandler;
     @Autowired
@@ -62,35 +60,36 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()   //Межсайтовая подделка запроса
-                .exceptionHandling()
-                .accessDeniedHandler(accessDeniedHandler)
-                .authenticationEntryPoint(restAuthenticationEntryPoint)
-                .and()
+                    .exceptionHandling()
+                    .accessDeniedHandler(accessDeniedHandler)
+                    .authenticationEntryPoint(restAuthenticationEntryPoint)
+                    .and()
 //            .headers().frameOptions().sameOrigin()
 //                .and()
 //                .addFilterAfter(restTokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
-                .antMatchers("/login*", "/logout*", "/signin/**", "/signup/**", "/customLogin",
-                        "/expiredAccount*", "/badUser*", "/forgetPassword*", "/user/resetPassword*",
-                        "/user/changePassword*", "/emailError*", "/successRegister*","/qrcode*").permitAll()
-//                .antMatchers("/auth/registration*", "/auth/registrationConfirm*", "/auth/registration*",
-//                        "/auth/resendRegistrationToken*").permitAll()
-                .antMatchers("/v1/auth/**").permitAll() //rest
-                .antMatchers("/auth/**").permitAll() //web
-                .antMatchers("/resources/**", "/webjars/**", "/static/**").permitAll() //web
-                .antMatchers("/test/**").permitAll()
-                .antMatchers("/invalidSession*").anonymous()
-                .antMatchers("/admin/**").hasRole("ADMIN")
-                .antMatchers("/web/**", "/v1/**").hasAnyRole("ADMIN", "USER")
-//                .antMatchers("/user/updatePassword*","/user/savePassword*","/updatePassword*").hasAuthority("CHANGE_PASSWORD_PRIVILEGE")
-//                .anyRequest().hasAuthority("READ_PRIVILEGE")
-                .anyRequest().authenticated()
+                    .antMatchers("/login*", "/logout*", "/signin/**", "/signup/**", "/customLogin*",
+                            "/registration*", "/registrationConfirm*",
+                            "/expiredAccount*", "/badUser*", "/forgetPassword*", "/user/resetPassword*",
+                            "/user/changePassword*", "/emailError*", "/successRegister*","/qrcode*").permitAll()
+    //                .antMatchers("/login*", "/logout*",
+    //                        "/auth/resendRegistrationToken*").permitAll()
+                    .antMatchers("/v1/auth/**").permitAll() //rest
+                    .antMatchers("/auth/**").permitAll() //web
+                    .antMatchers("/resources/**", "/webjars/**", "/static/**").permitAll() //web
+                    .antMatchers("/test/**").permitAll() //websocket
+                    .antMatchers("/invalidSession*").anonymous()
+                    .antMatchers("/admin/**").hasRole("ADMIN")
+                    .antMatchers("/web/**", "/v1/**").hasAnyRole("ADMIN", "USER")
+                    .antMatchers("/user/updatePassword*","/user/savePassword*","/updatePassword*").hasAuthority("CHANGE_PASSWORD_PRIVILEGE")
+                    .anyRequest().hasAuthority("READ_PRIVILEGE")
+                    //.anyRequest().authenticated()
                 .and()
                 .formLogin()
                     //.passwordParameter("")
                     .defaultSuccessUrl("/homepage.html")
                     .loginPage("/login")
-                    .loginProcessingUrl("/authenticateTheUser")
+                    //.loginProcessingUrl("/authenticateTheUser")
                     .failureUrl("/login?error=true")
                     .successHandler(customAuthenticationSuccessHandler)
                     .failureHandler(customAuthenticationFailureHandler)
@@ -111,13 +110,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .permitAll()
                 .and()
                     .httpBasic()
-//                .and()
-//                .rememberMe().rememberMeServices(rememberMeServices()).key("theKey")
+                .and()
+                .rememberMe().rememberMeServices(rememberMeServices()).key("theKey")
                 .and()
                 //See https://jira.springsource.org/browse/SPR-11496
-                .headers().addHeaderWriter(
-                new XFrameOptionsHeaderWriter(
-                        XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN));
+                    .headers().addHeaderWriter(
+                        new XFrameOptionsHeaderWriter(
+                            XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN));
     }
 
     @Bean

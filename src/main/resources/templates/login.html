@@ -40,7 +40,8 @@ label{padding-left:0 !important}
     <div class="container">
         <div class="row wrapper">
             <h1 th:text="#{label.form.loginTitle}">Header</h1>
-             <a href="?lang=en" th:text="#{label.form.loginEnglish}">login</a> | 
+             <a href="?lang=ru" th:text="#{label.form.loginRussian}">login</a> |
+             <a href="?lang=en" th:text="#{label.form.loginEnglish}">login</a> |
              <a href="?lang=es_ES" th:text="#{label.form.loginSpanish}">login</a>
             <br/><br/>
             
@@ -49,7 +50,8 @@ label{padding-left:0 !important}
                  
                  <br /><br />
                  <label class="col-sm-4" th:text="#{label.form.loginEmail}">Email</label>
-                 <span class="col-sm-8"><input class="form-control" name='username' type='text' value=''/></span>
+                 <span class="col-sm-8">
+                     <input class="form-control" name='username' type='text' value=''/></span>
                 
                 <br/><br/>        
                  <label class="col-sm-4" th:text="#{label.form.loginPass}">password</label>

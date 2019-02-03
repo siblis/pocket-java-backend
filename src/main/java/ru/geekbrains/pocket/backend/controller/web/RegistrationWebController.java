@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Controller
-@RequestMapping("/auth")
+@RequestMapping
 public class RegistrationWebController {
     @Autowired
     private UserService userService;
@@ -88,10 +88,10 @@ public class RegistrationWebController {
             roleUser = roleService.insert(roleUser);
 
         User user = new User();
-        user.setUsername(systemUser.getUsername());
+        user.setUsername(systemUser.getEmail());
         user.setPassword(passwordEncoder.encode(systemUser.getPassword()));
         user.setEmail(systemUser.getEmail());
-        user.setProfile(new UserProfile(systemUser.getUsername()));
+        user.setProfile(new UserProfile(systemUser.getEmail()));
         user.setRoles(Arrays.asList(roleUser));
 
         user = userService.insert(user);
@@ -116,7 +116,7 @@ public class RegistrationWebController {
     public GenericResponse registerUserAccount(@Valid SystemUser account, final HttpServletRequest request) { //@ModelAttribute("user")
         log.debug("Registering user account with information: {}", account);
 
-        final User registered = userService.registerNewUserAccount(account.getEmail(), account.getPassword(), account.getUsername());
+        final User registered = userService.registerNewUserAccount(account);
         eventPublisher.publishEvent(new OnRegistrationCompleteEvent(registered, request.getLocale(), getAppUrl(request)));
         return new GenericResponse("success");
     }

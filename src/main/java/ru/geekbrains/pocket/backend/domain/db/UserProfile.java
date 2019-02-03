@@ -36,6 +36,10 @@ public class UserProfile {
         this.username = username;
     }
 
+    public UserProfile(String username, String fullName) {
+        this.fullName = fullName;
+    }
+
     @Override
     public String toString() {
         return "profile{" +

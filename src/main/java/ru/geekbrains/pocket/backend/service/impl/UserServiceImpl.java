@@ -9,6 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import ru.geekbrains.pocket.backend.domain.SystemUser;
 import ru.geekbrains.pocket.backend.domain.db.*;
 import ru.geekbrains.pocket.backend.exception.RoleNotFoundException;
 import ru.geekbrains.pocket.backend.exception.UserAlreadyExistException;
@@ -159,14 +160,28 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User registerNewUserAccount(SystemUser account) throws UserAlreadyExistException {
+        if (userRepository.findByEmail(account.getEmail()) != null) {
+            throw new UserAlreadyExistException("There is an account with that email adress: " + account.getEmail());
+        }
+
+        final User user = new User();
+
+        user.setEmail(account.getEmail());
+        //user.setPassword(password); //если приходит в зашифрованном виде
+        user.setPassword(passwordEncoder.encode(account.getPassword())); //шифруем
+        //user.setUsing2FA(account.isUsing2FA());
+        user.setUsername(account.getFirstname());
+        user.setProfile(new UserProfile(account.getFirstname(), account.getFirstname() + account.getLastname()));
+        user.setRoles(Arrays.asList(getRoleUser()));
+        return userRepository.insert(user);
+    }
+
+    @Override
     public User registerNewUserAccount(String email, String password, String name) throws UserAlreadyExistException {
         if (userRepository.findByEmail(email) != null) {
             throw new UserAlreadyExistException("There is an account with that email adress: " + email);
         }
-
-        Role roleUser = roleRepository.findByName(ROLE_USER);
-        if (roleUser == null)
-            roleUser = roleRepository.insert(new Role(ROLE_USER));
 
         final User user = new User();
 
@@ -176,8 +191,15 @@ public class UserServiceImpl implements UserService {
         //user.setUsing2FA(account.isUsing2FA());
         user.setUsername(name);
         user.setProfile(new UserProfile(name));
-        user.setRoles(Arrays.asList(roleUser));
+        user.setRoles(Arrays.asList(getRoleUser()));
         return userRepository.insert(user);
+    }
+
+    private Role getRoleUser() {
+        Role roleUser = roleRepository.findByName(ROLE_USER);
+        if (roleUser == null)
+            roleUser = roleRepository.insert(new Role(ROLE_USER));
+        return roleUser;
     }
 
     @Override

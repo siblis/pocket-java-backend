@@ -20,7 +20,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-@NoArgsConstructor
 @Service("userDetailsService")
 @Transactional
 public class MyUserDetailsService implements UserDetailsService {
@@ -33,6 +32,10 @@ public class MyUserDetailsService implements UserDetailsService {
 
     @Autowired
     private HttpServletRequest request;
+
+    public MyUserDetailsService() {
+        super();
+    }
 
     // API
 
