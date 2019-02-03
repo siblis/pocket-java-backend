@@ -27,6 +27,8 @@ public class PasswordResetToken {
     @DBRef
     private User user;
 
+    private Date logged_at = new Date();
+
     private Date expiryDate;
 
     public PasswordResetToken(final String token) {
@@ -53,13 +55,16 @@ public class PasswordResetToken {
 
     public void updateToken(final String token) {
         this.token = token;
+        this.logged_at = new Date();
         this.expiryDate = calculateExpiryDate(EXPIRATION);
     }
 
     @Override
     public String toString() {
         final StringBuilder builder = new StringBuilder();
-        builder.append("Token [String=").append(token).append("]").append("[Expires").append(expiryDate).append("]");
+        builder.append("Token [String=").append(token).append("]")
+                .append("[logged_at=").append(expiryDate).append("]")
+                .append("[Expires").append(expiryDate).append("]");
         return builder.toString();
     }
 

@@ -20,7 +20,7 @@ OAuth2Configuration
 
 http (80) redirect to https (8888)
 \
-http://localhost
+http://localhost:8888
 \
 https://localhost:8888
 

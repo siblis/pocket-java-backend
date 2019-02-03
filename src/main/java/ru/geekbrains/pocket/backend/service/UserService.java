@@ -2,10 +2,7 @@ package ru.geekbrains.pocket.backend.service;
 
 import org.bson.types.ObjectId;
 import ru.geekbrains.pocket.backend.domain.SystemUser;
-import ru.geekbrains.pocket.backend.domain.db.Role;
-import ru.geekbrains.pocket.backend.domain.db.User;
-import ru.geekbrains.pocket.backend.domain.db.UserProfile;
-import ru.geekbrains.pocket.backend.domain.db.VerificationToken;
+import ru.geekbrains.pocket.backend.domain.db.*;
 import ru.geekbrains.pocket.backend.exception.UserAlreadyExistException;
 import ru.geekbrains.pocket.backend.resource.UserResource;
 
@@ -14,13 +11,15 @@ import java.util.List;
 
 public interface UserService { //extends UserDetailsService {
 
-    void changeUserPassword(User user, String password);
+    User changeUserPassword(User user, String password);
 
     boolean checkIfValidOldPassword(User user, String oldPassword);
 
-    void createPasswordResetTokenForUser(User user, String token);
+    PasswordResetToken createPasswordResetTokenForUser(User user, String token);
 
-    void createVerificationTokenForUser(User user, String token);
+    UserToken createVerificationTokenForUser(User user);
+
+    UserToken createVerificationTokenForUser(User user, String token);
 
     void delete(ObjectId id);
 
@@ -38,9 +37,11 @@ public interface UserService { //extends UserDetailsService {
 
     User getUserByUsername(String userName);
 
-    VerificationToken getVerificationToken(String token);
+    UserToken getVerificationToken(User user);
 
-    VerificationToken generateNewVerificationToken(String token);
+    UserToken getVerificationToken(String token);
+
+    UserToken generateNewVerificationToken(String token);
 
     List<Role> getRolesByUsername(String userName);
 

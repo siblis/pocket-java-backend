@@ -1,5 +1,6 @@
 package ru.geekbrains.pocket.backend.controller.rest;
 
+import com.mongodb.MongoWriteException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,13 +27,14 @@ import org.springframework.web.context.request.WebRequest;
 import ru.geekbrains.pocket.backend.domain.db.Privilege;
 import ru.geekbrains.pocket.backend.domain.db.Role;
 import ru.geekbrains.pocket.backend.domain.db.User;
-import ru.geekbrains.pocket.backend.domain.db.VerificationToken;
+import ru.geekbrains.pocket.backend.domain.db.UserToken;
 import ru.geekbrains.pocket.backend.domain.pub.UserPub;
 import ru.geekbrains.pocket.backend.exception.UserAlreadyExistException;
 import ru.geekbrains.pocket.backend.response.GenericResponse;
 import ru.geekbrains.pocket.backend.security.registration.OnRegistrationCompleteEvent;
 import ru.geekbrains.pocket.backend.service.RoleService;
 import ru.geekbrains.pocket.backend.service.UserService;
+import ru.geekbrains.pocket.backend.util.validation.ValidEmail;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -44,31 +46,27 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
-//@Validated
 @RestController
 @RequestMapping("/v1/auth")
 public class AuthRestController {
-    private final static String ROLE_USER = "ROLE_USER";
-
     @Autowired
     private UserService userService;
     @Autowired
-    private RoleService roleService;
-    @Autowired
     private PasswordEncoder passwordEncoder;
-    @Autowired
-    ApplicationEventPublisher eventPublisher;
+
+    //отправка электронного письма с запросом подтверждения email
+//    @Autowired
+//    ApplicationEventPublisher eventPublisher;
     @Autowired
     private MessageSource messages;
-    @Autowired
-    private JavaMailSender mailSender;
+//    @Autowired
+//    private JavaMailSender mailSender;
     @Autowired
     private Environment env;
 
 
-    @PostMapping(path = "/login", consumes = "application/json")
-    //@PostMapping(path = "/login", produces = "application/json;charset=UTF-8")
-    public ResponseEntity login(@RequestBody LoginRequest loginRequest) {
+    @PostMapping(path = "/login", consumes = "application/json")// produces = "application/json;charset=UTF-8")
+    public ResponseEntity login(@Valid @RequestBody LoginRequest loginRequest) {
         //TODO validate
         User user = userService.getUserByEmail(loginRequest.getEmail());
         if (user == null) {
@@ -76,42 +74,40 @@ public class AuthRestController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        String token = ""; //TODO token
+        if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
+            log.debug("Password does not match");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
 
-        return new ResponseEntity<>(new RegistrationResponse(token, new UserPub(user)), HttpStatus.OK);
+        UserToken token = userService.getVerificationToken(user);
+        if (token == null) {
+            token = userService.createVerificationTokenForUser(user);
+//            log.debug("Token for user '" + loginRequest.getEmail() + "' not exists.");
+//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(new RegistrationResponse(token.getToken(), new UserPub(token.getUser())), HttpStatus.OK);
     }
 
-    @PostMapping(path = "/login3", consumes = "application/json")
+    //test
+    @PostMapping(path = "/login2", consumes = "application/json")
     @ResponseBody
-    public GenericResponse login3(HttpServletRequest request, @RequestParam("token") String existingToken) {
-        VerificationToken newToken = userService.generateNewVerificationToken(existingToken);
+    public GenericResponse login2(HttpServletRequest request, @RequestParam("token") String existingToken) {
+        UserToken newToken = userService.generateNewVerificationToken(existingToken);
 
         User user = userService.getUserByToken(newToken.getToken());
+
+        //отправка ссылки на email для подтверждения регистрации
         String appUrl =
                 "http://" + request.getServerName() +
                         ":" + request.getServerPort() +
                         request.getContextPath();
-        SimpleMailMessage email =
-                constructResendVerificationTokenEmail(appUrl, request.getLocale(), newToken, user);
-        mailSender.send(email);
+//        SimpleMailMessage email =
+//                constructResendVerificationTokenEmail(appUrl, request.getLocale(), newToken, user);
+//        mailSender.send(email);
 
         return new GenericResponse(
                 messages.getMessage("message.resendToken", null, request.getLocale()));
-    }
-
-    //Example
-    @PostMapping("/login2")
-    public ResponseEntity<?> login2(@RequestParam(name = "email") String email,
-                                    @RequestParam(name = "password") String password) {
-        User user = userService.getUserByEmail(email);
-        if (user == null) {
-            log.debug("User not exists.");
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        String token = "";
-
-        return new ResponseEntity<>(new RegistrationResponse(token, new UserPub(user)), HttpStatus.OK);
     }
 
     @PostMapping(path = "/registration", consumes = "application/json")
@@ -140,21 +136,26 @@ public class AuthRestController {
         } catch (UserAlreadyExistException e) {
             log.debug("Email already exists.");
             return new ResponseEntity<>(HttpStatus.CONFLICT);
+        } catch (MongoWriteException e) {
+            log.debug("Email write to db user " + registrationRequest);
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
 
-        log.debug("Successfully created user: " + registered.getEmail());
-
-        String token = ""; //TODO token
-
+        UserToken newToken = userService.createVerificationTokenForUser(registered);
+        if (newToken == null) {
+            log.debug("Error create token for user " + registered.getEmail());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
         //отправка электронного письма с запросом подтверждения email
 //        try {
-        eventPublisher.publishEvent(new OnRegistrationCompleteEvent
-                (registered, request.getLocale(), getAppUrl(request)));
+//        eventPublisher.publishEvent(new OnRegistrationCompleteEvent
+//                (registered, request.getLocale(), getAppUrl(request)));
 //        } catch (Exception me) {
 //            return new ResponseEntity<>(HttpStatus.CONFLICT);
 //        }
+        log.debug("Successfully created user: " + registered.getEmail() + " and token " + newToken.getToken());
 
-        return new ResponseEntity<>(new RegistrationResponse(token, new UserPub(registered)), HttpStatus.CREATED);
+        return new ResponseEntity<>(new RegistrationResponse(newToken.getToken(), new UserPub(newToken.getUser())), HttpStatus.CREATED);
 
     }
 
@@ -175,15 +176,15 @@ public class AuthRestController {
         }
 
         //Пользователь будет перенаправлен на страницу ошибки с соответствующим сообщением, если:
-        // - VerificationToken не существует по какой-либо причине или
-        // - Срок действия VerificationToken истек
+        // - UserToken не существует по какой-либо причине или
+        // - Срок действия UserToken истек
         return new ResponseEntity<>(HttpStatus.CONFLICT);
     }
 
     // ============== NON-API ============
 
     private SimpleMailMessage constructResendVerificationTokenEmail
-            (final String contextPath, final Locale locale, final VerificationToken newToken, final User user) {
+            (final String contextPath, final Locale locale, final UserToken newToken, final User user) {
         String confirmationUrl =
                 contextPath + "/regitrationConfirm.html?token=" + newToken.getToken();
         String message = messages.getMessage("message.resendToken", null, locale);
@@ -233,10 +234,10 @@ public class AuthRestController {
     @AllArgsConstructor
     private static class LoginRequest {
 
-        //@Size(max = 32)//, message = "email should at most 32 characters long")
+        @ValidEmail
+        @Size(min = 6, max = 32)
         private String email;
-        //@Min(value = 8)
-        //@Max(value = 32)//, message = "password should at most 32 characters long")
+        @Size(min = 8, max = 32)
         private String password;
     }
 
@@ -245,15 +246,12 @@ public class AuthRestController {
     @NoArgsConstructor
     @AllArgsConstructor
     private static class RegistrationRequest {
-        //@ValidEmail(message = "email names must comply with the standard")
-        //@Max(value = 32, message = "email should at most 32 characters long")
+        @ValidEmail //(message = "email names must comply with the standard")
+        @Size(min = 6, max = 32)
         private String email;
-        //@Min(value = 8, message = "password must be more than 8 characters")
-        @Size(min = 8, max = 32)//, message = "password 8 - 32")//"password should at most 32 characters long")
-        //@Max(value = 32, message = "password should at most 32 characters long")
+        @Size(min = 8, max = 32)
         private String password;
-        @Min(value = 5)//, message = "name must be more than 8 characters")
-        @Max(value = 32)// , message = "name should at most 32 characters long")
+        @Size(min = 2, max = 32)
         private String name;
     }
 

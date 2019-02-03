@@ -10,25 +10,24 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.data.domain.Example;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
-import ru.geekbrains.pocket.backend.domain.db.Privilege;
-import ru.geekbrains.pocket.backend.domain.db.Role;
-import ru.geekbrains.pocket.backend.domain.db.User;
+import ru.geekbrains.pocket.backend.domain.db.*;
 import ru.geekbrains.pocket.backend.repository.PrivilegeRepository;
 import ru.geekbrains.pocket.backend.repository.RoleRepository;
 import ru.geekbrains.pocket.backend.repository.UserRepository;
+import ru.geekbrains.pocket.backend.service.UserService;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-@Configuration
 @Slf4j
+@Configuration
 public class SetupDataLoader implements ApplicationListener<ContextRefreshedEvent> {
     private boolean alreadySetup = false;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
     @Autowired
     private RoleRepository roleRepository;
     @Autowired
@@ -36,14 +35,14 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    // API
-
     @Override
     @Transactional
     public void onApplicationEvent(final ContextRefreshedEvent event) {
         if (alreadySetup) {
             return;
         }
+        //userRepository.deleteAll();
+        //userRepository.deleteByEmail("a@mail.ru");
 
         // == create initial privileges
         final Privilege readPrivilege = createPrivilegeIfNotFound("READ_PRIVILEGE");
@@ -54,83 +53,75 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         final List<Privilege> adminPrivileges = new ArrayList<Privilege>(Arrays.asList(readPrivilege, writePrivilege, passwordPrivilege));
         final List<Privilege> userPrivileges = new ArrayList<Privilege>(Arrays.asList(readPrivilege, passwordPrivilege));
         final Role adminRole = createRoleIfNotFound("ROLE_ADMIN", adminPrivileges);
-        createRoleIfNotFound("ROLE_USER", userPrivileges);
+        final Role userRole = createRoleIfNotFound("ROLE_USER", userPrivileges);
 
         // == create initial user
-        createUserIfNotFound("test@test.com", "Test", "Test", new ArrayList<Role>(Arrays.asList(adminRole)));
+        User user1 = createUserIfNotFound("test@test.com", "Test", "Test1234", Arrays.asList(adminRole));
+        User user2 = createUserIfNotFound("a@mail.ru", "Alex", "Abc12345", Arrays.asList(adminRole));
+        User user3 = createUserIfNotFound("b@mail.ru", "Bob", "Abc12345", Arrays.asList(userRole));
+        User user4 = createUserIfNotFound("i@mail.ru", "ivan", "Qwe12345", Arrays.asList(userRole));
+
+        createTokenForUser(user1);
+        createTokenForUser(user2);
+        createTokenForUser(user3);
+        //createTokenForUser(user4); не создаём токен специально для тестирования
 
         alreadySetup = true;
     }
 
     @Transactional
-    private final Privilege createPrivilegeIfNotFound(final String name) {
+    private Privilege createPrivilegeIfNotFound(final String name) {
         Privilege privilege = privilegeRepository.findByName(name);
         if (privilege == null) {
             privilege = new Privilege(name);
             privilege = privilegeRepository.save(privilege);
+            log.info("Preloading " + privilege);
         }
         return privilege;
     }
 
     @Transactional
-    private final Role createRoleIfNotFound(final String name, final List<Privilege> privileges) {
+    private Role createRoleIfNotFound(final String name, final List<Privilege> privileges) {
         Role role = roleRepository.findByName(name);
         if (role == null) {
             role = new Role(name);
         }
         role.setPrivileges(privileges);
         role = roleRepository.save(role);
+        log.info("Preloading " + role);
         return role;
     }
 
     @Transactional
-    private final User createUserIfNotFound(final String email, final String userName, final String password, final Collection<Role> roles) {
-        User user = userRepository.findByEmail(email);
+    private User createUserIfNotFound(final String email, final String userName, final String password, final Collection<Role> roles) {
+        User user = userService.getUserByEmail(email);
         if (user == null) {
             user = new User();
+            user.setEmail(email);
             user.setUsername(userName);
             user.setPassword(passwordEncoder.encode(password));
-            user.setEmail(email);
+            user.setProfile(new UserProfile(userName));
             user.setEnabled(true);
         }
         user.setRoles(roles);
-        user = userRepository.save(user);
+        user = userService.update(user);
+        log.info("Preloading " + user);
         return user;
     }
 
-    @Bean
-    CommandLineRunner initDatabase() {
-//        CommandLineRunner initDatabase(UserRepository userRepository, RoleRepository roleRepository) {
-//        this.userRepository = userRepository;
-//        this.roleRepository = roleRepository;
-
-        return args -> {
-
-            addRoleToDB(new Role("ROLE_ADMIN"));
-            addRoleToDB(new Role("ROLE_USER"));
-
-            //userRepository.deleteAll();
-            //userRepository.deleteByEmail("a@mail.ru");
-
-            Role roleAdmin = roleRepository.findByName("ROLE_ADMIN");
-            Role roleUser = roleRepository.findByName("ROLE_USER");
-
-            addUserToDB(new User("a@mail.ru", passwordEncoder.encode("Abc123"), "Alex",
-                    Arrays.asList(roleAdmin, roleUser)));
-            addUserToDB(new User("b@mail.ru", passwordEncoder.encode("Abc345"), "Bob",
-                    Arrays.asList(roleUser)));
-            addUserToDB(new User("i@mail.ru", passwordEncoder.encode("Abc567"), "ivan",
-                    Arrays.asList(roleUser)));
-        };
+    @Transactional
+    private UserToken createTokenForUser(User user) {
+        UserToken token = userService.getVerificationToken(user);
+        if (token == null) {
+            token = userService.createVerificationTokenForUser(user);
+        }
+        return token;
     }
+//    @Bean
+//    CommandLineRunner initDatabase() {
+//        return args -> {
+//            log.info("initDatabase");
+//        };
+//    }
 
-    private void addRoleToDB(Role role) {
-        if (!roleRepository.exists(Example.of(role)))
-            log.info("Preloading " + roleRepository.save(role));
-    }
-
-    private void addUserToDB(User user) {
-        if (userRepository.findByEmail(user.getEmail()) == null)
-            log.info("Preloading " + userRepository.save(user));
-    }
 }

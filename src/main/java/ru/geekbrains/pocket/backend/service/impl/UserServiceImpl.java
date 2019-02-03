@@ -1,5 +1,7 @@
 package ru.geekbrains.pocket.backend.service.impl;
 
+import com.mongodb.MongoWriteException;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,16 +16,14 @@ import ru.geekbrains.pocket.backend.domain.db.*;
 import ru.geekbrains.pocket.backend.exception.RoleNotFoundException;
 import ru.geekbrains.pocket.backend.exception.UserAlreadyExistException;
 import ru.geekbrains.pocket.backend.exception.UserNotFoundException;
-import ru.geekbrains.pocket.backend.repository.PasswordResetTokenRepository;
-import ru.geekbrains.pocket.backend.repository.RoleRepository;
-import ru.geekbrains.pocket.backend.repository.UserRepository;
-import ru.geekbrains.pocket.backend.repository.VerificationTokenRepository;
+import ru.geekbrains.pocket.backend.repository.*;
 import ru.geekbrains.pocket.backend.resource.UserResource;
 import ru.geekbrains.pocket.backend.service.UserService;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class UserServiceImpl implements UserService {
     public static final String TOKEN_INVALID = "invalidToken";
@@ -33,7 +33,7 @@ public class UserServiceImpl implements UserService {
     public static String APP_NAME = "Pocket";
 
     @Autowired
-    private VerificationTokenRepository tokenRepository;
+    private UserTokenRepository tokenRepository;
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -45,9 +45,9 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public void changeUserPassword(User user, String password) {
+    public User changeUserPassword(User user, String password) {
         user.setPassword(passwordEncoder.encode(password));
-        userRepository.save(user);
+        return userRepository.save(user);
     }
 
     @Override
@@ -56,15 +56,22 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void createPasswordResetTokenForUser(User user, String token) {
-        final PasswordResetToken myToken = new PasswordResetToken(token, user);
-        passwordTokenRepository.save(myToken);
+    public PasswordResetToken createPasswordResetTokenForUser(User user, String token) {
+        final PasswordResetToken userToken = new PasswordResetToken(token, user);
+        return passwordTokenRepository.save(userToken);
     }
 
     @Override
-    public void createVerificationTokenForUser(User user, String token) {
-        final VerificationToken myToken = new VerificationToken(token, user);
-        tokenRepository.save(myToken);
+    public UserToken createVerificationTokenForUser(User user) {
+        final String token = UUID.randomUUID().toString();
+        final UserToken userToken = new UserToken(token, user);
+        return tokenRepository.save(userToken);
+    }
+
+    @Override
+    public UserToken createVerificationTokenForUser(User user, String token) {
+        final UserToken userToken = new UserToken(token, user);
+        return tokenRepository.save(userToken);
     }
 
     @Override
@@ -116,9 +123,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserByToken(String token) {
-        final VerificationToken verificationToken = tokenRepository.findByToken(token);
-        if (verificationToken != null) {
-            return verificationToken.getUser();
+        final UserToken UserToken = tokenRepository.findByToken(token);
+        if (UserToken != null) {
+            return UserToken.getUser();
         }
         return null;
     }
@@ -132,13 +139,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public VerificationToken getVerificationToken(String token) {
+    public UserToken getVerificationToken(User user) {
+        return tokenRepository.findByUser(user);
+    }
+
+    @Override
+    public UserToken getVerificationToken(String token) {
         return tokenRepository.findByToken(token);
     }
 
     @Override
-    public VerificationToken generateNewVerificationToken(final String token) {
-        VerificationToken vToken = tokenRepository.findByToken(token);
+    public UserToken generateNewVerificationToken(final String token) {
+        UserToken vToken = tokenRepository.findByToken(token);
         vToken.updateToken(UUID.randomUUID().toString());
         vToken = tokenRepository.save(vToken);
         return vToken;
@@ -160,7 +172,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User registerNewUserAccount(SystemUser account) throws UserAlreadyExistException {
+    public User registerNewUserAccount(SystemUser account)
+            throws UserAlreadyExistException, MongoWriteException {
         if (userRepository.findByEmail(account.getEmail()) != null) {
             throw new UserAlreadyExistException("There is an account with that email adress: " + account.getEmail());
         }
@@ -168,17 +181,22 @@ public class UserServiceImpl implements UserService {
         final User user = new User();
 
         user.setEmail(account.getEmail());
-        //user.setPassword(password); //если приходит в зашифрованном виде
         user.setPassword(passwordEncoder.encode(account.getPassword())); //шифруем
         //user.setUsing2FA(account.isUsing2FA());
         user.setUsername(account.getFirstname());
-        user.setProfile(new UserProfile(account.getFirstname(), account.getFirstname() + account.getLastname()));
+        user.setProfile(new UserProfile(account.getFirstname(), account.getFirstname() + " " + account.getLastname()));
         user.setRoles(Arrays.asList(getRoleUser()));
-        return userRepository.insert(user);
+        try {
+            return userRepository.insert(user);
+        } catch (MongoWriteException ex) {
+            log.error(ex.getMessage());
+        }
+        return null;
     }
 
     @Override
-    public User registerNewUserAccount(String email, String password, String name) throws UserAlreadyExistException {
+    public User registerNewUserAccount(String email, String password, String name)
+            throws UserAlreadyExistException, MongoWriteException {
         if (userRepository.findByEmail(email) != null) {
             throw new UserAlreadyExistException("There is an account with that email adress: " + email);
         }
@@ -186,13 +204,17 @@ public class UserServiceImpl implements UserService {
         final User user = new User();
 
         user.setEmail(email);
-        //user.setPassword(password); //если приходит в зашифрованном виде
-        user.setPassword(passwordEncoder.encode(password)); //шифруем
+        user.setPassword(passwordEncoder.encode(password)); //получаем хэш пароля
         //user.setUsing2FA(account.isUsing2FA());
         user.setUsername(name);
         user.setProfile(new UserProfile(name));
         user.setRoles(Arrays.asList(getRoleUser()));
-        return userRepository.insert(user);
+        try {
+            return userRepository.insert(user);
+        } catch (MongoWriteException ex) {
+            log.error(ex.getMessage());
+        }
+        return null;
     }
 
     private Role getRoleUser() {
@@ -203,8 +225,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User update(User user) {
-        return userRepository.save(user);
+    public User update(User user) throws MongoWriteException {
+        try {
+            return userRepository.save(user);
+        } catch (MongoWriteException ex) {
+            log.error(ex.getMessage());
+        }
+        return null;
     }
 
 
@@ -313,23 +340,23 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String validateVerificationToken(String token) {
-        final VerificationToken verificationToken = tokenRepository.findByToken(token);
-        if (verificationToken == null) {
+        final UserToken UserToken = tokenRepository.findByToken(token);
+        if (UserToken == null) {
             return TOKEN_INVALID;
         }
 
-        final User user = verificationToken.getUser();
+        final User user = UserToken.getUser();
         final Calendar cal = Calendar.getInstance();
-        if ((verificationToken.getExpiryDate()
+        if ((UserToken.getExpiryDate()
                 .getTime()
                 - cal.getTime()
                 .getTime()) <= 0) {
-            tokenRepository.delete(verificationToken);
+            tokenRepository.delete(UserToken);
             return TOKEN_EXPIRED;
         }
 
         user.setEnabled(true);
-        // tokenRepository.delete(verificationToken);
+        // tokenRepository.delete(UserToken);
         userRepository.save(user);
         return TOKEN_VALID;
     }

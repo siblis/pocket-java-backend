@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.TypeAlias;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -15,31 +16,36 @@ import java.util.Date;
 @Getter
 @Setter
 @NoArgsConstructor
-@Document(collection = "tokens")
-@TypeAlias("tokens")
-public class VerificationToken {
+@Document(collection = "users.tokens")
+public class UserToken {
 
     private static final int EXPIRATION = 60 * 24;
 
     @Id
     private ObjectId id;
 
-    private String token;
-
     @DBRef
     private User user;
 
+    @Indexed
+    private String token;
+
+    private String user_ip;
+
+    private String agent;
+
+    private Date logged_at = new Date();
+
     private Date expiryDate;
 
-
-    public VerificationToken(final String token) {
+    public UserToken(final String token) {
         super();
 
         this.token = token;
         this.expiryDate = calculateExpiryDate(EXPIRATION);
     }
 
-    public VerificationToken(final String token, final User user) {
+    public UserToken(final String token, final User user) {
         super();
 
         this.token = token;
@@ -56,13 +62,16 @@ public class VerificationToken {
 
     public void updateToken(final String token) {
         this.token = token;
+        this.logged_at = new Date();
         this.expiryDate = calculateExpiryDate(EXPIRATION);
     }
 
     @Override
     public String toString() {
         final StringBuilder builder = new StringBuilder();
-        builder.append("Token [String=").append(token).append("]").append("[Expires").append(expiryDate).append("]");
+        builder.append("Token [String=").append(token).append("]")
+                .append("[logged_at=").append(expiryDate).append("]")
+                .append("[Expires=").append(expiryDate).append("]");
         return builder.toString();
     }
 
@@ -89,7 +98,7 @@ public class VerificationToken {
 //        if (getClass() != obj.getClass()) {
 //            return false;
 //        }
-//        final VerificationToken other = (VerificationToken) obj;
+//        final UserToken other = (UserToken) obj;
 //        if (expiryDate == null) {
 //            if (other.expiryDate != null) {
 //                return false;
