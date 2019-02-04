@@ -4,18 +4,19 @@ import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
-import ru.geekbrains.pocket.backend.domain.User;
+import ru.geekbrains.pocket.backend.domain.db.User;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface UserRepository extends MongoRepository<User, ObjectId> {
 
+    void deleteByEmail(String email);
+
     User findFirstByUsername(String username);
 
     //@Cacheable()
-    Optional<User> findByUsername(String username);
+    User findByUsername(String username);
 
     // Supports native JSON query string
     @Query("{firstname:'?0'}")
@@ -29,7 +30,7 @@ public interface UserRepository extends MongoRepository<User, ObjectId> {
     @Query(value = "{ 'firstname' : ?0 }", fields = "{ 'firstname' : 1, 'lastname' : 1}")
     List<User> findByTheUsersFirstname(String firstname);
 
-    Optional<User> findByEmailMatches(String email);
+    User findByEmailMatches(String email);
 
     User findByProfileUsername(String Username);
 

@@ -1,17 +1,29 @@
 package ru.geekbrains.pocket.backend.service;
 
 import org.bson.types.ObjectId;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import ru.geekbrains.pocket.backend.domain.Role;
-import ru.geekbrains.pocket.backend.domain.User;
-import ru.geekbrains.pocket.backend.domain.UserProfile;
+import ru.geekbrains.pocket.backend.domain.SystemUser;
+import ru.geekbrains.pocket.backend.domain.db.*;
+import ru.geekbrains.pocket.backend.exception.UserAlreadyExistException;
 import ru.geekbrains.pocket.backend.resource.UserResource;
 
 import java.util.Date;
 import java.util.List;
 
-public interface UserService extends UserDetailsService {
+public interface UserService { //extends UserDetailsService {
+
+    User changeUserPassword(User user, String password);
+
+    boolean checkIfValidOldPassword(User user, String oldPassword);
+
+    PasswordResetToken createPasswordResetTokenForUser(User user, String token);
+
+    UserToken createVerificationTokenForUser(User user);
+
+    UserToken createVerificationTokenForUser(User user, String token);
+
     void delete(ObjectId id);
+
+    void delete(String email);
 
     List<User> getAllUsers();
 
@@ -19,30 +31,29 @@ public interface UserService extends UserDetailsService {
 
     User getUserById(ObjectId id);
 
+    User getUserByEmail(String email);
+
+    User getUserByToken(String token);
+
     User getUserByUsername(String userName);
+
+    UserToken getVerificationToken(User user);
+
+    UserToken getVerificationToken(String token);
+
+    UserToken generateNewVerificationToken(String token);
 
     List<Role> getRolesByUsername(String userName);
 
     User insert(User user);
 
+    User registerNewUserAccount(SystemUser account)
+            throws UserAlreadyExistException;
+
+    User registerNewUserAccount(String email, String password, String name)
+            throws UserAlreadyExistException;
+
     User update(User user);
-
-    User validateUser(ObjectId id);
-
-    User validateUser(String username);
-
-
-    public String addNewUser(User user);
-
-    public String deleteUser(User user);
-
-    public User findUserByID(ObjectId id);
-
-    public User findByEmail(String email);
-
-    public User findUsersByUsername(String username);
-
-    public String updateUser(User user);
 
     public String updateUserProfile(User user, UserProfile userProfile);
 
@@ -53,5 +64,13 @@ public interface UserService extends UserDetailsService {
     public String updateUsersLastSeen(User user, Date date);
 
     public String updateUsersPassword(User user, String password);
+
+    String validatePasswordResetToken(ObjectId id, String token);
+
+    User validateUser(ObjectId id);
+
+    User validateUser(String username);
+
+    String validateVerificationToken(String token);
 
 }

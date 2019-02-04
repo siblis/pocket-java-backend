@@ -3,8 +3,8 @@ package ru.geekbrains.pocket.backend.resource;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.hateoas.Resources;
-import ru.geekbrains.pocket.backend.controller.rest.UserRestController;
-import ru.geekbrains.pocket.backend.domain.User;
+import ru.geekbrains.pocket.backend.controller.rest.ExampleUserRestController;
+import ru.geekbrains.pocket.backend.domain.db.User;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,12 +21,12 @@ public class UserResources extends ResourceSupport {
     public UserResources(List<User> users) {
         List<Resource<User>> userResources = users.stream()
                 .map(user -> new Resource<>(user,
-                        linkTo(methodOn(UserRestController.class).getUserByName2(user.getUsername())).withSelfRel(),
-                        linkTo(methodOn(UserRestController.class).getAllUsers()).withRel("users")))
+                        linkTo(methodOn(ExampleUserRestController.class).getUserByName(user.getUsername())).withSelfRel(),
+                        linkTo(methodOn(ExampleUserRestController.class).getAllUsers()).withRel("users")))
                 .collect(Collectors.toList());
 
         this.users = new Resources<>(userResources,
-                linkTo(methodOn(UserRestController.class).getAllUsers()).withSelfRel());
+                linkTo(methodOn(ExampleUserRestController.class).getAllUsers()).withSelfRel());
 
     }
 

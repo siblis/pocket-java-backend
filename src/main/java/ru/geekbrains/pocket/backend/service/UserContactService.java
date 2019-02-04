@@ -1,7 +1,7 @@
 package ru.geekbrains.pocket.backend.service;
 
-import ru.geekbrains.pocket.backend.domain.User;
-import ru.geekbrains.pocket.backend.domain.UserContacts;
+import ru.geekbrains.pocket.backend.domain.db.User;
+import ru.geekbrains.pocket.backend.domain.db.UserContacts;
 
 import java.util.List;
 

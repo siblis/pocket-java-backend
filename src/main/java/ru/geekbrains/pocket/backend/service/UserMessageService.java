@@ -1,8 +1,8 @@
 package ru.geekbrains.pocket.backend.service;
 
 import org.bson.types.ObjectId;
-import ru.geekbrains.pocket.backend.domain.User;
-import ru.geekbrains.pocket.backend.domain.UserMessage;
+import ru.geekbrains.pocket.backend.domain.db.User;
+import ru.geekbrains.pocket.backend.domain.db.UserMessage;
 
 import java.util.List;
 
