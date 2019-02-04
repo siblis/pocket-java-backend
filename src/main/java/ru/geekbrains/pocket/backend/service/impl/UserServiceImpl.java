@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.geekbrains.pocket.backend.domain.SystemUser;
 import ru.geekbrains.pocket.backend.domain.db.*;
+import ru.geekbrains.pocket.backend.exception.InvalidOldPasswordException;
 import ru.geekbrains.pocket.backend.exception.RoleNotFoundException;
 import ru.geekbrains.pocket.backend.exception.UserAlreadyExistException;
 import ru.geekbrains.pocket.backend.exception.UserNotFoundException;
@@ -282,12 +283,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String updateUsersPassword(User user, String password) {
-        User updatingUser = userRepository.findByEmailMatches(user.getEmail());
-        if (updatingUser != null) {
-            updatingUser.setPassword(password);
-            return userRepository.save(updatingUser).getId().toString();
-        } else return "user not found";
+    public User updateNameAndPassword(User user, String name, String oldPassword, String newPassword)
+            throws InvalidOldPasswordException {
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            throw new InvalidOldPasswordException("Old & current password does not match!");
+        }
+        user.setUsername(name);
+        user.getProfile().setUsername(name);
+        user.setPassword(passwordEncoder.encode(newPassword));
+        return update(user);
     }
 
     @Override

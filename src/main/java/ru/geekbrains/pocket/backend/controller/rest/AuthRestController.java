@@ -40,6 +40,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
@@ -234,9 +235,11 @@ public class AuthRestController {
     @AllArgsConstructor
     private static class LoginRequest {
 
+        @NotNull
         @ValidEmail
         @Size(min = 6, max = 32)
         private String email;
+        @NotNull
         @Size(min = 8, max = 32)
         private String password;
     }
@@ -246,11 +249,14 @@ public class AuthRestController {
     @NoArgsConstructor
     @AllArgsConstructor
     private static class RegistrationRequest {
+        @NotNull
         @ValidEmail //(message = "email names must comply with the standard")
         @Size(min = 6, max = 32)
         private String email;
+        @NotNull
         @Size(min = 8, max = 32)
         private String password;
+        @NotNull
         @Size(min = 2, max = 32)
         private String name;
     }
