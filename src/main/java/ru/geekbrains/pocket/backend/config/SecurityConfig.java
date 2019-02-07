@@ -16,7 +16,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.token.ClientKeyGenerator;
 import org.springframework.security.oauth2.client.token.DefaultClientKeyGenerator;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import ru.geekbrains.pocket.backend.security.*;
+import ru.geekbrains.pocket.backend.security.token.JwtAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -55,6 +57,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
+//            .cors()
+//            .and()
             .csrf().disable()   //Межсайтовая подделка запроса
                 .exceptionHandling()
                 .accessDeniedHandler(accessDeniedHandler)
@@ -62,7 +66,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
 //            .headers().frameOptions().sameOrigin()
 //                .and()
-//                .addFilterAfter(restTokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+            .addFilterAfter(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class)
             .authorizeRequests()
             //более конкретные правила должны стоять первыми, а затем более общие
                 .antMatchers("/v1/auth/**").permitAll() //rest
@@ -101,6 +105,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         auth.setUserDetailsService(userDetailsService);
         auth.setPasswordEncoder(passwordEncoder());
         return auth;
+    }
+
+    @Bean
+    public JwtAuthenticationFilter authenticationTokenFilterBean() throws Exception {
+        return new JwtAuthenticationFilter();
     }
 
     @Bean

@@ -1,7 +1,5 @@
 package ru.geekbrains.pocket.backend.config;
 
-import com.mongodb.client.MongoClient;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
@@ -13,19 +11,13 @@ import org.springframework.data.mongodb.core.convert.DefaultMongoTypeMapper;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
-import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.servlet.LocaleResolver;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.i18n.CookieLocaleResolver;
-import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import ru.geekbrains.pocket.backend.util.validation.EmailValidator;
 import ru.geekbrains.pocket.backend.util.validation.PasswordMatchesValidator;
-
-import javax.sql.DataSource;
-import java.util.Locale;
 
 @Configuration
 //@EnableCaching
@@ -55,8 +47,6 @@ public class AppConfig {
         return mongoTemplate;
 
     }
-
-    // beans
 
     //https://www.baeldung.com/spring-security-login-error-handling-localization
     @Bean

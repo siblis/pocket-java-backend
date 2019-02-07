@@ -2,19 +2,16 @@ package ru.geekbrains.pocket.backend.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.ApplicationListener;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.data.domain.Example;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import ru.geekbrains.pocket.backend.domain.db.*;
 import ru.geekbrains.pocket.backend.repository.PrivilegeRepository;
 import ru.geekbrains.pocket.backend.repository.RoleRepository;
-import ru.geekbrains.pocket.backend.repository.UserRepository;
 import ru.geekbrains.pocket.backend.service.UserService;
+import ru.geekbrains.pocket.backend.service.UserTokenService;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,6 +31,9 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     private PrivilegeRepository privilegeRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private UserTokenService userTokenService;
+
 
     @Override
     @Transactional
@@ -43,6 +43,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         }
         //userRepository.deleteAll();
         //userRepository.deleteByEmail("a@mail.ru");
+        //userTokenService.deleteAllUserToken();
 
         // == create initial privileges
         final Privilege readPrivilege = createPrivilegeIfNotFound("READ_PRIVILEGE");
@@ -111,11 +112,11 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 
     @Transactional
     private UserToken createTokenForUser(User user) {
-        UserToken token = userService.getVerificationToken(user);
-        if (token == null) {
-            token = userService.createVerificationTokenForUser(user);
+        UserToken userToken = userTokenService.getVerificationToken(user);
+        if (userToken == null) {
+            userToken = userTokenService.createVerificationTokenForUser(user);
         }
-        return token;
+        return userToken;
     }
 //    @Bean
 //    CommandLineRunner initDatabase() {

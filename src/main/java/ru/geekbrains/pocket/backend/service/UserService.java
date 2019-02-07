@@ -1,8 +1,11 @@
 package ru.geekbrains.pocket.backend.service;
 
+import com.mongodb.MongoServerException;
 import org.bson.types.ObjectId;
 import ru.geekbrains.pocket.backend.domain.SystemUser;
-import ru.geekbrains.pocket.backend.domain.db.*;
+import ru.geekbrains.pocket.backend.domain.db.Role;
+import ru.geekbrains.pocket.backend.domain.db.User;
+import ru.geekbrains.pocket.backend.domain.db.UserProfile;
 import ru.geekbrains.pocket.backend.exception.InvalidOldPasswordException;
 import ru.geekbrains.pocket.backend.exception.UserAlreadyExistException;
 import ru.geekbrains.pocket.backend.resource.UserResource;
@@ -16,12 +19,6 @@ public interface UserService { //extends UserDetailsService {
 
     boolean checkIfValidOldPassword(User user, String oldPassword);
 
-    PasswordResetToken createPasswordResetTokenForUser(User user, String token);
-
-    UserToken createVerificationTokenForUser(User user);
-
-    UserToken createVerificationTokenForUser(User user, String token);
-
     void delete(ObjectId id);
 
     void delete(String email);
@@ -34,15 +31,7 @@ public interface UserService { //extends UserDetailsService {
 
     User getUserByEmail(String email);
 
-    User getUserByToken(String token);
-
     User getUserByUsername(String userName);
-
-    UserToken getVerificationToken(User user);
-
-    UserToken getVerificationToken(String token);
-
-    UserToken generateNewVerificationToken(String token);
 
     List<Role> getRolesByUsername(String userName);
 
@@ -52,7 +41,7 @@ public interface UserService { //extends UserDetailsService {
             throws UserAlreadyExistException;
 
     User registerNewUserAccount(String email, String password, String name)
-            throws UserAlreadyExistException;
+            throws UserAlreadyExistException, MongoServerException;
 
     User update(User user);
 
@@ -67,12 +56,8 @@ public interface UserService { //extends UserDetailsService {
     User updateNameAndPassword(User user, String name, String oldPassword, String newPassword)
             throws InvalidOldPasswordException;
 
-    String validatePasswordResetToken(ObjectId id, String token);
-
     User validateUser(ObjectId id);
 
     User validateUser(String username);
-
-    String validateVerificationToken(String token);
 
 }
