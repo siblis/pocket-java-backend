@@ -1,5 +1,9 @@
 package ru.geekbrains.pocket.backend.config;
 
+import com.mongodb.client.MongoClient;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.MongoDbFactory;
@@ -9,23 +13,36 @@ import org.springframework.data.mongodb.core.convert.DefaultMongoTypeMapper;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+import org.springframework.validation.Validator;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
+import org.springframework.web.context.request.RequestContextListener;
+import org.springframework.web.servlet.LocaleResolver;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.i18n.CookieLocaleResolver;
+import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
+import ru.geekbrains.pocket.backend.util.validation.EmailValidator;
+import ru.geekbrains.pocket.backend.util.validation.PasswordMatchesValidator;
+
+import javax.sql.DataSource;
+import java.util.Locale;
 
 @Configuration
 //@EnableCaching
 @EnableMongoRepositories(basePackages = {"ru.geekbrains.pocket.backend.repository"})
 public class AppConfig {
 
-//    @Bean
-//    public MethodValidationPostProcessor methodValidationPostProcessor() {
-//        return new MethodValidationPostProcessor();
-//    }
+    @Bean
+    public MethodValidationPostProcessor methodValidationPostProcessor() {
+        return new MethodValidationPostProcessor();
+    }
 
-//    @Bean
-//    public LocalValidatorFactoryBean validator(MessageSource messageSource) {
-//        LocalValidatorFactoryBean validatorFactoryBean = new LocalValidatorFactoryBean();
-//        validatorFactoryBean.setValidationMessageSource(messageSource);
-//        return validatorFactoryBean;
-//    }
+    @Bean
+    public LocalValidatorFactoryBean validator(MessageSource messageSource) {
+        LocalValidatorFactoryBean validatorFactoryBean = new LocalValidatorFactoryBean();
+        validatorFactoryBean.setValidationMessageSource(messageSource);
+        return validatorFactoryBean;
+    }
 
     @Bean
     public MongoTemplate mongoTemplate(MongoDbFactory mongoDbFactory, MongoMappingContext context) {
@@ -37,6 +54,42 @@ public class AppConfig {
 
         return mongoTemplate;
 
+    }
+
+    // beans
+
+    //https://www.baeldung.com/spring-security-login-error-handling-localization
+    @Bean
+    public LocaleResolver localeResolver() {
+        final CookieLocaleResolver cookieLocaleResolver = new CookieLocaleResolver();
+        //cookieLocaleResolver.setDefaultLocale(Locale.ENGLISH);
+        return cookieLocaleResolver;
+    }
+
+    // @Bean
+    // public MessageSource messageSource() {
+    // final ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+    // messageSource.setBasename("classpath:messages");
+    // messageSource.setUseCodeAsDefaultMessage(true);
+    // messageSource.setDefaultEncoding("UTF-8");
+    // messageSource.setCacheSeconds(0);
+    // return messageSource;
+    // }
+
+    @Bean
+    public EmailValidator usernameValidator() {
+        return new EmailValidator();
+    }
+
+    @Bean
+    public PasswordMatchesValidator passwordMatchesValidator() {
+        return new PasswordMatchesValidator();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(RequestContextListener.class)
+    public RequestContextListener requestContextListener() {
+        return new RequestContextListener();
     }
 
     //http://spring-projects.ru/guides/caching/

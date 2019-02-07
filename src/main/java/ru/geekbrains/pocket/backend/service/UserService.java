@@ -3,6 +3,7 @@ package ru.geekbrains.pocket.backend.service;
 import org.bson.types.ObjectId;
 import ru.geekbrains.pocket.backend.domain.SystemUser;
 import ru.geekbrains.pocket.backend.domain.db.*;
+import ru.geekbrains.pocket.backend.exception.InvalidOldPasswordException;
 import ru.geekbrains.pocket.backend.exception.UserAlreadyExistException;
 import ru.geekbrains.pocket.backend.resource.UserResource;
 
@@ -55,15 +56,16 @@ public interface UserService { //extends UserDetailsService {
 
     User update(User user);
 
-    public String updateUserProfile(User user, UserProfile userProfile);
+    String updateUserProfile(User user, UserProfile userProfile);
 
-    public String updateUserFullName(User user, String firstName);
+    String updateUserFullName(User user, String firstName);
 
-    public String updateUserUsername(User user, String lastName);
+    String updateUserUsername(User user, String lastName);
 
-    public String updateUsersLastSeen(User user, Date date);
+    String updateUsersLastSeen(User user, Date date);
 
-    public String updateUsersPassword(User user, String password);
+    User updateNameAndPassword(User user, String name, String oldPassword, String newPassword)
+            throws InvalidOldPasswordException;
 
     String validatePasswordResetToken(ObjectId id, String token);
 

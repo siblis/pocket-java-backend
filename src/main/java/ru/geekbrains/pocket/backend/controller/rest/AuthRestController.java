@@ -14,10 +14,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
@@ -36,10 +38,13 @@ import ru.geekbrains.pocket.backend.service.RoleService;
 import ru.geekbrains.pocket.backend.service.UserService;
 import ru.geekbrains.pocket.backend.util.validation.ValidEmail;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
@@ -53,6 +58,8 @@ public class AuthRestController {
     private UserService userService;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Resource(name="authenticationManager")
+    private AuthenticationManager authManager;
 
     //отправка электронного письма с запросом подтверждения email
 //    @Autowired
@@ -85,6 +92,15 @@ public class AuthRestController {
 //            log.debug("Token for user '" + loginRequest.getEmail() + "' not exists.");
 //            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+
+        //https://www.baeldung.com/manually-set-user-authentication-spring-security
+//        UsernamePasswordAuthenticationToken authReq
+//                = new UsernamePasswordAuthenticationToken(user, user.getPassword());
+//        Authentication auth = authManager.authenticate(authReq);
+//        SecurityContext sc = SecurityContextHolder.getContext();
+//        sc.setAuthentication(auth);
+//        HttpSession session = request.getSession(true);
+//        session.setAttribute("SPRING_SECURITY_CONTEXT", sc);
 
         return new ResponseEntity<>(new RegistrationResponse(token.getToken(), new UserPub(token.getUser())), HttpStatus.OK);
     }
@@ -234,9 +250,11 @@ public class AuthRestController {
     @AllArgsConstructor
     private static class LoginRequest {
 
+        @NotNull
         @ValidEmail
         @Size(min = 6, max = 32)
         private String email;
+        @NotNull
         @Size(min = 8, max = 32)
         private String password;
     }
@@ -246,11 +264,14 @@ public class AuthRestController {
     @NoArgsConstructor
     @AllArgsConstructor
     private static class RegistrationRequest {
+        @NotNull
         @ValidEmail //(message = "email names must comply with the standard")
         @Size(min = 6, max = 32)
         private String email;
+        @NotNull
         @Size(min = 8, max = 32)
         private String password;
+        @NotNull
         @Size(min = 2, max = 32)
         private String name;
     }
