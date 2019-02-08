@@ -4,22 +4,28 @@ import org.bson.types.ObjectId;
 import ru.geekbrains.pocket.backend.domain.db.PasswordResetToken;
 import ru.geekbrains.pocket.backend.domain.db.User;
 import ru.geekbrains.pocket.backend.domain.db.UserToken;
+import ru.geekbrains.pocket.backend.enumeration.TokenStatus;
+import ru.geekbrains.pocket.backend.exception.TokenNotFoundException;
 
 public interface UserTokenService {
 
     PasswordResetToken createPasswordResetTokenForUser(User user, String token);
 
-    UserToken createVerificationTokenForUser(User user);
+    UserToken createTokenForUser(User user);
 
     User getUserByToken(String token);
 
-    UserToken getVerificationToken(User user);
+    UserToken getNewToken(User user);
 
-    UserToken getVerificationToken(String token);
+    UserToken getToken(User user);
 
-    UserToken generateNewVerificationToken(String token);
+    UserToken getToken(String token);
 
-    UserToken newUserToken(UserToken newToken);
+    UserToken getValidToken(User user);
+
+    UserToken updateToken(UserToken userToken);
+
+    UserToken updateToken(String token) throws TokenNotFoundException;
 
     void deleteUserToken(UserToken tokenOnDelete);
 
@@ -27,6 +33,6 @@ public interface UserTokenService {
 
     String validatePasswordResetToken(ObjectId id, String token);
 
-    String validateVerificationToken(String token);
+    TokenStatus validateToken(String token);
 
 }
