@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.geekbrains.pocket.backend.domain.db.*;
 import ru.geekbrains.pocket.backend.repository.PrivilegeRepository;
 import ru.geekbrains.pocket.backend.repository.RoleRepository;
+import ru.geekbrains.pocket.backend.service.UserChatService;
 import ru.geekbrains.pocket.backend.service.UserService;
 import ru.geekbrains.pocket.backend.service.UserTokenService;
 
@@ -33,6 +34,8 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     private PasswordEncoder passwordEncoder;
     @Autowired
     private UserTokenService userTokenService;
+    @Autowired
+    private UserChatService userChatService;
 
 
     @Override
@@ -44,6 +47,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         //userRepository.deleteAll();
         //userRepository.deleteByEmail("a@mail.ru");
         //userTokenService.deleteAllUserToken();
+        //userChatService.deleteAllUserChats();
 
         // == create initial privileges
         final Privilege readPrivilege = createPrivilegeIfNotFound("READ_PRIVILEGE");
@@ -66,6 +70,11 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         createTokenForUser(user2);
         createTokenForUser(user3);
         //createTokenForUser(user4); не создаём токен специально для тестирования
+
+        createUserChatIfNotFound(user1, user2, user3);
+        createUserChatIfNotFound(user1, user3, user4);
+        createUserChatIfNotFound(user1, user4, user2);
+        createUserChatIfNotFound(user4, user1, user3);
 
         alreadySetup = true;
     }
@@ -118,6 +127,17 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         }
         return userToken;
     }
+
+    @Transactional
+    private UserChat createUserChatIfNotFound(User user, User direct, User sender) {
+        UserChat userChat = new UserChat(user, direct, sender);
+        log.info("Preloading " + userChat);
+        return userChatService.insert(userChat);
+    }
+
+
+
+
 //    @Bean
 //    CommandLineRunner initDatabase() {
 //        return args -> {

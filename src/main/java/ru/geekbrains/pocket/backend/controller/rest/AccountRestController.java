@@ -27,7 +27,7 @@ import javax.validation.constraints.Size;
 @Slf4j
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/v1")
+//@RequestMapping("/v1") config in application.properties
 public class AccountRestController {
     private static final String TOKEN_PREFIX = "Bearer ";
     private static final String HEADER_STRING = "Authorization";

@@ -21,6 +21,7 @@ import ru.geekbrains.pocket.backend.service.UserTokenService;
 
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Optional;
 
 @Slf4j
@@ -46,7 +47,8 @@ public class UserTokenServiceImpl implements UserTokenService {
     public UserToken createTokenForUser(User user) {
         //final String token = UUID.randomUUID().toString();
         final String token = jwtTokenUtil.generateToken(user);
-        final UserToken userToken = new UserToken(token, user);
+        Date expiryDate = jwtTokenUtil.getExpirationDateFromToken(token);
+        final UserToken userToken = new UserToken(token, user, expiryDate);
         return userTokenRepository.save(userToken);
     }
 
@@ -88,6 +90,15 @@ public class UserTokenServiceImpl implements UserTokenService {
         //ищем есть ли токен у этого юзера
         UserToken userToken = getToken(user);
         if (userToken != null) {
+            //проверяем токен
+//            if (jwtTokenUtil.validateToken(userToken.getToken(), user.getEmail())){
+//                //обновляем токен
+//                userToken = updateToken(userToken);
+//            }
+//            if (jwtTokenUtil.getExpirationDateFromToken(userToken.getToken()).before(new Date())){
+//                //обновляем токен
+//                userToken = updateToken(userToken);
+//            }
             if (validateToken(userToken.getToken()).equals(TokenStatus.EXPIRED)) {
                 //обновляем токен
                 userToken = updateToken(userToken);
@@ -101,7 +112,9 @@ public class UserTokenServiceImpl implements UserTokenService {
 
     @Override
     public UserToken updateToken(UserToken userToken) {
-        userToken.updateToken(jwtTokenUtil.generateToken(userToken.getUser()));
+        String newToken = jwtTokenUtil.generateToken(userToken.getUser());
+        Date expiryDate = jwtTokenUtil.getExpirationDateFromToken(newToken);
+        userToken.updateToken(newToken, expiryDate);
         return userTokenRepository.save(userToken);
     }
 
@@ -109,7 +122,9 @@ public class UserTokenServiceImpl implements UserTokenService {
     public UserToken updateToken(final String token) throws TokenNotFoundException {
         UserToken userToken = Optional.of(userTokenRepository.findByToken(token)).orElseThrow(
                 () -> new TokenNotFoundException("Token not found : " + token));
-        userToken.updateToken(jwtTokenUtil.generateToken(userToken.getUser()));
+        String newToken = jwtTokenUtil.generateToken(userToken.getUser());
+        Date expiryDate = jwtTokenUtil.getExpirationDateFromToken(newToken);
+        userToken.updateToken(newToken, expiryDate);
         return userTokenRepository.save(userToken);
     }
 

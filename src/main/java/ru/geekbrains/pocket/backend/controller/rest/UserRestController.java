@@ -16,7 +16,7 @@ import javax.validation.constraints.Size;
 @Slf4j
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/v1")
+//@RequestMapping("/v1") config in application.properties
 public class UserRestController {
     @Autowired
     private UserService userService;
