@@ -1,25 +1,26 @@
 package ru.geekbrains.pocket.backend.controller.rest;
 
-import com.mongodb.MongoWriteException;
+import com.mongodb.MongoServerException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.MessageSource;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
@@ -31,28 +32,32 @@ import ru.geekbrains.pocket.backend.domain.db.UserToken;
 import ru.geekbrains.pocket.backend.domain.pub.UserPub;
 import ru.geekbrains.pocket.backend.exception.UserAlreadyExistException;
 import ru.geekbrains.pocket.backend.response.GenericResponse;
-import ru.geekbrains.pocket.backend.security.registration.OnRegistrationCompleteEvent;
-import ru.geekbrains.pocket.backend.service.RoleService;
 import ru.geekbrains.pocket.backend.service.UserService;
+import ru.geekbrains.pocket.backend.service.UserTokenService;
 import ru.geekbrains.pocket.backend.util.validation.ValidEmail;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
+//@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/v1/auth")
 public class AuthRestController {
     @Autowired
     private UserService userService;
     @Autowired
+    private UserTokenService userTokenService;
+    @Autowired
     private PasswordEncoder passwordEncoder;
+    @Resource(name="authenticationManager")
+    private AuthenticationManager authManager;
 
     //отправка электронного письма с запросом подтверждения email
 //    @Autowired
@@ -66,7 +71,7 @@ public class AuthRestController {
 
 
     @PostMapping(path = "/login", consumes = "application/json")// produces = "application/json;charset=UTF-8")
-    public ResponseEntity login(@Valid @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity login(@Valid @RequestBody LoginRequest loginRequest) throws AuthenticationException {
         //TODO validate
         User user = userService.getUserByEmail(loginRequest.getEmail());
         if (user == null) {
@@ -79,12 +84,22 @@ public class AuthRestController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        UserToken token = userService.getVerificationToken(user);
+        UserToken token = userTokenService.getVerificationToken(user);
         if (token == null) {
-            token = userService.createVerificationTokenForUser(user);
+            token = userTokenService.createVerificationTokenForUser(user);
 //            log.debug("Token for user '" + loginRequest.getEmail() + "' not exists.");
 //            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+
+        //https://www.baeldung.com/manually-set-user-authentication-spring-security
+//        UsernamePasswordAuthenticationToken authReq
+//                = new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword());
+//        Authentication authentication = authManager.authenticate(authReq);
+//        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+//        SecurityContext sc = SecurityContextHolder.getContext();
+//        sc.setAuthentication(authentication);
+//        HttpSession session = request.getSession(true);
+//        session.setAttribute("SPRING_SECURITY_CONTEXT", sc);
 
         return new ResponseEntity<>(new RegistrationResponse(token.getToken(), new UserPub(token.getUser())), HttpStatus.OK);
     }
@@ -93,9 +108,9 @@ public class AuthRestController {
     @PostMapping(path = "/login2", consumes = "application/json")
     @ResponseBody
     public GenericResponse login2(HttpServletRequest request, @RequestParam("token") String existingToken) {
-        UserToken newToken = userService.generateNewVerificationToken(existingToken);
+        UserToken newToken = userTokenService.generateNewVerificationToken(existingToken);
 
-        User user = userService.getUserByToken(newToken.getToken());
+        User user = userTokenService.getUserByToken(newToken.getToken());
 
         //отправка ссылки на email для подтверждения регистрации
         String appUrl =
@@ -113,7 +128,8 @@ public class AuthRestController {
     @PostMapping(path = "/registration", consumes = "application/json")
     public ResponseEntity<?> registration(@Valid @RequestBody RegistrationRequest registrationRequest,
                                           final HttpServletRequest request,
-                                          BindingResult result, WebRequest webRequest, Errors errors) {
+                                          BindingResult result, WebRequest webRequest, Errors errors)
+            throws AuthenticationException {
         //TODO validate
         //If error, just return a 400 bad request, along with the error message
         if (result.hasErrors()) {
@@ -128,24 +144,32 @@ public class AuthRestController {
 
         log.debug("Processing registration form for: " + registrationRequest);
 
-        User registered;
+        User registeredUser;
         try {
-            registered = userService.registerNewUserAccount(registrationRequest.getEmail(),
+            registeredUser = userService.registerNewUserAccount(registrationRequest.getEmail(),
                     registrationRequest.getPassword(),
                     registrationRequest.getName());
         } catch (UserAlreadyExistException e) {
             log.debug("Email already exists.");
             return new ResponseEntity<>(HttpStatus.CONFLICT);
-        } catch (MongoWriteException e) {
+        } catch (MongoServerException e) {// MongoWriteException, DuplicateKeyException
             log.debug("Email write to db user " + registrationRequest);
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
 
-        UserToken newToken = userService.createVerificationTokenForUser(registered);
+        UserToken newToken = userTokenService.createVerificationTokenForUser(registeredUser);
         if (newToken == null) {
-            log.debug("Error create token for user " + registered.getEmail());
+            log.debug("Error create token for user " + registeredUser.getEmail());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+
+//        UsernamePasswordAuthenticationToken authReq
+//                = new UsernamePasswordAuthenticationToken(registeredUser.getEmail(), registeredUser.getPassword());
+//        Authentication authentication = authManager.authenticate(authReq);
+//        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+//        SecurityContext sc = SecurityContextHolder.getContext();
+//        sc.setAuthentication(authentication);
+
         //отправка электронного письма с запросом подтверждения email
 //        try {
 //        eventPublisher.publishEvent(new OnRegistrationCompleteEvent
@@ -153,7 +177,7 @@ public class AuthRestController {
 //        } catch (Exception me) {
 //            return new ResponseEntity<>(HttpStatus.CONFLICT);
 //        }
-        log.debug("Successfully created user: " + registered.getEmail() + " and token " + newToken.getToken());
+        log.debug("Successfully created user: " + registeredUser.getEmail() + " and token " + newToken.getToken());
 
         return new ResponseEntity<>(new RegistrationResponse(newToken.getToken(), new UserPub(newToken.getUser())), HttpStatus.CREATED);
 
@@ -164,9 +188,9 @@ public class AuthRestController {
     public ResponseEntity<?> confirmRegistration(final HttpServletRequest request, @RequestParam("token") final String token)
             throws UnsupportedEncodingException {
         Locale locale = request.getLocale();
-        final String result = userService.validateVerificationToken(token);
+        final String result = userTokenService.validateVerificationToken(token);
         if (result.equals("valid")) {
-            final User user = userService.getUserByToken(token);
+            final User user = userTokenService.getUserByToken(token);
             // if (user.isUsing2FA()) {
             // model.addAttribute("qr", userService.generateQRUrl(user));
             // return "redirect:/qrcode.html?lang=" + locale.getLanguage();
@@ -234,9 +258,11 @@ public class AuthRestController {
     @AllArgsConstructor
     private static class LoginRequest {
 
+        @NotNull
         @ValidEmail
         @Size(min = 6, max = 32)
         private String email;
+        @NotNull
         @Size(min = 8, max = 32)
         private String password;
     }
@@ -246,11 +272,14 @@ public class AuthRestController {
     @NoArgsConstructor
     @AllArgsConstructor
     private static class RegistrationRequest {
+        @NotNull
         @ValidEmail //(message = "email names must comply with the standard")
         @Size(min = 6, max = 32)
         private String email;
+        @NotNull
         @Size(min = 8, max = 32)
         private String password;
+        @NotNull
         @Size(min = 2, max = 32)
         private String name;
     }
@@ -260,7 +289,7 @@ public class AuthRestController {
     @AllArgsConstructor
     private static class RegistrationResponse {
         private String token;
-        private UserPub userPub;
+        private UserPub user;
     }
 
 }
