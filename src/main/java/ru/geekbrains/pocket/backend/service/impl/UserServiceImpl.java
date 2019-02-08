@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import ru.geekbrains.pocket.backend.domain.SystemUser;
 import ru.geekbrains.pocket.backend.domain.db.Role;
 import ru.geekbrains.pocket.backend.domain.db.User;
 import ru.geekbrains.pocket.backend.domain.db.UserProfile;
@@ -118,30 +117,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User registerNewUserAccount(SystemUser account)
-            throws UserAlreadyExistException, MongoWriteException {
-        if (userRepository.findByEmail(account.getEmail()) != null) {
-            throw new UserAlreadyExistException("There is an account with that email adress: " + account.getEmail());
-        }
-
-        final User user = new User();
-
-        user.setEmail(account.getEmail());
-        user.setPassword(passwordEncoder.encode(account.getPassword())); //шифруем
-        //user.setUsing2FA(account.isUsing2FA());
-        user.setUsername(account.getFirstname());
-        user.setProfile(new UserProfile(account.getFirstname(), account.getFirstname() + " " + account.getLastname()));
-        user.setRoles(Arrays.asList(getRoleUser()));
-        try {
-            return userRepository.insert(user);
-        } catch (MongoWriteException ex) {
-            log.error(ex.getMessage());
-        }
-        return null;
-    }
-
-    @Override
-    public User registerNewUserAccount(String email, String password, String name)
+    public User createUserAccount(String email, String password, String name)
             throws UserAlreadyExistException, MongoServerException {
         if (userRepository.findByEmail(email) != null) {
             throw new UserAlreadyExistException("There is an account with that email adress: " + email);

@@ -2,7 +2,6 @@ package ru.geekbrains.pocket.backend.service;
 
 import com.mongodb.MongoServerException;
 import org.bson.types.ObjectId;
-import ru.geekbrains.pocket.backend.domain.SystemUser;
 import ru.geekbrains.pocket.backend.domain.db.Role;
 import ru.geekbrains.pocket.backend.domain.db.User;
 import ru.geekbrains.pocket.backend.domain.db.UserProfile;
@@ -37,10 +36,7 @@ public interface UserService { //extends UserDetailsService {
 
     User insert(User user);
 
-    User registerNewUserAccount(SystemUser account)
-            throws UserAlreadyExistException;
-
-    User registerNewUserAccount(String email, String password, String name)
+    User createUserAccount(String email, String password, String name)
             throws UserAlreadyExistException, MongoServerException;
 
     User update(User user);

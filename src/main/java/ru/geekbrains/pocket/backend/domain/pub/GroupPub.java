@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import ru.geekbrains.pocket.backend.domain.db.Group;
+
+import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
@@ -21,7 +24,7 @@ public class GroupPub {
 
     private String description;
 
-    private String invitation_code;
+    private String invitation_code; //Видна только создателю группы и только если активна
 
     private boolean isPublic;
 
@@ -29,6 +32,16 @@ public class GroupPub {
         this.creator = creator;
         this.name = name;
         this.isPublic = isPublic;
+    }
+
+    public GroupPub(@NotNull Group group) {
+        this.id = group.getId().toString();
+        this.creator = group.getCreator().getEmail();
+        //this.space = "";
+        this.name = group.getName();
+        this.description = group.getDescription();
+        this.invitation_code = group.getInvitation_code();
+        this.isPublic = group.isPublic();
     }
 
     @Override

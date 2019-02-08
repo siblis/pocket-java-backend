@@ -57,8 +57,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-//            .cors()
-//            .and()
+            .cors().and()
             .csrf().disable()   //Межсайтовая подделка запроса
                 .exceptionHandling()
                 .accessDeniedHandler(accessDeniedHandler)
@@ -69,8 +68,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .addFilterAfter(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class)
             .authorizeRequests()
             //более конкретные правила должны стоять первыми, а затем более общие
-                .antMatchers("/v1/auth/**").permitAll() //rest
-                .antMatchers("/v1/**").hasAnyRole("ADMIN", "USER")
+                .antMatchers("/auth/**").permitAll() //rest
+                .antMatchers("/**").hasAnyRole("ADMIN", "USER")
                 .antMatchers("/test/**").permitAll() //websocket
                 //.anyRequest().hasAuthority("READ_PRIVILEGE")
                 .anyRequest().authenticated()

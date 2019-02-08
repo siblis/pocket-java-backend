@@ -4,11 +4,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
+import ru.geekbrains.pocket.backend.security.token.JwtTokenUtil;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -18,7 +20,6 @@ import java.util.Date;
 @NoArgsConstructor
 @Document(collection = "users.tokens")
 public class UserToken {
-
     private static final int EXPIRATION = 60 * 24;
 
     @Id
@@ -53,6 +54,14 @@ public class UserToken {
         this.expiryDate = calculateExpiryDate(EXPIRATION);
     }
 
+    public UserToken(final String token, final User user, final Date expiryDate) {
+        super();
+
+        this.token = token;
+        this.user = user;
+        this.expiryDate = expiryDate;
+    }
+
     private Date calculateExpiryDate(final int expiryTimeInMinutes) {
         final Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(new Date().getTime());
@@ -64,6 +73,12 @@ public class UserToken {
         this.token = token;
         this.logged_at = new Date();
         this.expiryDate = calculateExpiryDate(EXPIRATION);
+    }
+
+    public void updateToken(final String token, final Date expiryDate) {
+        this.token = token;
+        this.logged_at = new Date();
+        this.expiryDate = expiryDate;
     }
 
     @Override
