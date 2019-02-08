@@ -21,6 +21,8 @@ public interface UserTokenService {
 
     UserToken getToken(String token);
 
+    UserToken getValidToken(User user);
+
     UserToken updateToken(UserToken userToken);
 
     UserToken updateToken(String token) throws TokenNotFoundException;

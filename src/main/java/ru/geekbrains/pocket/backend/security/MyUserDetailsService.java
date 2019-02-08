@@ -32,12 +32,6 @@ public class MyUserDetailsService implements UserDetailsService {
     @Autowired
     private HttpServletRequest request;
 
-//    public MyUserDetailsService() {
-//        super();
-//    }
-
-    // API
-
     @Override
     public UserDetails loadUserByUsername(final String email) throws UsernameNotFoundException {
         final String ip = getClientIP();

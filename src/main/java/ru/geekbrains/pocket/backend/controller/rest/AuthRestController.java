@@ -81,7 +81,7 @@ public class AuthRestController {
         }
 
         //ищем есть ли токен у этого юзера
-        UserToken userToken = userTokenService.getNewToken(user);
+        UserToken userToken = userTokenService.getValidToken(user);
 
         try {
             authWithoutPassword(user);
@@ -90,27 +90,6 @@ public class AuthRestController {
         }
 
         return new ResponseEntity<>(new RegistrationResponse(userToken.getToken(), new UserPub(userToken.getUser())), HttpStatus.OK);
-    }
-
-    //test
-    @PostMapping(path = "/login2", consumes = "application/json")
-    @ResponseBody
-    public GenericResponse login2(HttpServletRequest request, @RequestParam("token") String existingToken) {
-        UserToken newToken = userTokenService.updateToken(existingToken);
-
-        User user = userTokenService.getUserByToken(newToken.getToken());
-
-        //отправка ссылки на email для подтверждения регистрации
-        String appUrl =
-                "http://" + request.getServerName() +
-                        ":" + request.getServerPort() +
-                        request.getContextPath();
-//        SimpleMailMessage email =
-//                constructResendVerificationTokenEmail(appUrl, request.getLocale(), newToken, user);
-//        mailSender.send(email);
-
-        return new GenericResponse(
-                messages.getMessage("message.resendToken", null, request.getLocale()));
     }
 
     @PostMapping(path = "/registration", consumes = "application/json")

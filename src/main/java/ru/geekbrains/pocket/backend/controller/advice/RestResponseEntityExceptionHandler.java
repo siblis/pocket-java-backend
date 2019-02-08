@@ -22,7 +22,6 @@ import ru.geekbrains.pocket.backend.response.GenericResponse;
 @ControllerAdvice
 //@RestControllerAdvice
 public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
-    // API
 
     @Autowired
     private MessageSource messages;

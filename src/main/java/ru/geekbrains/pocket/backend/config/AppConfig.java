@@ -17,7 +17,6 @@ import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 import ru.geekbrains.pocket.backend.util.validation.EmailValidator;
-import ru.geekbrains.pocket.backend.util.validation.PasswordMatchesValidator;
 
 @Configuration
 //@EnableCaching
@@ -69,11 +68,6 @@ public class AppConfig {
     @Bean
     public EmailValidator usernameValidator() {
         return new EmailValidator();
-    }
-
-    @Bean
-    public PasswordMatchesValidator passwordMatchesValidator() {
-        return new PasswordMatchesValidator();
     }
 
     @Bean

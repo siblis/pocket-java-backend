@@ -84,6 +84,22 @@ public class UserTokenServiceImpl implements UserTokenService {
     }
 
     @Override
+    public UserToken getValidToken(User user) {
+        //ищем есть ли токен у этого юзера
+        UserToken userToken = getToken(user);
+        if (userToken != null) {
+            if (validateToken(userToken.getToken()).equals(TokenStatus.EXPIRED)) {
+                //обновляем токен
+                userToken = updateToken(userToken);
+            }
+        } else {
+            //токен не найден, создаём новый токен
+            userToken = createTokenForUser(user);
+        }
+        return userToken;
+    }
+
+    @Override
     public UserToken updateToken(UserToken userToken) {
         userToken.updateToken(jwtTokenUtil.generateToken(userToken.getUser()));
         return userTokenRepository.save(userToken);
@@ -131,6 +147,7 @@ public class UserTokenServiceImpl implements UserTokenService {
             return TokenStatus.INVALID;
         }
 
+        //TODO use JwtTokenUtil.isTokenExpired
         final User user = UserToken.getUser();
         final Calendar cal = Calendar.getInstance();
         if ((UserToken.getExpiryDate()
