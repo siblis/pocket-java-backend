@@ -112,9 +112,9 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 
     @Transactional
     private UserToken createTokenForUser(User user) {
-        UserToken userToken = userTokenService.getVerificationToken(user);
+        UserToken userToken = userTokenService.getToken(user);
         if (userToken == null) {
-            userToken = userTokenService.createVerificationTokenForUser(user);
+            userToken = userTokenService.createTokenForUser(user);
         }
         return userToken;
     }

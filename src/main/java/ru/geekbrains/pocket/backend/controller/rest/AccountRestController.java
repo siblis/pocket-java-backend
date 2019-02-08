@@ -59,27 +59,25 @@ public class AccountRestController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         String header = request.getHeader(HEADER_STRING);
-        String authToken = null;
+        String token = null;
         if (header != null && header.startsWith(TOKEN_PREFIX)) {
-            authToken = header.replace(TOKEN_PREFIX, "");
+            token = header.replace(TOKEN_PREFIX, "");
         }
-        User user = userTokenService.getUserByToken(authToken);
-        //TODO validate
-        if (user != null) {
-            try {
-                user = userService.updateNameAndPassword(user, editAccountRequest.getName(),
-                        editAccountRequest.getOldPassword(), editAccountRequest.getNewPassword());
-            } catch (InvalidOldPasswordException ex) {
-                log.debug("Old & current password does not match!");
-                log.error(ex.getMessage());
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
-            return new ResponseEntity<>(new UserPub(user), HttpStatus.OK);
-        }
-        else {
+        User user = userTokenService.getUserByToken(token);
+        if (user == null) {
             ValidationErrorCollection validationErrorCollection = new ValidationErrorCollection();
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+
+        try {
+            user = userService.updateNameAndPassword(user, editAccountRequest.getName(),
+                    editAccountRequest.getOldPassword(), editAccountRequest.getNewPassword());
+        } catch (InvalidOldPasswordException ex) {
+            log.debug("Old & current password does not match!");
+            log.error(ex.getMessage());
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(new UserPub(user), HttpStatus.OK);
     }
 
     @Getter

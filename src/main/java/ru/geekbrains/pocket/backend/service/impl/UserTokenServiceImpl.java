@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import ru.geekbrains.pocket.backend.domain.db.PasswordResetToken;
 import ru.geekbrains.pocket.backend.domain.db.User;
 import ru.geekbrains.pocket.backend.domain.db.UserToken;
+import ru.geekbrains.pocket.backend.enumeration.TokenStatus;
+import ru.geekbrains.pocket.backend.exception.TokenNotFoundException;
 import ru.geekbrains.pocket.backend.repository.PasswordResetTokenRepository;
 import ru.geekbrains.pocket.backend.repository.UserRepository;
 import ru.geekbrains.pocket.backend.repository.UserTokenRepository;
@@ -19,13 +21,11 @@ import ru.geekbrains.pocket.backend.service.UserTokenService;
 
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Optional;
 
 @Slf4j
 @Service
 public class UserTokenServiceImpl implements UserTokenService {
-    private static final String TOKEN_INVALID = "invalidToken";
-    private static final String TOKEN_EXPIRED = "expired";
-    private static final String TOKEN_VALID = "valid";
 
     @Autowired
     private UserTokenRepository userTokenRepository;
@@ -43,7 +43,7 @@ public class UserTokenServiceImpl implements UserTokenService {
     }
 
     @Override
-    public UserToken createVerificationTokenForUser(User user) {
+    public UserToken createTokenForUser(User user) {
         //final String token = UUID.randomUUID().toString();
         final String token = jwtTokenUtil.generateToken(user);
         final UserToken userToken = new UserToken(token, user);
@@ -60,27 +60,41 @@ public class UserTokenServiceImpl implements UserTokenService {
     }
 
     @Override
-    public UserToken getVerificationToken(User user) {
+    public UserToken getNewToken(User user) {
+        //ищем есть ли токен у этого юзера
+        UserToken userToken = getToken(user);
+        if (userToken != null) {
+            //обновляем токен
+            userToken = updateToken(userToken);
+        } else {
+            //токен не найден, создаём новый токен
+            userToken = createTokenForUser(user);
+        }
+        return userToken;
+    }
+
+    @Override
+    public UserToken getToken(User user) {
         return userTokenRepository.findByUser(user);
     }
 
     @Override
-    public UserToken getVerificationToken(String token) {
+    public UserToken getToken(String token) {
         return userTokenRepository.findByToken(token);
     }
 
     @Override
-    public UserToken generateNewVerificationToken(final String token) {
-        UserToken vToken = userTokenRepository.findByToken(token);
-        //vToken.updateToken(UUID.randomUUID().toString());
-        vToken.updateToken(jwtTokenUtil.generateToken(vToken.getUser()));
-        vToken = userTokenRepository.save(vToken);
-        return vToken;
+    public UserToken updateToken(UserToken userToken) {
+        userToken.updateToken(jwtTokenUtil.generateToken(userToken.getUser()));
+        return userTokenRepository.save(userToken);
     }
 
     @Override
-    public UserToken newUserToken(UserToken newToken) {
-        return null;
+    public UserToken updateToken(final String token) throws TokenNotFoundException {
+        UserToken userToken = Optional.of(userTokenRepository.findByToken(token)).orElseThrow(
+                () -> new TokenNotFoundException("Token not found : " + token));
+        userToken.updateToken(jwtTokenUtil.generateToken(userToken.getUser()));
+        return userTokenRepository.save(userToken);
     }
 
     @Override
@@ -111,10 +125,10 @@ public class UserTokenServiceImpl implements UserTokenService {
     }
 
     @Override
-    public String validateVerificationToken(String token) {
+    public TokenStatus validateToken(String token) {
         final UserToken UserToken = userTokenRepository.findByToken(token);
         if (UserToken == null) {
-            return TOKEN_INVALID;
+            return TokenStatus.INVALID;
         }
 
         final User user = UserToken.getUser();
@@ -124,13 +138,13 @@ public class UserTokenServiceImpl implements UserTokenService {
                 - cal.getTime()
                 .getTime()) <= 0) {
             userTokenRepository.delete(UserToken);
-            return TOKEN_EXPIRED;
+            return TokenStatus.EXPIRED;
         }
 
         user.setEnabled(true);
         // userTokenRepository.delete(UserToken);
         userRepository.save(user);
-        return TOKEN_VALID;
+        return TokenStatus.VALID;
     }
 
 }

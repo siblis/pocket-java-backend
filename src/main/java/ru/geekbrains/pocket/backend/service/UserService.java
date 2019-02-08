@@ -37,10 +37,10 @@ public interface UserService { //extends UserDetailsService {
 
     User insert(User user);
 
-    User registerNewUserAccount(SystemUser account)
+    User createUserAccount(SystemUser account)
             throws UserAlreadyExistException;
 
-    User registerNewUserAccount(String email, String password, String name)
+    User createUserAccount(String email, String password, String name)
             throws UserAlreadyExistException, MongoServerException;
 
     User update(User user);

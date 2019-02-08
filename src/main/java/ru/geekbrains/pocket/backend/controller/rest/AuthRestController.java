@@ -12,7 +12,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -20,7 +19,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
@@ -30,13 +28,13 @@ import ru.geekbrains.pocket.backend.domain.db.Role;
 import ru.geekbrains.pocket.backend.domain.db.User;
 import ru.geekbrains.pocket.backend.domain.db.UserToken;
 import ru.geekbrains.pocket.backend.domain.pub.UserPub;
+import ru.geekbrains.pocket.backend.enumeration.TokenStatus;
 import ru.geekbrains.pocket.backend.exception.UserAlreadyExistException;
 import ru.geekbrains.pocket.backend.response.GenericResponse;
 import ru.geekbrains.pocket.backend.service.UserService;
 import ru.geekbrains.pocket.backend.service.UserTokenService;
 import ru.geekbrains.pocket.backend.util.validation.ValidEmail;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -56,8 +54,6 @@ public class AuthRestController {
     private UserTokenService userTokenService;
     @Autowired
     private PasswordEncoder passwordEncoder;
-    @Resource(name="authenticationManager")
-    private AuthenticationManager authManager;
 
     //отправка электронного письма с запросом подтверждения email
 //    @Autowired
@@ -71,7 +67,7 @@ public class AuthRestController {
 
 
     @PostMapping(path = "/login", consumes = "application/json")// produces = "application/json;charset=UTF-8")
-    public ResponseEntity login(@Valid @RequestBody LoginRequest loginRequest) throws AuthenticationException {
+    public ResponseEntity login(@Valid @RequestBody LoginRequest loginRequest) {
         //TODO validate
         User user = userService.getUserByEmail(loginRequest.getEmail());
         if (user == null) {
@@ -84,31 +80,23 @@ public class AuthRestController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        UserToken token = userTokenService.getVerificationToken(user);
-        if (token == null) {
-            token = userTokenService.createVerificationTokenForUser(user);
-//            log.debug("Token for user '" + loginRequest.getEmail() + "' not exists.");
-//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        //ищем есть ли токен у этого юзера
+        UserToken userToken = userTokenService.getNewToken(user);
+
+        try {
+            authWithoutPassword(user);
+        } catch (AuthenticationException ex){
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
-        //https://www.baeldung.com/manually-set-user-authentication-spring-security
-//        UsernamePasswordAuthenticationToken authReq
-//                = new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword());
-//        Authentication authentication = authManager.authenticate(authReq);
-//        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-//        SecurityContext sc = SecurityContextHolder.getContext();
-//        sc.setAuthentication(authentication);
-//        HttpSession session = request.getSession(true);
-//        session.setAttribute("SPRING_SECURITY_CONTEXT", sc);
-
-        return new ResponseEntity<>(new RegistrationResponse(token.getToken(), new UserPub(token.getUser())), HttpStatus.OK);
+        return new ResponseEntity<>(new RegistrationResponse(userToken.getToken(), new UserPub(userToken.getUser())), HttpStatus.OK);
     }
 
     //test
     @PostMapping(path = "/login2", consumes = "application/json")
     @ResponseBody
     public GenericResponse login2(HttpServletRequest request, @RequestParam("token") String existingToken) {
-        UserToken newToken = userTokenService.generateNewVerificationToken(existingToken);
+        UserToken newToken = userTokenService.updateToken(existingToken);
 
         User user = userTokenService.getUserByToken(newToken.getToken());
 
@@ -144,9 +132,9 @@ public class AuthRestController {
 
         log.debug("Processing registration form for: " + registrationRequest);
 
-        User registeredUser;
+        User user;
         try {
-            registeredUser = userService.registerNewUserAccount(registrationRequest.getEmail(),
+            user = userService.createUserAccount(registrationRequest.getEmail(),
                     registrationRequest.getPassword(),
                     registrationRequest.getName());
         } catch (UserAlreadyExistException e) {
@@ -157,18 +145,13 @@ public class AuthRestController {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
 
-        UserToken newToken = userTokenService.createVerificationTokenForUser(registeredUser);
-        if (newToken == null) {
-            log.debug("Error create token for user " + registeredUser.getEmail());
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        UserToken userToken = userTokenService.getNewToken(user);
 
-//        UsernamePasswordAuthenticationToken authReq
-//                = new UsernamePasswordAuthenticationToken(registeredUser.getEmail(), registeredUser.getPassword());
-//        Authentication authentication = authManager.authenticate(authReq);
-//        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-//        SecurityContext sc = SecurityContextHolder.getContext();
-//        sc.setAuthentication(authentication);
+        try {
+            authWithoutPassword(user);
+        } catch (AuthenticationException ex){
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
 
         //отправка электронного письма с запросом подтверждения email
 //        try {
@@ -177,9 +160,9 @@ public class AuthRestController {
 //        } catch (Exception me) {
 //            return new ResponseEntity<>(HttpStatus.CONFLICT);
 //        }
-        log.debug("Successfully created user: " + registeredUser.getEmail() + " and token " + newToken.getToken());
+        log.debug("Successfully created user: " + user.getEmail() + " and token " + userToken.getToken());
 
-        return new ResponseEntity<>(new RegistrationResponse(newToken.getToken(), new UserPub(newToken.getUser())), HttpStatus.CREATED);
+        return new ResponseEntity<>(new RegistrationResponse(userToken.getToken(), new UserPub(userToken.getUser())), HttpStatus.CREATED);
 
     }
 
@@ -188,8 +171,8 @@ public class AuthRestController {
     public ResponseEntity<?> confirmRegistration(final HttpServletRequest request, @RequestParam("token") final String token)
             throws UnsupportedEncodingException {
         Locale locale = request.getLocale();
-        final String result = userTokenService.validateVerificationToken(token);
-        if (result.equals("valid")) {
+        final TokenStatus result = userTokenService.validateToken(token);
+        if (result.equals(TokenStatus.VALID)) {
             final User user = userTokenService.getUserByToken(token);
             // if (user.isUsing2FA()) {
             // model.addAttribute("qr", userService.generateQRUrl(user));
@@ -239,15 +222,34 @@ public class AuthRestController {
         return "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
     }
 
-    public void authWithoutPassword(User user) {
+    //аутентификация в Spring
+    public void authWithoutPassword(User user) throws AuthenticationException {
         List<Privilege> privileges = user.getRoles().stream()
                 .map(Role::getPrivileges)
                 .flatMap(Collection::stream).distinct().collect(Collectors.toList());
-        List<GrantedAuthority> authorities = privileges.stream().map(p -> new SimpleGrantedAuthority(p.getName())).collect(Collectors.toList());
+        List<GrantedAuthority> authorities = privileges.stream().map(
+                p -> new SimpleGrantedAuthority(p.getName())).collect(Collectors.toList());
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, authorities);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
+
+    public void authWithPassword(User user) throws AuthenticationException {
+        List<Privilege> privileges = user.getRoles().stream()
+                .map(Role::getPrivileges)
+                .flatMap(Collection::stream).distinct().collect(Collectors.toList());
+        List<GrantedAuthority> authorities = privileges.stream().map(
+                p -> new SimpleGrantedAuthority(p.getName())).collect(Collectors.toList());
+
+        //https://www.baeldung.com/manually-set-user-authentication-spring-security
+        Authentication authentication =
+                new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword(), authorities);
+//        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
+
+//        HttpSession session = request.getSession(true);
+//        session.setAttribute("SPRING_SECURITY_CONTEXT", sc);
     }
 
     //===== Request & Response =====

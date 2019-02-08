@@ -118,7 +118,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User registerNewUserAccount(SystemUser account)
+    public User createUserAccount(SystemUser account)
             throws UserAlreadyExistException, MongoWriteException {
         if (userRepository.findByEmail(account.getEmail()) != null) {
             throw new UserAlreadyExistException("There is an account with that email adress: " + account.getEmail());
@@ -141,7 +141,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User registerNewUserAccount(String email, String password, String name)
+    public User createUserAccount(String email, String password, String name)
             throws UserAlreadyExistException, MongoServerException {
         if (userRepository.findByEmail(email) != null) {
             throw new UserAlreadyExistException("There is an account with that email adress: " + email);
