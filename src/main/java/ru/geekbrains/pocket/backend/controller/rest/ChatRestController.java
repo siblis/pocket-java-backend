@@ -8,8 +8,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.geekbrains.pocket.backend.domain.db.User;
 import ru.geekbrains.pocket.backend.domain.db.UserChat;
 import ru.geekbrains.pocket.backend.domain.pub.UserChatCollection;
-import ru.geekbrains.pocket.backend.domain.pub.UserPub;
-import ru.geekbrains.pocket.backend.repository.UserChatRepository;
 import ru.geekbrains.pocket.backend.service.UserChatService;
 import ru.geekbrains.pocket.backend.service.UserTokenService;
 
