@@ -35,12 +35,15 @@ public class GroupMessage {
     @NotEmpty
     private String text;
 
-    private Object in_thread;
+    @Nullable
+    private Object in_thread = null;
 
-    private ObjectId belongs_to;
+    @DBRef
+    @Nullable
+    private GroupMessage belongs_to = null;
 
     @Nullable
-    private Attachment attachment;
+    private Attachment attachment = null;
 
     private Date sent_at;
 

@@ -51,7 +51,7 @@ public class User {
 
     @NotNull
     @Valid
-    @Field(value = "profile")
+    //@Field(value = "profile")
     private UserProfile profile;
 
     @NotNull
@@ -62,7 +62,7 @@ public class User {
     @NotNull
     @Valid
     @JsonIgnore
-    @Field(value = "roles")
+    //@Field(value = "roles")
     private Collection<Role> roles;
 
     public User(String email, String password, UserProfile userProfile) {

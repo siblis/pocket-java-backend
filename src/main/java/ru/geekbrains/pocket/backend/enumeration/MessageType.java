@@ -1,6 +1,6 @@
 package ru.geekbrains.pocket.backend.enumeration;
 
-public enum TokenStatus {
+public enum MessageType {
 
-    INVALID,EXPIRED,VALID
+    direct,group
 }
