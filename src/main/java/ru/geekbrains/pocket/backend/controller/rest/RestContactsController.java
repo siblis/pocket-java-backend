@@ -26,8 +26,7 @@ public class RestContactsController {
     @Autowired
     private UserContactService userContactService;
     @GetMapping("account/contacts")
-    public void
-    }
+
     @GetMapping ("account/contacts/%id")
     public UserContacts getContactById(){
         return UserContactsRepository.findById;
