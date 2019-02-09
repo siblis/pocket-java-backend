@@ -10,10 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.geekbrains.pocket.backend.domain.db.*;
 import ru.geekbrains.pocket.backend.repository.PrivilegeRepository;
 import ru.geekbrains.pocket.backend.repository.RoleRepository;
-import ru.geekbrains.pocket.backend.service.UserChatService;
-import ru.geekbrains.pocket.backend.service.UserMessageService;
-import ru.geekbrains.pocket.backend.service.UserService;
-import ru.geekbrains.pocket.backend.service.UserTokenService;
+import ru.geekbrains.pocket.backend.service.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,6 +36,10 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     private UserChatService userChatService;
     @Autowired
     private UserMessageService userMessageService;
+    @Autowired
+    private GroupService groupService;
+    @Autowired
+    private GroupMessageService groupMessageService;
 
 
     @Override
@@ -52,6 +53,8 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         //userTokenService.deleteAllUserToken();
         userChatService.deleteAllUserChats();
         userMessageService.deleteAllMessages();
+        //groupService.deleteAllGroups();
+        groupMessageService.deleteAllMessages();
 
         // == create initial privileges
         final Privilege readPrivilege = createPrivilegeIfNotFound("READ_PRIVILEGE");
@@ -80,6 +83,10 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         createUserChat(user1, user4, user2);
         createUserChat(user4, user1, user3);
 
+        Group group1 = createGroupIfNotFound(user2, "group1");
+        Group group2 = createGroupIfNotFound(user2, "group2");
+        Group group3 = createGroupIfNotFound(user3, "group3");
+
         createUserMessage(user2, user3, "Сообщение №1");
         createUserMessage(user3, user2, "Сообщение №2");
         createUserMessage(user2, user3, "Сообщение №3");
@@ -87,6 +94,14 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         createUserMessage(user2, user1, "Сообщение №5");
         createUserMessage(user1, user2, "Сообщение №6");
         createUserMessage(user1, user3, "Сообщение №7");
+
+        createGroupMessage(user2, group1, "Сообщение №1 для группы №1");
+        createGroupMessage(user3, group1, "Сообщение №2 для группы №1");
+        createGroupMessage(user2, group2, "Сообщение №1 для группы №2");
+        createGroupMessage(user1, group3, "Сообщение №1 для группы №3");
+        createGroupMessage(user2, group3, "Сообщение №2 для группы №3");
+        createGroupMessage(user3, group3, "Сообщение №3 для группы №3");
+
 
         alreadySetup = true;
     }
@@ -149,12 +164,37 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 
     @Transactional
     private UserMessage createUserMessage(User sender, User recipient, String text) {
-        UserMessage userMessage = userMessageService.createMessage(sender, recipient, text);
-        log.info("Preloading " + userMessage);
-        return userMessage;
+        UserMessage message = userMessageService.createMessage(sender, recipient, text);
+        log.info("Preloading " + message);
+        return message;
     }
 
+    @Transactional
+    private Group createGroupIfNotFound(final User creator, final String name) {
+        List<Group> groups = groupService.getGroups(name);
+        Group group;
+        if (groups.size() == 0) {
+            group = new Group();
+            group.setCreator(creator);
+            //group.setProject();
+            group.setName(name);
+            group.setDescription("");
+            group.setInvitation_code("Invitation to " + group.getName());
+            group.setPublic(false);
+            group = groupService.createGroup(group);
+            log.info("Preloading " + group);
+        } else
+            group = groups.get(0);
 
+        return group;
+    }
+
+    @Transactional
+    private GroupMessage createGroupMessage(User sender, Group group, String text) {
+        GroupMessage message = groupMessageService.createMessage(sender, group, text);
+        log.info("Preloading " + message);
+        return message;
+    }
 
 //    @Bean
 //    CommandLineRunner initDatabase() {

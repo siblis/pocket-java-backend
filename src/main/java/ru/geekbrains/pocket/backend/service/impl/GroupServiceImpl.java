@@ -2,6 +2,7 @@ package ru.geekbrains.pocket.backend.service.impl;
 
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import ru.geekbrains.pocket.backend.domain.db.Group;
 import ru.geekbrains.pocket.backend.domain.db.User;
 import ru.geekbrains.pocket.backend.exception.GroupNotFoundException;
@@ -11,6 +12,7 @@ import ru.geekbrains.pocket.backend.service.GroupService;
 import java.util.List;
 import java.util.Optional;
 
+@Service
 public class GroupServiceImpl implements GroupService {
     @Autowired
     private GroupRepository repository;
@@ -23,6 +25,11 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public void deleteGroup(Group group) {
         repository.delete(group);
+    }
+
+    @Override
+    public void deleteAllGroups() {
+        repository.deleteAll();
     }
 
     @Override

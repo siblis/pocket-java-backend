@@ -12,6 +12,8 @@ public interface GroupService {
 
     void deleteGroup(Group group);
 
+    void deleteAllGroups();
+
     Group getGroup(ObjectId id);
 
     List<Group> getGroups(User creator);
