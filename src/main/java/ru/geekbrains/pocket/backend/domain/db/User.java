@@ -50,18 +50,12 @@ public class User {
 
     @NotNull
     @Valid
-    //@Field(value = "profile")
     private UserProfile profile;
-
-    @NotNull
-    @Indexed(unique = true)
-    private String username;
 
     @DBRef
     @NotNull
     @Valid
     @JsonIgnore
-    //@Field(value = "roles")
     private Collection<Role> roles;
 
     public User(String email, String password, UserProfile userProfile) {
@@ -72,18 +66,13 @@ public class User {
         this.password = password;
         this.profile = userProfile;
         this.created_at = new Date();
-        this.username = profile.getUsername();
-        //this.roles.add(только имеющийся в бд);
     }
 
     public User(String email, String password, String username) {
         this.email = email;
-        this.username = username;
         this.password = password;
-        this.profile = new UserProfile(email);
+        this.profile = new UserProfile(username);
         this.created_at = new Date();
-        this.username = profile.getUsername();
-        //this.roles.add(только имеющийся в бд);
     }
 
     public User(String email, String password, String username, Collection<Role> roles) {
@@ -91,7 +80,6 @@ public class User {
         this.password = password;
         this.profile = new UserProfile(username);
         this.created_at = new Date();
-        this.username = username;
         this.roles = roles;
     }
 
@@ -100,7 +88,7 @@ public class User {
         return "User{" +
                 "'id':'" + id + "'" +
                 ", 'email':'" + email + "'" +
-                ", 'username':'" + username + "'" +
+                ", 'username':'" + profile.getUsername() + "'" +
                 '}';
     }
 }

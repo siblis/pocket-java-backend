@@ -96,14 +96,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUserByUsername(String username) throws RuntimeException {
         //User user2 = userRepository.findFirstByUsername(username);
-        User user = Optional.of(userRepository.findByUsername(username)).orElseThrow(
+        User user = Optional.of(userRepository.findByProfileUsername(username)).orElseThrow(
                 () -> new UserNotFoundException("User with username = '" + username + "' not found"));
         return user;
     }
 
     @Override
     public List<Role> getRolesByUsername(String username) throws RuntimeException {
-        User user = Optional.of(userRepository.findByUsername(username)).orElseThrow(
+        User user = Optional.of(userRepository.findByProfileUsername(username)).orElseThrow(
                 () -> new UserNotFoundException("User with username = '" + username + "' not found"));
         return (List<Role>) user.getRoles();
     }
@@ -128,7 +128,6 @@ public class UserServiceImpl implements UserService {
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(password)); //получаем хэш пароля
         //user.setUsing2FA(account.isUsing2FA());
-        user.setUsername(name);
         user.setProfile(new UserProfile(name));
         user.setRoles(Arrays.asList(getRoleUser()));
         try {
@@ -209,7 +208,6 @@ public class UserServiceImpl implements UserService {
         if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
             throw new InvalidOldPasswordException("Old & current password does not match!");
         }
-        user.setUsername(name);
         user.getProfile().setUsername(name);
         user.setPassword(passwordEncoder.encode(newPassword));
         return update(user);
@@ -221,7 +219,7 @@ public class UserServiceImpl implements UserService {
     }
 
     public User validateUser(String username) throws UsernameNotFoundException {
-        return Optional.of(userRepository.findByUsername(username)).orElseThrow(
+        return Optional.of(userRepository.findByProfileUsername(username)).orElseThrow(
                 () -> new UserNotFoundException("User with username = " + username + " not found"));
     }
 
