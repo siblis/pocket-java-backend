@@ -37,10 +37,10 @@ public class Group {
     private String description;
 
     @Indexed
-    private String invitation_code;
+    private String invitation_code; //приглашение
 
-    @Field("public")
     @NotNull
+    @Field("public")
     private boolean isPublic = false;
 
 //    @Override

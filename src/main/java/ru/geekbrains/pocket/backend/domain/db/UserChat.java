@@ -8,7 +8,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -19,16 +18,17 @@ import javax.validation.constraints.NotNull;
 public class UserChat {
 
     @Id
-    ObjectId id;
+    private ObjectId id;
 
     @DBRef
     @Indexed
     @Valid
+    @NotNull
     private User user;
 
     @DBRef
     @Nullable
-    Group group = null;
+    private Group group = null;
 
     @DBRef
     @Nullable
@@ -38,9 +38,9 @@ public class UserChat {
     @NotNull
     private User sender;
 
-    String preview;
+    private String preview;
 
-    Integer unread;
+    private Integer unread;
 
     public UserChat(@Valid User user, @Nullable User direct, @NotNull User sender) {
         this.user = user;
@@ -53,4 +53,5 @@ public class UserChat {
         this.group = group;
         this.sender = sender;
     }
+
 }

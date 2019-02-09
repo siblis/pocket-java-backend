@@ -10,7 +10,6 @@ import ru.geekbrains.pocket.backend.domain.db.User;
 import ru.geekbrains.pocket.backend.domain.pub.UserProfilePub;
 import ru.geekbrains.pocket.backend.service.UserService;
 
-import javax.validation.constraints.Max;
 import javax.validation.constraints.Size;
 
 @Slf4j
