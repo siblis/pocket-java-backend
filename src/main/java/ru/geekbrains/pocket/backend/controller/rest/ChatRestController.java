@@ -9,7 +9,6 @@ import ru.geekbrains.pocket.backend.domain.db.User;
 import ru.geekbrains.pocket.backend.domain.db.UserChat;
 import ru.geekbrains.pocket.backend.domain.pub.UserChatCollection;
 import ru.geekbrains.pocket.backend.service.UserChatService;
-import ru.geekbrains.pocket.backend.service.UserTokenService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -19,23 +18,16 @@ import java.util.List;
 @RestController
 @RequestMapping("/account")
 public class ChatRestController {
-    private static final String TOKEN_PREFIX = "Bearer ";
-    private static final String HEADER_STRING = "Authorization";
 
-    @Autowired
-    private UserTokenService userTokenService;
     @Autowired
     private UserChatService userChatService;
+    @Autowired
+    private HttpRequestComponent httpRequestComponent;
 
     @GetMapping("/chats") //Получить историю чатов
-    public ResponseEntity<?> findUser(@RequestParam("offset") Integer offset,
+    public ResponseEntity<?> getChats(@RequestParam("offset") Integer offset,
                                       HttpServletRequest request) {
-        String header = request.getHeader(HEADER_STRING);
-        String authToken = null;
-        if (header != null && header.startsWith(TOKEN_PREFIX)) {
-            authToken = header.replace(TOKEN_PREFIX, "");
-        }
-        User user = userTokenService.getUserByToken(authToken);
+        User user = httpRequestComponent.getUserFromToken(request);
         List<UserChat> userChats;
         if (user != null) {
             userChats = userChatService.getUserChats(user);

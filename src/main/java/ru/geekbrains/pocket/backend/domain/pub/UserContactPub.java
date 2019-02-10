@@ -19,7 +19,7 @@ public class UserContactPub {
 
     @Override
     public String toString() {
-        return "UserContactPub{" +
+        return "UserContact{" +
                 "'contact':'" + contact + "'" +
                 ", 'byname':'" + byname + "'" +
                 ", 'added_at':'" + added_at + "'" +

@@ -17,7 +17,6 @@ import ru.geekbrains.pocket.backend.domain.pub.UserPub;
 import ru.geekbrains.pocket.backend.domain.pub.ValidationErrorCollection;
 import ru.geekbrains.pocket.backend.exception.InvalidOldPasswordException;
 import ru.geekbrains.pocket.backend.service.UserService;
-import ru.geekbrains.pocket.backend.service.UserTokenService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -29,22 +28,14 @@ import javax.validation.constraints.Size;
 @RestController
 //@RequestMapping("/v1") config in application.properties
 public class AccountRestController {
-    private static final String TOKEN_PREFIX = "Bearer ";
-    private static final String HEADER_STRING = "Authorization";
-
     @Autowired
     private UserService userService;
     @Autowired
-    private UserTokenService userTokenService;
+    private HttpRequestComponent httpRequestComponent;
 
     @GetMapping("/account") //Получить информацию о своем аккаунте
     public ResponseEntity<?> getAccount(HttpServletRequest request) {
-        String header = request.getHeader(HEADER_STRING);
-        String authToken = null;
-        if (header != null && header.startsWith(TOKEN_PREFIX)) {
-            authToken = header.replace(TOKEN_PREFIX, "");
-        }
-        User user = userTokenService.getUserByToken(authToken);
+        User user = httpRequestComponent.getUserFromToken(request);
         if (user != null)
             return new ResponseEntity<>(new UserPub(user), HttpStatus.OK);
         else
@@ -59,12 +50,7 @@ public class AccountRestController {
             log.debug("Old & new password is match!");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        String header = request.getHeader(HEADER_STRING);
-        String token = null;
-        if (header != null && header.startsWith(TOKEN_PREFIX)) {
-            token = header.replace(TOKEN_PREFIX, "");
-        }
-        User user = userTokenService.getUserByToken(token);
+        User user = httpRequestComponent.getUserFromToken(request);
         if (user == null) {
             ValidationErrorCollection validationErrorCollection = new ValidationErrorCollection();
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
