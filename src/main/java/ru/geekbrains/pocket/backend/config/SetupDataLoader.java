@@ -40,6 +40,8 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     private GroupService groupService;
     @Autowired
     private GroupMessageService groupMessageService;
+    @Autowired
+    private UserContactService userContactService;
 
 
     @Override
@@ -101,6 +103,12 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         createGroupMessage(user1, group3, "Сообщение №1 для группы №3");
         createGroupMessage(user2, group3, "Сообщение №2 для группы №3");
         createGroupMessage(user3, group3, "Сообщение №3 для группы №3");
+
+        createUserContact(user2, user1);
+        createUserContact(user2, user3);
+        createUserContact(user2, user4);
+        createUserContact(user3, user1);
+        createUserContact(user3, user2);
 
 
         alreadySetup = true;
@@ -193,6 +201,11 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         GroupMessage message = groupMessageService.createMessage(sender, group, text);
         log.info("Preloading " + message);
         return message;
+    }
+
+    @Transactional
+    private UserContact createUserContact(User user, User contact){
+        return userContactService.createUserContact(user, contact);
     }
 
 //    @Bean
