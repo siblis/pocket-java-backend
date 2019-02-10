@@ -26,7 +26,7 @@ public class UserMessageRestController {
     private UserMessageService userMessageService;
 
     @GetMapping("/{idUser}/messages") //Получить историю переписки
-    public ResponseEntity<?> findUser(@PathVariable String idUser, @RequestParam("offset") Integer offset) {
+    public ResponseEntity<?> getMessages(@PathVariable String idUser, @RequestParam("offset") Integer offset) {
         User user = userService.getUserById(new ObjectId(idUser));
         List<UserMessage> messages;
         if (user != null) {
@@ -41,7 +41,7 @@ public class UserMessageRestController {
 }
 
     @GetMapping("/{idUser}/messages/{idMessage}") //Получить конкретное сообщение
-    public ResponseEntity<?> findUser(@PathVariable String idUser, @PathVariable String idMessage) {
+    public ResponseEntity<?> findMessage(@PathVariable String idUser, @PathVariable String idMessage) {
         UserMessage message = userMessageService.getMessage(new ObjectId(idMessage));
         if (message != null) {
             if (idUser.equals(message.getSender().getId().toString())

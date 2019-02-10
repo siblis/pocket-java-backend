@@ -1,5 +1,6 @@
 package ru.geekbrains.pocket.backend.domain.pub;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,6 +29,7 @@ public class MessagePub {
 
     private String text;
 
+    @JsonProperty("read")
     private boolean isRead; //Только для личный сообщений
 
     private Date sent_at;
