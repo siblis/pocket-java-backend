@@ -13,55 +13,55 @@ import java.util.List;
 @Service
 public class UserContactServiselmpl implements UserContactService {
     @Autowired
-    private UserContactRepository userContactRepository;
+    private UserContactRepository repository;
 
     @Override
     public UserContact createUserContact(UserContact userContact) {
-        return userContactRepository.insert(userContact);
+        return repository.insert(userContact);
     }
 
     @Override
     public UserContact createUserContact(User user, User contact) {
-        UserContact userContact = userContactRepository.findFirstByUserAndContact(user, contact);
+        UserContact userContact = repository.findFirstByUserAndContact(user, contact);
         if (userContact == null) {
             userContact = new UserContact(user, contact);
-            return userContactRepository.insert(userContact);
+            return repository.insert(userContact);
         } else
             return userContact;
     }
 
     @Override
     public UserContact createUserContact(User user, User contact, String byname) {
-        UserContact userContact = userContactRepository.findFirstByUserAndContact(user, contact);
+        UserContact userContact = repository.findFirstByUserAndContact(user, contact);
         if (userContact == null) {
             userContact = new UserContact(user, contact, byname);
-            return userContactRepository.insert(userContact);
+            return repository.insert(userContact);
         } else
             return userContact;
     }
 
     @Override
     public void deleteUsersContact(UserContact userContact) {
-        userContactRepository.delete(userContact);
+        repository.delete(userContact);
     }
 
     @Override
     public UserContact getUserContact(User user, User contact) {
-        return userContactRepository.findFirstByUserAndContact(user, contact);
+        return repository.findFirstByUserAndContact(user, contact);
     }
 
     @Override
     public UserContact getUserContact(User user, ObjectId idContact) {
-        return userContactRepository.findFirstByUserAndContactId(user, idContact);
+        return repository.findFirstByUserAndContactId(user, idContact);
     }
 
     @Override
     public List<UserContact> getUserContacts(User user) {
-        return userContactRepository.findByUser(user);
+        return repository.findByUser(user);
     }
 
     @Override
     public UserContact updateUserContact(UserContact userContact) {
-        return userContactRepository.save(userContact);
+        return repository.save(userContact);
     }
 }
