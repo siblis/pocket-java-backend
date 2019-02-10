@@ -42,6 +42,13 @@ public class UserContact {
     public UserContact(@Valid @NotNull User user, @NotNull User contact) {
         this.user = user;
         this.contact = contact;
+        this.byName = user.getProfile().getUsername();
+    }
+
+    public UserContact(@Valid @NotNull User user, @NotNull User contact, String byName) {
+        this.user = user;
+        this.contact = contact;
+        this.byName = byName;
     }
 
     public UserContact(User user, User contact, String byName, Date addedAt) {

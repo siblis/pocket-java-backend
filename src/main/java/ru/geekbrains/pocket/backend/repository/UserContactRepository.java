@@ -15,4 +15,6 @@ public interface UserContactRepository extends MongoRepository<UserContact, Obje
 
     UserContact findFirstByUserAndContact(User user, User contact);
 
+    UserContact findFirstByUserAndContactId(User user, ObjectId id);
+
 }

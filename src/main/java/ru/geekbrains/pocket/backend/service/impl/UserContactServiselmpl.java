@@ -1,5 +1,6 @@
 package ru.geekbrains.pocket.backend.service.impl;
 
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.geekbrains.pocket.backend.domain.db.User;
@@ -30,17 +31,37 @@ public class UserContactServiselmpl implements UserContactService {
     }
 
     @Override
+    public UserContact createUserContact(User user, User contact, String byname) {
+        UserContact userContact = userContactRepository.findFirstByUserAndContact(user, contact);
+        if (userContact == null) {
+            userContact = new UserContact(user, contact, byname);
+            return userContactRepository.insert(userContact);
+        } else
+            return userContact;
+    }
+
+    @Override
     public void deleteUsersContact(UserContact userContact) {
         userContactRepository.delete(userContact);
     }
 
     @Override
-    public UserContact getContact(User user, User contact) {
+    public UserContact getUserContact(User user, User contact) {
         return userContactRepository.findFirstByUserAndContact(user, contact);
     }
 
     @Override
-    public List<UserContact> getContacts(User user) {
+    public UserContact getUserContact(User user, ObjectId idContact) {
+        return userContactRepository.findFirstByUserAndContactId(user, idContact);
+    }
+
+    @Override
+    public List<UserContact> getUserContacts(User user) {
         return userContactRepository.findByUser(user);
+    }
+
+    @Override
+    public UserContact updateUserContact(UserContact userContact) {
+        return userContactRepository.save(userContact);
     }
 }
