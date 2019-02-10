@@ -25,7 +25,7 @@ public class GroupMessageRestController {
     private GroupMessageService groupMessageService;
 
     @GetMapping("/{idGroup}/messages") //Получить историю переписки
-    public ResponseEntity<?> findUser(@PathVariable String idGroup, @RequestParam("offset") Integer offset) {
+    public ResponseEntity<?> getMessages(@PathVariable String idGroup, @RequestParam("offset") Integer offset) {
         List<GroupMessage> messages = groupMessageService.getMessages(new ObjectId(idGroup));
         if (messages != null) {
             MessageCollection messageCollection = new MessageCollection();
@@ -37,7 +37,7 @@ public class GroupMessageRestController {
 }
 
     @GetMapping("/{idGroup}/messages/{idMessage}") //Получить конкретное сообщение
-    public ResponseEntity<?> findUser(@PathVariable String idGroup, @PathVariable String idMessage) {
+    public ResponseEntity<?> findMessage(@PathVariable String idGroup, @PathVariable String idMessage) {
         GroupMessage message = groupMessageService.getMessage(new ObjectId(idMessage));
         if (message != null) {
             if (idGroup.equals(message.getGroup().getId().toString()))

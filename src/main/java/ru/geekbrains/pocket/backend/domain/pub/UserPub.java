@@ -31,10 +31,7 @@ public class UserPub {
     public UserPub(@NotNull User user) {
         this.id = user.getId().toString();
         this.email = user.getEmail();
-        this.profile = new UserProfilePub(
-                user.getId().toString(),
-                user.getProfile().getUsername(),
-                user.getProfile().getFullName());
+        this.profile = new UserProfilePub(user);
     }
 
     @Override
