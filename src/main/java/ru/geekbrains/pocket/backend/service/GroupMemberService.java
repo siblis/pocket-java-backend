@@ -1,5 +1,6 @@
 package ru.geekbrains.pocket.backend.service;
 
+import org.bson.types.ObjectId;
 import ru.geekbrains.pocket.backend.domain.db.Group;
 import ru.geekbrains.pocket.backend.domain.db.GroupMember;
 import ru.geekbrains.pocket.backend.domain.db.User;
@@ -19,7 +20,15 @@ public interface GroupMemberService {
 
     GroupMember getGroupMember(Group group, User member);
 
+    GroupMember getGroupMember(ObjectId idGroup, User member);
+
+    GroupMember getGroupMember(Group group, ObjectId idMember);
+
+    GroupMember getGroupMember(ObjectId idGroup, ObjectId idMember);
+
     List<GroupMember> getGroupMembers(Group group);
+
+    List<GroupMember> getGroupMembers(ObjectId id);
 
     List<GroupMember> getGroupMembers(User member);
 

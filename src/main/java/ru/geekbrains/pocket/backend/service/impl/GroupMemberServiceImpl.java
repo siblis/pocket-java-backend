@@ -1,5 +1,6 @@
 package ru.geekbrains.pocket.backend.service.impl;
 
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.geekbrains.pocket.backend.domain.db.Group;
@@ -43,8 +44,28 @@ public class GroupMemberServiceImpl implements GroupMemberService {
     }
 
     @Override
+    public GroupMember getGroupMember(ObjectId idGroup, User member) {
+        return repository.findFirstByGroupIdAndMember(idGroup, member);
+    }
+
+    @Override
+    public GroupMember getGroupMember(Group group, ObjectId idMember) {
+        return repository.findFirstByGroupAndMemberId(group, idMember);
+    }
+
+    @Override
+    public GroupMember getGroupMember(ObjectId idGroup, ObjectId idMember) {
+        return repository.findFirstByGroupIdAndMemberId(idGroup, idMember);
+    }
+
+    @Override
     public List<GroupMember> getGroupMembers(Group group) {
         return repository.findByGroup(group);
+    }
+
+    @Override
+    public List<GroupMember> getGroupMembers(ObjectId id) {
+        return repository.findByGroupId(id);
     }
 
     @Override
