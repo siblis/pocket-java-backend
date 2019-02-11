@@ -30,7 +30,7 @@ import java.util.List;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/groups")
-public class GroupMemberController {
+public class GroupMemberRestController {
     @Autowired
     private UserService userService;
     @Autowired
@@ -60,7 +60,7 @@ public class GroupMemberController {
         //определяем группу и текущего пользователя
         if (group != null && user != null) {
             GroupMember groupMember = groupMemberService.getGroupMember(group, user);
-            //определяем является пользователем членом и администратором группы
+            //определяем является пользователь членом и администратором группы
             if (groupMember != null && groupMember.getRole().equals(RoleGroupMember.administrator)) {
                 User member = userService.getUserById(new ObjectId(addGroupMemberRequest.getUser()));
                 //ищем есть ли позользователь в бд по предъявленному id
@@ -68,7 +68,8 @@ public class GroupMemberController {
                     groupMember = groupMemberService.createGroupMember(group, member, RoleGroupMember.speacker);
                     return new ResponseEntity<>(new GroupMemberPub(groupMember), HttpStatus.OK);
                 }
-            }
+            } else
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
@@ -81,7 +82,7 @@ public class GroupMemberController {
         //определяем группу и текущего пользователя
         if (user != null) {
             GroupMember groupMember = groupMemberService.getGroupMember(new ObjectId(idGroup), user);
-            //определяем является пользователем членом и администратором группы
+            //определяем является пользователь членом и администратором группы
             if (groupMember != null && groupMember.getRole().equals(RoleGroupMember.administrator)) {
                 groupMember = groupMemberService.getGroupMember(new ObjectId(idGroup), new ObjectId(idMember));
                 //ищем есть ли пользователь в группе по предъявленному id
