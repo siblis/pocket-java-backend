@@ -61,7 +61,9 @@ public class GroupRestController {
                                       @Valid @RequestBody InvitationCodeRequest invitationCodeRequest) {
         Group group = groupService.getGroup(new ObjectId(id));
         if (group != null) {
-            if (group.getInvitation_code().equals(invitationCodeRequest.getInvitation_code()))
+            if (group.getInvitation_code() == null ||
+                    (group.getInvitation_code() != null
+                    && group.getInvitation_code().equals(invitationCodeRequest.getInvitation_code())))
                 return new ResponseEntity<>(new GroupPub(group), HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -95,7 +97,6 @@ public class GroupRestController {
         Group group = groupService.getGroup(new ObjectId(id));
         User user = httpRequestComponent.getUserFromToken(request);
         if (group != null && user != null) {
-            List<GroupMember> groupMembers = groupMemberService.getGroupMembers(group);
             GroupMember groupMember = groupMemberService.getGroupMember(group, user);
             //изменять можно только администратору
             if (groupMember != null && groupMember.getRole().equals(RoleGroupMember.administrator)) {

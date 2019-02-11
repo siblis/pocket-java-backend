@@ -14,7 +14,15 @@ public interface GroupMemberRepository extends MongoRepository<GroupMember, Obje
 
     GroupMember findFirstByGroupAndMember(Group group, User member);
 
+    GroupMember findFirstByGroupIdAndMember(ObjectId idGroup, User member);
+
+    GroupMember findFirstByGroupAndMemberId(Group group, ObjectId idMember);
+
+    GroupMember findFirstByGroupIdAndMemberId(ObjectId idGroup, ObjectId idMember);
+
     List<GroupMember> findByGroup(Group group);
+
+    List<GroupMember> findByGroupId(ObjectId id);
 
     List<GroupMember> findByMember(User member);
 }
