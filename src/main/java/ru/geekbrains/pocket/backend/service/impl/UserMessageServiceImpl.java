@@ -43,9 +43,9 @@ public class UserMessageServiceImpl implements UserMessageService {
 
     @Override
     public UserMessage getMessage(ObjectId id) {
-        Optional<UserMessage> userMessage = Optional.of(userMessageRepository.findById(id).orElseThrow(
-                () -> new UserMessageNotFoundException("User message with id = " + id + " not found")));
-        return userMessage.get();
+        UserMessage userMessage = userMessageRepository.findById(id).orElseThrow(
+                () -> new UserMessageNotFoundException("User message with id = " + id + " not found"));
+        return userMessage;
     }
 
     @Override
