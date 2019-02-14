@@ -40,7 +40,7 @@ public class UserMessageRestController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 }
 
-    @GetMapping("/{idUser}/messages/{idMessage}") //Получить конкретное сообщение
+    @GetMapping("/{idUser}/messages/{id}") //Получить конкретное сообщение
     public ResponseEntity<?> findMessage(@PathVariable String idUser, @PathVariable String idMessage) {
         UserMessage message = userMessageService.getMessage(new ObjectId(idMessage));
         if (message != null) {
