@@ -30,6 +30,7 @@ import ru.geekbrains.pocket.backend.domain.db.UserToken;
 import ru.geekbrains.pocket.backend.domain.pub.UserPub;
 import ru.geekbrains.pocket.backend.enumeration.TokenStatus;
 import ru.geekbrains.pocket.backend.exception.UserAlreadyExistException;
+import ru.geekbrains.pocket.backend.security.AuthenticationUser;
 import ru.geekbrains.pocket.backend.service.UserService;
 import ru.geekbrains.pocket.backend.service.UserTokenService;
 import ru.geekbrains.pocket.backend.util.validation.ValidEmail;
@@ -83,7 +84,7 @@ public class AuthRestController {
         UserToken userToken = userTokenService.getValidToken(user);
 
         try {
-            authWithoutPassword(user);
+            AuthenticationUser.authWithoutPassword(user);
         } catch (AuthenticationException ex){
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
@@ -126,7 +127,7 @@ public class AuthRestController {
         UserToken userToken = userTokenService.getNewToken(user);
 
         try {
-            authWithoutPassword(user);
+            AuthenticationUser.authWithoutPassword(user);
         } catch (AuthenticationException ex){
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
@@ -156,7 +157,7 @@ public class AuthRestController {
             // model.addAttribute("qr", userService.generateQRUrl(user));
             // return "redirect:/qrcode.html?lang=" + locale.getLanguage();
             // }
-            authWithoutPassword(user);
+            AuthenticationUser.authWithoutPassword(user);
             return new ResponseEntity<>(HttpStatus.OK);
         }
 
@@ -198,36 +199,6 @@ public class AuthRestController {
 
     private String getAppUrl(HttpServletRequest request) {
         return "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
-    }
-
-    //аутентификация в Spring
-    public void authWithoutPassword(User user) throws AuthenticationException {
-        List<Privilege> privileges = user.getRoles().stream()
-                .map(Role::getPrivileges)
-                .flatMap(Collection::stream).distinct().collect(Collectors.toList());
-        List<GrantedAuthority> authorities = privileges.stream().map(
-                p -> new SimpleGrantedAuthority(p.getName())).collect(Collectors.toList());
-
-        Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, authorities);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-    }
-
-    public void authWithPassword(User user) throws AuthenticationException {
-        List<Privilege> privileges = user.getRoles().stream()
-                .map(Role::getPrivileges)
-                .flatMap(Collection::stream).distinct().collect(Collectors.toList());
-        List<GrantedAuthority> authorities = privileges.stream().map(
-                p -> new SimpleGrantedAuthority(p.getName())).collect(Collectors.toList());
-
-        //https://www.baeldung.com/manually-set-user-authentication-spring-security
-        Authentication authentication =
-                new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword(), authorities);
-//        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-//        HttpSession session = request.getSession(true);
-//        session.setAttribute("SPRING_SECURITY_CONTEXT", sc);
     }
 
     //===== Request & Response =====

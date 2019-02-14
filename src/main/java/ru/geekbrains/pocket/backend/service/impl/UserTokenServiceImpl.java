@@ -54,9 +54,11 @@ public class UserTokenServiceImpl implements UserTokenService {
 
     @Override
     public User getUserByToken(String token) {
-        final UserToken UserToken = userTokenRepository.findByToken(token);
-        if (UserToken != null) {
-            return UserToken.getUser();
+        if (token != null && !token.equals("")) {
+            final UserToken UserToken = userTokenRepository.findByToken(token);
+            if (UserToken != null) {
+                return UserToken.getUser();
+            }
         }
         return null;
     }

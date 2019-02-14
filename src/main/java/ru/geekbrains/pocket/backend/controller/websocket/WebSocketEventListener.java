@@ -28,11 +28,12 @@ public class WebSocketEventListener {
 
         String username = (String) headerAccessor.getSessionAttributes().get("username");
         //String username = StompUtils.getHeaderValue("username", headerAccessor);
+        //TODO нужен поиск по sessionId с привязкой к юзеру
 
         if(username != null) {
             log.info("User Disconnected : " + username);
-
-            messagingTemplate.convertAndSend("/topic/test", "handleWebSocketDisconnectListener");
+            //TODO ???
+            messagingTemplate.convertAndSend("/topic/user", "handleWebSocketDisconnectListener");
         }
     }
 

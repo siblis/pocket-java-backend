@@ -12,7 +12,7 @@ import ru.geekbrains.pocket.backend.resource.UserResource;
 import java.util.Date;
 import java.util.List;
 
-public interface UserService { //extends UserDetailsService {
+public interface UserService {
 
     User changeUserPassword(User user, String password);
 
