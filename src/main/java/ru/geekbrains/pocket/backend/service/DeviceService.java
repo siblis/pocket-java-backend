@@ -28,8 +28,7 @@ import java.util.Objects;
 
 import static java.util.Objects.nonNull;
 
-//@Component
-@Service
+//@Service
 public class DeviceService {
     private static final String UNKNOWN = "UNKNOWN";
     private final Logger logger = LoggerFactory.getLogger(getClass());
