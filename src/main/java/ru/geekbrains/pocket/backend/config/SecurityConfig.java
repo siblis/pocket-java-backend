@@ -83,20 +83,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .authorizeRequests()
             //более конкретные правила должны стоять первыми, а затем более общие
                 .antMatchers("/auth/**").permitAll() //rest
-                .antMatchers("/socket", "/socket/**").permitAll() //rest
-                .antMatchers("/ws", "/ws/**").permitAll() //websocket
-                .antMatchers("/topic", "/topic/**").permitAll() //websocket
-                .antMatchers("/queue", "/queue/**").permitAll() //websocket
+                .antMatchers("/socket/**").permitAll() //websocket
+                //.antMatchers("/test/**").permitAll() //websocket
                 .antMatchers("/**").hasAnyRole("ADMIN", "USER")
-                .antMatchers("/test/**").permitAll() //websocket
-                .antMatchers("/secured/**").authenticated() //websocket
                 //.anyRequest().hasAuthority("READ_PRIVILEGE")
                 .anyRequest().authenticated()
             .and()
             .formLogin()
                 //.passwordParameter("")
-                .defaultSuccessUrl("/homepage.html")
-                .loginPage("/login")
+                .loginPage("/auth/login")
                 .successHandler(customAuthenticationSuccessHandler)
                 .failureHandler(customAuthenticationFailureHandler)
                 .permitAll()

@@ -12,14 +12,21 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.messaging.simp.broker.BrokerAvailabilityEvent;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.MimeTypeUtils;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.Errors;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.util.HtmlUtils;
 import ru.geekbrains.pocket.backend.domain.db.User;
 import ru.geekbrains.pocket.backend.domain.db.UserMessage;
 import ru.geekbrains.pocket.backend.service.UserMessageService;
 import ru.geekbrains.pocket.backend.service.UserService;
 
+import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,14 +58,18 @@ public class MessagesWebsocketController implements ApplicationListener<BrokerAv
 
     @MessageMapping("/send") //Отправить новое сообщение
     @SendToUser("/topic/send") //Событие "Новое сообщение"
-    public String clientSendMessage(@Payload ClientSendMessage message) {
-//                                    Principal principal,
-//                                    @Header("simpSessionId") String sessionId) throws Exception {
+    public String clientSendMessage(@Payload ClientSendMessage message,
+                                    //@Headers Map headers,
+                                    //Principal principal,
+                                    @Header("simpUser") Authentication simpUser,
+                                    @Header("simpSessionId") String sessionId) throws Exception {
+        //@Header("token") String token
         String response = "Error";
+        //Authentication a = (Authentication) headers.get("simpUser");
         if (message == null || message.getText() == null || message.getText().equals("")) {
             //TODO проверка на ошибки
         } else {
-            User sender = userService.getUserByUsername("Alex");//principal.getName());
+            User sender = userService.getUserByEmail(simpUser.getName());
             if (message.getGroup() != null && !message.getGroup().equals("")) {
                 //TODO запись сообщения для группы в бд
                 //TODO отправить сообщение группе
@@ -75,6 +86,7 @@ public class MessagesWebsocketController implements ApplicationListener<BrokerAv
                 }
             }
         }
+        log.warn("clientSendMessage: " + response);
         return response;
     }
 
@@ -144,3 +156,9 @@ public class MessagesWebsocketController implements ApplicationListener<BrokerAv
         private String recipient;
     }
 }
+
+//example
+//   @MessageMapping("/myHandler/{username}")
+//public void handleTextMessage(@DestinationVariable String username,Message message) {
+//        //do something
+//        }

@@ -22,13 +22,10 @@ public class WebSocketSecurityConfig extends AbstractSecurityWebSocketMessageBro
     protected void configureInbound(MessageSecurityMetadataSourceRegistry messages) {
         messages
                 .simpTypeMatchers(CONNECT, UNSUBSCRIBE, DISCONNECT).permitAll()
-                .simpDestMatchers("/secured/**", "/secured/**/**").authenticated()
-                .simpDestMatchers("/v1/**", "/ws", "/ws/**").permitAll()
-                .simpDestMatchers("/topic", "/topic/**").permitAll()
-                .simpDestMatchers("/queue", "/queue/**").permitAll()
-                .simpDestMatchers("/socket", "/socket/**").permitAll()
+                .simpDestMatchers("/topic", "/topic/**").hasAnyRole("ADMIN","USER")
+                .simpDestMatchers("/queue", "/queue/**").hasAnyRole("ADMIN","USER")
                 //.simpDestMatchers("/topic/**").authenticated()
-                //.simpDestMatchers("/app/**").hasRole("ADMIN")
+                .simpDestMatchers("/send").hasAnyRole("ADMIN","USER")
                 //.simpSubscribeDestMatchers("/topic/**").authenticated()
                 .anyMessage().authenticated();
 

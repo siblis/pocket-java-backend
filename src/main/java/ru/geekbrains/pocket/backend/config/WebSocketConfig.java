@@ -64,7 +64,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 new DefaultHandshakeHandler(new TomcatRequestUpgradeStrategy());
 
         //registry.addEndpoint("/ws");
-        registry.addEndpoint("/ws")
+        registry.addEndpoint("/socket")
                 .setHandshakeHandler(handler)
                 //.setAllowedOrigins("*")
                 .withSockJS()

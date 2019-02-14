@@ -22,6 +22,12 @@
             <PatternLayout
                     pattern="${sys:LOG_PATTERN}"/>
         </Console>
+        <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
+                </pattern>
+            </encoder>
+        </appender>
 
         <!-- File Appender -->
         <RollingFile name="pocketLog" fileName="${APP_LOG_ROOT}/pocket_log-${date:yyyy-MM-dd}.log"
@@ -41,9 +47,15 @@
     </Appenders>
     <Loggers>
         <Logger name="org.hibernate.validator.internal.util.Version" level="warn"/>
+        <logger name="org.springframework" level="WARN" />
         <logger name="org.springframework.boot.actuate.endpoint.jmx" level="warn"/>
-        <Root level="debug">
+        <logger name="org.springframework.transaction" level="WARN" />
+        <!-- in order to debug some marshalling issues, this needs to be TRACE -->
+        <logger name="org.springframework.web.servlet.mvc" level="WARN" />
+
+        <Root level="INFO">
             <AppenderRef ref="Console"/>
+            <AppenderRef ref="STDOUT"/>
             <AppenderRef ref="pocketLog"/>
         </Root>
     </Loggers>
