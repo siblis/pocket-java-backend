@@ -25,7 +25,7 @@ public class WebSocketSecurityConfig extends AbstractSecurityWebSocketMessageBro
                 .simpDestMatchers("/topic", "/topic/**").hasAnyRole("ADMIN","USER")
                 .simpDestMatchers("/queue", "/queue/**").hasAnyRole("ADMIN","USER")
                 //.simpDestMatchers("/topic/**").authenticated()
-                .simpDestMatchers("/send").hasAnyRole("ADMIN","USER")
+                .simpDestMatchers("/send", "/read", "/typing").hasAnyRole("ADMIN","USER")
                 //.simpSubscribeDestMatchers("/topic/**").authenticated()
                 .anyMessage().authenticated();
 
