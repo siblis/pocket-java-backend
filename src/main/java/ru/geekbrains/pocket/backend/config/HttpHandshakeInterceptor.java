@@ -30,13 +30,13 @@ public class HttpHandshakeInterceptor implements HandshakeInterceptor {
                                    Map<String, Object> attributes) throws Exception {
 
         logger.info("Call beforeHandshake");
-        if (SecurityContextHolder.getContext().getAuthentication() != null) {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            String principal = authentication.getPrincipal().toString();
-            boolean isAuthenticated = authentication.isAuthenticated();
-            String name = authentication.getName();
-            logger.info("name=" + name + ", isAuthenticated=" + isAuthenticated + ", principal=" + principal);
-        }
+//        if (SecurityContextHolder.getContext().getAuthentication() != null) {
+//            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//            String principal = authentication.getPrincipal().toString();
+//            boolean isAuthenticated = authentication.isAuthenticated();
+//            String name = authentication.getName();
+//            logger.info("name=" + name + ", isAuthenticated=" + isAuthenticated + ", principal=" + principal);
+//        }
 
         if (request instanceof ServletServerHttpRequest) {
             ServletServerHttpRequest servletRequest = (ServletServerHttpRequest) request;
@@ -49,13 +49,13 @@ public class HttpHandshakeInterceptor implements HandshakeInterceptor {
     public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler,
                                Exception ex) {
         logger.info("Call afterHandshake");
-        if (SecurityContextHolder.getContext().getAuthentication() != null) {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            String principal = authentication.getPrincipal().toString();
-            boolean isAuthenticated = authentication.isAuthenticated();
-            String name = authentication.getName();
-            logger.info("name=" + name + ", isAuthenticated=" + isAuthenticated + ", principal=" + principal);
-        }
+//        if (SecurityContextHolder.getContext().getAuthentication() != null) {
+//            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//            String principal = authentication.getPrincipal().toString();
+//            boolean isAuthenticated = authentication.isAuthenticated();
+//            String name = authentication.getName();
+//            logger.info("name=" + name + ", isAuthenticated=" + isAuthenticated + ", principal=" + principal);
+//        }
     }
 
 }

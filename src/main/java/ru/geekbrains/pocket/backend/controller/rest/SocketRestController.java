@@ -26,9 +26,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-@Slf4j
-@CrossOrigin(origins = "*", maxAge = 3600)
-@RestController
+//@Slf4j
+//@CrossOrigin(origins = "*", maxAge = 3600)
+//@RestController
 public class SocketRestController {
 
 //    private SimpUserRegistry userRegistry;
@@ -45,7 +45,7 @@ public class SocketRestController {
 //        this.userRegistry = userRegistry;
 //    }
 
-    @GetMapping("/socket") //Создать WS соеденение
+    //@GetMapping("/socket") //Создать WS соеденение
     //В отличие от других запросов, токен передается не в заголовке а в get-параметре
     public ResponseEntity<?> openSocket(@RequestParam("token") String token,
                                         HttpServletRequest request) {
