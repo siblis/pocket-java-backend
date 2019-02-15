@@ -2,7 +2,7 @@ package ru.geekbrains.pocket.backend.service.impl;
 
 import com.mongodb.MongoServerException;
 import com.mongodb.MongoWriteException;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -23,7 +23,7 @@ import ru.geekbrains.pocket.backend.service.UserService;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Slf4j
+@Log4j2
 @Service
 public class UserServiceImpl implements UserService {
     private final static String ROLE_USER = "ROLE_USER";

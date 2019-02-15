@@ -1,7 +1,7 @@
 package ru.geekbrains.pocket.backend.controller.websocket;
 
 import lombok.*;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 //https://o7planning.org/ru/10719/create-a-simple-chat-application-with-spring-boot-and-websocket
 //https://docs.spring.io/spring/docs/current/spring-framework-reference/web.html#websocket-server
 
-@Slf4j
+@Log4j2
 @Controller
 public class MessagesWebsocketController implements ApplicationListener<BrokerAvailabilityEvent> {
 

@@ -1,6 +1,6 @@
 package ru.geekbrains.pocket.backend.config;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Configuration;
@@ -17,7 +17,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-@Slf4j
+@Log4j2
 @Configuration
 public class SetupDataLoader implements ApplicationListener<ContextRefreshedEvent> {
     private boolean alreadySetup = false;
@@ -50,6 +50,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         if (alreadySetup) {
             return;
         }
+
         //userRepository.deleteAll();
         //userRepository.deleteByEmail("a@mail.ru");
         //userTokenService.deleteAllUserToken();
