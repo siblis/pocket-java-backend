@@ -1,32 +1,17 @@
 package ru.geekbrains.pocket.backend.controller.rest;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.simp.user.SimpUser;
-import org.springframework.messaging.simp.user.SimpUserRegistry;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.context.request.WebRequest;
 import ru.geekbrains.pocket.backend.domain.db.User;
 import ru.geekbrains.pocket.backend.security.AuthenticationUser;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-//@Slf4j
+//@Log4j2
 //@CrossOrigin(origins = "*", maxAge = 3600)
 //@RestController
 public class SocketRestController {

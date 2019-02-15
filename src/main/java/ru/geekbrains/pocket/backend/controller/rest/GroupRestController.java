@@ -6,11 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import org.bson.types.ObjectId;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,13 +26,12 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.IOException;
-import java.util.List;
 
-@Slf4j
+@Log4j2
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 public class GroupRestController {
-    private static final Logger logger = LoggerFactory.getLogger(GroupRestController.class.getName());
+    //private static final Logger logger = LoggerFactory.getLogger(GroupRestController.class.getName());
 
     @Autowired
     private GroupService groupService;
@@ -114,7 +111,7 @@ public class GroupRestController {
             e.printStackTrace();
         }
         if (request.getMethod().equals("LINK")) {
-            logger.info("LINK METHOD"); //Вступить в группу
+            log.info("LINK METHOD"); //Вступить в группу
             User user = httpRequestComponent.getUserFromToken(request);
             Group group = groupService.getGroup(new ObjectId(id));
             if (invitationCodeRequest != null && user != null
@@ -129,7 +126,7 @@ public class GroupRestController {
             }
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else if (request.getMethod().equals("UNLINK")) {
-            logger.info("UNLINK METHOD"); //Покинуть группу
+            log.info("UNLINK METHOD"); //Покинуть группу
             User user = httpRequestComponent.getUserFromToken(request);
             Group group = groupService.getGroup(new ObjectId(id));
             if (user != null && group != null) {

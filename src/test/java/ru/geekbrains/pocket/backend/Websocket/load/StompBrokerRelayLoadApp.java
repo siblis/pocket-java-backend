@@ -250,10 +250,10 @@ public class StompBrokerRelayLoadApp {
 		private final CountDownLatch brokerAvailabilityLatch = new CountDownLatch(1);
 
 
-		@Override
-		protected SimpUserRegistry createLocalUserRegistry() {
-			return new DefaultSimpUserRegistry();
-		}
+//		@Override
+//		protected SimpUserRegistry createLocalUserRegistry() {
+//			return new DefaultSimpUserRegistry();
+//		}
 
 		@Override
 		protected SimpUserRegistry createLocalUserRegistry(Integer order) {

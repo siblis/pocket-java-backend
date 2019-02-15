@@ -1,25 +1,18 @@
 package ru.geekbrains.pocket.backend.controller.websocket;
 
 import lombok.*;
-import lombok.extern.slf4j.Slf4j;
-import org.bson.types.ObjectId;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.messaging.MessageHeaders;
-import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.messaging.simp.broker.BrokerAvailabilityEvent;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.MimeTypeUtils;
-import org.springframework.web.util.HtmlUtils;
-import ru.geekbrains.pocket.backend.domain.db.User;
-import ru.geekbrains.pocket.backend.domain.db.UserMessage;
 import ru.geekbrains.pocket.backend.service.UserMessageService;
 import ru.geekbrains.pocket.backend.service.UserService;
 
@@ -31,8 +24,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 //https://o7planning.org/ru/10719/create-a-simple-chat-application-with-spring-boot-and-websocket
 //https://docs.spring.io/spring/docs/current/spring-framework-reference/web.html#websocket-server
 
+@Log4j2
 @Controller
-@Slf4j
 public class TestWebsocketController implements ApplicationListener<BrokerAvailabilityEvent> {
 
     private AtomicBoolean brokerAvailable = new AtomicBoolean(); //доступность брокера

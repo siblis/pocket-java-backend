@@ -1,8 +1,6 @@
 package ru.geekbrains.pocket.backend.config;
 
 import com.maxmind.geoip2.DatabaseReader;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.util.ResourceUtils;
 import ua_parser.Parser;
 
