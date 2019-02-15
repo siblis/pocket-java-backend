@@ -1,7 +1,10 @@
 package ru.geekbrains.pocket.backend.controller.websocket;
 
-import lombok.*;
-import lombok.extern.slf4j.Slf4j;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.extern.log4j.Log4j2;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
@@ -23,7 +26,7 @@ import ru.geekbrains.pocket.backend.service.UserService;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-@Slf4j
+@Log4j2
 @Controller
 public class ChatWebsocketController implements ApplicationListener<BrokerAvailabilityEvent> {
     private AtomicBoolean brokerAvailable = new AtomicBoolean(); //доступность брокера

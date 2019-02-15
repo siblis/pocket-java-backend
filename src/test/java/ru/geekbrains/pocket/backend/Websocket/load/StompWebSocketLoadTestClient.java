@@ -66,7 +66,7 @@ public class StompWebSocketLoadTestClient {
 		String homeUrl = "http://{host}:{port}/ws";
 		logger.debug("Sending warm-up HTTP request to " + homeUrl);
 		HttpStatus status = new RestTemplate().getForEntity(homeUrl, Void.class, host, port).getStatusCode();
-		Assert.state(status == HttpStatus.OK);
+		Assert.state(status == HttpStatus.OK, "OK");
 
 		final CountDownLatch connectLatch = new CountDownLatch(NUMBER_OF_USERS);
 		final CountDownLatch subscribeLatch = new CountDownLatch(NUMBER_OF_USERS);
