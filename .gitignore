@@ -1,3 +1,4 @@
+*.mmdb
 /target/
 /deploy/
 .gradle/
