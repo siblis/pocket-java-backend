@@ -9,6 +9,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.core.env.Environment;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
@@ -81,7 +82,7 @@ public class AuthRestController {
         try {
             AuthenticationUser.authWithoutPassword(user);
         } catch (AuthenticationException ex){
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.UNAUTHORIZED);
         }
 
         return new ResponseEntity<>(new RegistrationResponse(userToken.getToken(), new UserPub(userToken.getUser())), HttpStatus.OK);
@@ -111,12 +112,16 @@ public class AuthRestController {
             user = userService.createUserAccount(registrationRequest.getEmail(),
                     registrationRequest.getPassword(),
                     registrationRequest.getName());
-        } catch (UserAlreadyExistException e) {
-            log.debug("Email already exists.");
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
-        } catch (MongoServerException e) {// MongoWriteException, DuplicateKeyException
-            log.debug("Email write to db user " + registrationRequest);
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
+            if (user == null){
+                log.debug("Error write to db:" + registrationRequest);
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        } catch (UserAlreadyExistException ex) {
+            log.debug("Email already exists: " + registrationRequest);
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT);
+        } catch (DuplicateKeyException | MongoServerException ex) {
+            log.debug("Error write to db:" + registrationRequest);
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT);
         }
 
         UserToken userToken = userTokenService.getNewToken(user);
@@ -124,7 +129,7 @@ public class AuthRestController {
         try {
             AuthenticationUser.authWithoutPassword(user);
         } catch (AuthenticationException ex){
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.UNAUTHORIZED);
         }
 
         //отправка электронного письма с запросом подтверждения email
@@ -202,7 +207,7 @@ public class AuthRestController {
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
-    private static class LoginRequest {
+    public static class LoginRequest {
 
         @NotNull
         @ValidEmail
@@ -217,7 +222,7 @@ public class AuthRestController {
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
-    private static class RegistrationRequest {
+    public static class RegistrationRequest {
         @NotNull
         @ValidEmail //(message = "email names must comply with the standard")
         @Size(min = 6, max = 32)
