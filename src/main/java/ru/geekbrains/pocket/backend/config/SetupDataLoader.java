@@ -72,8 +72,8 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         final Role userRole = createRoleIfNotFound("ROLE_USER", userPrivileges);
 
         // == create initial user
-        User user1 = createUserIfNotFound("test@test.com", "Test", "Test1234", Arrays.asList(adminRole));
-        User user2 = createUserIfNotFound("a@mail.ru", "Alex", "Abc12345", Arrays.asList(adminRole));
+        User user1 = createUserIfNotFound("test@test.com", "Test", "Test1234", Arrays.asList(adminRole, userRole));
+        User user2 = createUserIfNotFound("a@mail.ru", "Alex", "Abc12345", Arrays.asList(adminRole, userRole));
         User user3 = createUserIfNotFound("b@mail.ru", "Bob", "Abc12345", Arrays.asList(userRole));
         User user4 = createUserIfNotFound("i@mail.ru", "ivan", "Qwe12345", Arrays.asList(userRole));
 
@@ -157,8 +157,11 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 
     @Transactional
     private UserToken createTokenForUserIfNotFound(User user) {
-        UserToken userToken = userTokenService.createOrUpdateTokenForUser(user);
-        log.info("Preloading for user '" + user.getEmail() + "' " + userToken);
+        UserToken userToken = userTokenService.getUserToken(user);
+        if (user == null) {
+            userToken = userTokenService.createOrUpdateTokenForUser(user);
+            log.info("Preloading for user '" + user.getEmail() + "' " + userToken);
+        }
         return userToken;
     }
 

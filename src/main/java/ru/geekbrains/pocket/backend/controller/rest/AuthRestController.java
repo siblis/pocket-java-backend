@@ -77,12 +77,12 @@ public class AuthRestController {
         //ищем есть ли токен у этого юзера
         UserToken userToken = userTokenService.getValidToken(user);
 
-        try {
-            AuthenticationUser.authWithoutPassword(user);
-        } catch (AuthenticationException ex){
-            log.error(ex.getMessage());
-            return new ResponseEntity<>(ex.getMessage(), HttpStatus.UNAUTHORIZED);
-        }
+//        try {
+//            AuthenticationUser.authWithoutPassword(user);
+//        } catch (AuthenticationException ex){
+//            log.error(ex.getMessage());
+//            return new ResponseEntity<>(ex.getMessage(), HttpStatus.UNAUTHORIZED);
+//        }
 
         return new ResponseEntity<>(new RegistrationResponse(userToken.getToken(), new UserPub(userToken.getUser())), HttpStatus.OK);
     }
@@ -124,11 +124,11 @@ public class AuthRestController {
 
         UserToken userToken = userTokenService.getNewToken(user);
 
-        try {
-            AuthenticationUser.authWithoutPassword(user);
-        } catch (AuthenticationException ex){
-            return new ResponseEntity<>(ex.getMessage(), HttpStatus.UNAUTHORIZED);
-        }
+//        try {
+//            AuthenticationUser.authWithoutPassword(user);
+//        } catch (AuthenticationException ex){
+//            return new ResponseEntity<>(ex.getMessage(), HttpStatus.UNAUTHORIZED);
+//        }
 
         //отправка электронного письма с запросом подтверждения email
 //        try {

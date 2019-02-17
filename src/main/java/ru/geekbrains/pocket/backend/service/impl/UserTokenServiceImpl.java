@@ -50,13 +50,15 @@ public class UserTokenServiceImpl implements UserTokenService {
         final String newToken = jwtTokenUtil.generateToken(user);
         Date expiryDate = jwtTokenUtil.getExpirationDateFromToken(newToken);
         UserToken userToken = userTokenRepository.findByUser(user);
-        if (userToken == null)
+        if (userToken == null) {
             userToken = new UserToken(newToken, user, expiryDate);
+            return userTokenRepository.insert(userToken);
+        }
         else {
             userToken.setToken(newToken);
             userToken.setExpiryDate(expiryDate);
+            return userTokenRepository.save(userToken);
         }
-        return userTokenRepository.save(userToken);
     }
 
     @Override
