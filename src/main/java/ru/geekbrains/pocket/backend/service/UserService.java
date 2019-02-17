@@ -24,6 +24,8 @@ public interface UserService {
 
     void delete(String email);
 
+    void deleteAll();
+
     List<User> getAllUsers();
 
     List<UserResource> getAllUserResources();

@@ -7,32 +7,38 @@ import ru.geekbrains.pocket.backend.domain.db.UserToken;
 import ru.geekbrains.pocket.backend.enumeration.TokenStatus;
 import ru.geekbrains.pocket.backend.exception.TokenNotFoundException;
 
+import java.util.List;
+
 public interface UserTokenService {
 
     PasswordResetToken createPasswordResetTokenForUser(User user, String token);
 
-    UserToken createOrUpdateTokenForUser(User user);
+    UserToken createOrUpdateToken(User user, String userIp);
+
+    List<UserToken> createOrUpdateToken(User user);
+
+    TokenStatus getTokenStatus(String token);
 
     User getUserByToken(String token);
 
-    UserToken getNewToken(User user);
+    UserToken getUserToken(User user, String userIp);
 
-    UserToken getUserToken(User user);
+    List<UserToken> getUserToken(User user);
 
     UserToken getUserToken(String token);
 
-    UserToken getValidToken(User user);
+    UserToken getValidToken(User user, String userIp);
+
+    List<UserToken> getValidToken(User user);
 
     UserToken updateUserToken(UserToken userToken);
 
-    UserToken updateUserToken(String token) throws TokenNotFoundException;
+    UserToken updateUserToken(String token);
 
-    void deleteUserToken(UserToken tokenOnDelete);
+    void deleteUserToken(UserToken userToken);
 
     void deleteAllUserToken();
 
     String validatePasswordResetToken(ObjectId id, String token);
-
-    TokenStatus getTokenStatus(String token);
 
 }

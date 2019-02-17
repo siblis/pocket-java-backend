@@ -12,17 +12,13 @@ import ru.geekbrains.pocket.backend.domain.db.PasswordResetToken;
 import ru.geekbrains.pocket.backend.domain.db.User;
 import ru.geekbrains.pocket.backend.domain.db.UserToken;
 import ru.geekbrains.pocket.backend.enumeration.TokenStatus;
-import ru.geekbrains.pocket.backend.exception.TokenNotFoundException;
 import ru.geekbrains.pocket.backend.repository.PasswordResetTokenRepository;
 import ru.geekbrains.pocket.backend.repository.UserRepository;
 import ru.geekbrains.pocket.backend.repository.UserTokenRepository;
 import ru.geekbrains.pocket.backend.security.token.JwtTokenUtil;
 import ru.geekbrains.pocket.backend.service.UserTokenService;
 
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Optional;
+import java.util.*;
 
 @Log4j2
 @Service
@@ -44,12 +40,13 @@ public class UserTokenServiceImpl implements UserTokenService {
     }
 
     @Override
-    public UserToken createOrUpdateTokenForUser(User user) {
+    public UserToken createOrUpdateToken(User user, String userIp) {
+        userIp = "0.0.0.0"; //TODO
         if (user == null) return null;
         //final String token = UUID.randomUUID().toString();
         final String newToken = jwtTokenUtil.generateToken(user);
         Date expiryDate = jwtTokenUtil.getExpirationDateFromToken(newToken);
-        UserToken userToken = userTokenRepository.findByUser(user);
+        UserToken userToken = userTokenRepository.findFirstByUserAndUserip(user, userIp);
         if (userToken == null) {
             userToken = new UserToken(newToken, user, expiryDate);
             return userTokenRepository.insert(userToken);
@@ -62,17 +59,46 @@ public class UserTokenServiceImpl implements UserTokenService {
     }
 
     @Override
-    public UserToken getNewToken(User user) {
-        //ищем есть ли токен у этого юзера
-        UserToken userToken = getUserToken(user);
-        if (userToken != null) {
-            //обновляем токен
-            userToken = updateUserToken(userToken);
-        } else {
-            //токен не найден, создаём новый токен
-            userToken = createOrUpdateTokenForUser(user);
+    public List<UserToken> createOrUpdateToken(User user) {
+//        if (user == null) return null;
+//        //final String token = UUID.randomUUID().toString();
+//        final String newToken = jwtTokenUtil.generateToken(user);
+//        Date expiryDate = jwtTokenUtil.getExpirationDateFromToken(newToken);
+//        UserToken userToken = userTokenRepository.findByUser(user);
+//        if (userToken == null) {
+//            userToken = new UserToken(newToken, user, expiryDate);
+//            return userTokenRepository.insert(userToken);
+//        }
+//        else {
+//            userToken.setToken(newToken);
+//            userToken.setExpiryDate(expiryDate);
+//            return userTokenRepository.save(userToken);
+//        }
+        return null;
+    }
+
+    @Override
+    public TokenStatus getTokenStatus(String token) {
+        final UserToken UserToken = userTokenRepository.findByToken(token);
+        if (UserToken == null) {
+            return TokenStatus.INVALID;
         }
-        return userToken;
+
+        //TODO use JwtTokenUtil.isTokenExpired
+        final User user = UserToken.getUser();
+        final Calendar cal = Calendar.getInstance();
+        if ((UserToken.getExpiryDate()
+                .getTime()
+                - cal.getTime()
+                .getTime()) <= 0) {
+            userTokenRepository.delete(UserToken);
+            return TokenStatus.EXPIRED;
+        }
+
+        user.setEnabled(true);
+        // userTokenRepository.delete(UserToken);
+        userRepository.save(user);
+        return TokenStatus.VALID;
     }
 
     @Override
@@ -87,19 +113,25 @@ public class UserTokenServiceImpl implements UserTokenService {
     }
 
     @Override
-    public UserToken getUserToken(User user) {
+    public UserToken getUserToken(User user, String userIp) {
+        return userTokenRepository.findFirstByUserAndUserip(user, userIp);
+    }
+
+    @Override
+    public List<UserToken> getUserToken(User user) {
         return userTokenRepository.findByUser(user);
     }
 
     @Override
     public UserToken getUserToken(String token) {
-        return userTokenRepository.findByToken(token);
+        return null;
     }
 
     @Override
-    public UserToken getValidToken(User user) {
+    public UserToken getValidToken(User user, String userIp) {
+        userIp = "0.0.0.0"; //TODO
         //ищем есть ли токен у этого юзера
-        UserToken userToken = getUserToken(user);
+        UserToken userToken = getUserToken(user, userIp);
         if (userToken != null) {
             //проверяем токен
 //            if (jwtTokenUtil.getTokenStatus(userToken.getUserToken(), user.getEmail())){
@@ -116,32 +148,57 @@ public class UserTokenServiceImpl implements UserTokenService {
             }
         } else {
             //токен не найден, создаём новый токен
-            userToken = createOrUpdateTokenForUser(user);
+            userToken = createOrUpdateToken(user, userIp);
         }
         return userToken;
     }
 
+//    @Override
+//    public UserToken getUserToken(String token) {
+//        return userTokenRepository.findByToken(token);
+//    }
+
     @Override
-    public UserToken updateUserToken(UserToken userToken) {
-        userToken = userTokenRepository.findByUserAndToken(userToken.getUser(), userToken.getToken());
-        if (userToken == null){
-            userToken = createOrUpdateTokenForUser(userToken.getUser());
-        } else {
-            String newToken = jwtTokenUtil.generateToken(userToken.getUser());
-            Date expiryDate = jwtTokenUtil.getExpirationDateFromToken(newToken);
-            userToken.updateToken(newToken, expiryDate);
-        }
-        return userTokenRepository.save(userToken);
+    public List<UserToken> getValidToken(User user) {
+//        //ищем есть ли токен у этого юзера
+//        UserToken userToken = getUserToken(user);
+//        if (userToken != null) {
+//            //проверяем токен
+////            if (jwtTokenUtil.getTokenStatus(userToken.getUserToken(), user.getEmail())){
+////                //обновляем токен
+////                userToken = updateUserToken(userToken);
+////            }
+////            if (jwtTokenUtil.getExpirationDateFromToken(userToken.getUserToken()).before(new Date())){
+////                //обновляем токен
+////                userToken = updateUserToken(userToken);
+////            }
+//            if (getTokenStatus(userToken.getToken()).equals(TokenStatus.EXPIRED)) {
+//                //обновляем токен
+//                userToken = updateUserToken(userToken);
+//            }
+//        } else {
+//            //токен не найден, создаём новый токен
+//            userToken = createOrUpdateToken(user);
+//        }
+//        return userToken;
+        return null;
     }
 
     @Override
-    public UserToken updateUserToken(final String token) throws TokenNotFoundException {
-        UserToken userToken = Optional.of(userTokenRepository.findByToken(token)).orElseThrow(
-                () -> new TokenNotFoundException("Token not found : " + token));
+    public UserToken updateUserToken(UserToken userToken) {
         String newToken = jwtTokenUtil.generateToken(userToken.getUser());
         Date expiryDate = jwtTokenUtil.getExpirationDateFromToken(newToken);
         userToken.updateToken(newToken, expiryDate);
         return userTokenRepository.save(userToken);
+    }
+
+    @Override
+    public UserToken updateUserToken(String token) {
+        UserToken userToken = getUserToken(token);
+        if (userToken != null){
+            updateUserToken(userToken);
+        }
+        return null;
     }
 
     @Override
@@ -170,30 +227,6 @@ public class UserTokenServiceImpl implements UserTokenService {
         final Authentication auth = new UsernamePasswordAuthenticationToken(user, null, Arrays.asList(new SimpleGrantedAuthority("CHANGE_PASSWORD_PRIVILEGE")));
         SecurityContextHolder.getContext().setAuthentication(auth);
         return null;
-    }
-
-    @Override
-    public TokenStatus getTokenStatus(String token) {
-        final UserToken UserToken = userTokenRepository.findByToken(token);
-        if (UserToken == null) {
-            return TokenStatus.INVALID;
-        }
-
-        //TODO use JwtTokenUtil.isTokenExpired
-        final User user = UserToken.getUser();
-        final Calendar cal = Calendar.getInstance();
-        if ((UserToken.getExpiryDate()
-                .getTime()
-                - cal.getTime()
-                .getTime()) <= 0) {
-            userTokenRepository.delete(UserToken);
-            return TokenStatus.EXPIRED;
-        }
-
-        user.setEnabled(true);
-        // userTokenRepository.delete(UserToken);
-        userRepository.save(user);
-        return TokenStatus.VALID;
     }
 
 }

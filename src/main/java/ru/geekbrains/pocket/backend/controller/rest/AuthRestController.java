@@ -75,7 +75,7 @@ public class AuthRestController {
         }
 
         //ищем есть ли токен у этого юзера
-        UserToken userToken = userTokenService.getValidToken(user);
+        UserToken userToken = userTokenService.getValidToken(user, "0.0.0.0");
 
 //        try {
 //            AuthenticationUser.authWithoutPassword(user);
@@ -122,7 +122,7 @@ public class AuthRestController {
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT);
         }
 
-        UserToken userToken = userTokenService.getNewToken(user);
+        UserToken userToken = userTokenService.createOrUpdateToken(user, "0.0.0.0");
 
 //        try {
 //            AuthenticationUser.authWithoutPassword(user);

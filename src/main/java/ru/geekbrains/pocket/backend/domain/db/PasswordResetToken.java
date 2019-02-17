@@ -63,7 +63,7 @@ public class PasswordResetToken {
     public String toString() {
         final StringBuilder builder = new StringBuilder();
         builder.append("Token [String=").append(token).append("]")
-                .append("[logged_at=").append(expiryDate).append("]")
+                .append("[loggedAt=").append(expiryDate).append("]")
                 .append("[Expires").append(expiryDate).append("]");
         return builder.toString();
     }

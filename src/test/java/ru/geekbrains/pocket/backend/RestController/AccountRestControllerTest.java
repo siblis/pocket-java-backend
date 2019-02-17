@@ -197,7 +197,7 @@ public class AccountRestControllerTest {
         userService.delete(email);
         User user = userService.createUserAccount(email, password, username);
         try {
-            token = userTokenService.getValidToken(user).getToken();
+            token = userTokenService.getValidToken(user, "0.0.0.0").getToken();
         } catch (Exception ex) {
             log.debug(ex.getMessage());
         }

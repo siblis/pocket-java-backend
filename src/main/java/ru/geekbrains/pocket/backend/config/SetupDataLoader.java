@@ -52,26 +52,25 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
             return;
         }
 
-        //userRepository.deleteAll();
-        //userRepository.deleteByEmail("a@mail.ru");
-        //userTokenService.deleteAllUserToken();
-        //userChatService.deleteAllUserChats();
-        //userMessageService.deleteAllMessages();
-        //groupService.deleteAllGroups();
-        //groupMessageService.deleteAllMessages();
+        userService.deleteAll();
+        userTokenService.deleteAllUserToken();
+        userChatService.deleteAllUserChats();
+        userMessageService.deleteAllMessages();
+        groupService.deleteAllGroups();
+        groupMessageService.deleteAllMessages();
 
-        // == create initial privileges
+        // == createRoleIfNotFound initial privileges
         final Privilege readPrivilege = createPrivilegeIfNotFound("READ_PRIVILEGE");
         final Privilege writePrivilege = createPrivilegeIfNotFound("WRITE_PRIVILEGE");
         final Privilege passwordPrivilege = createPrivilegeIfNotFound("CHANGE_PASSWORD_PRIVILEGE");
 
-        // == create initial roles
+        // == createRoleIfNotFound initial roles
         final List<Privilege> adminPrivileges = new ArrayList<>(Arrays.asList(readPrivilege, writePrivilege, passwordPrivilege));
         final List<Privilege> userPrivileges = new ArrayList<>(Arrays.asList(readPrivilege, passwordPrivilege));
         final Role adminRole = createRoleIfNotFound("ROLE_ADMIN", adminPrivileges);
         final Role userRole = createRoleIfNotFound("ROLE_USER", userPrivileges);
 
-        // == create initial user
+        // == createRoleIfNotFound initial user
         User user1 = createUserIfNotFound("test@test.com", "Test", "Test1234", Arrays.asList(adminRole, userRole));
         User user2 = createUserIfNotFound("a@mail.ru", "Alex", "Abc12345", Arrays.asList(adminRole, userRole));
         User user3 = createUserIfNotFound("b@mail.ru", "Bob", "Abc12345", Arrays.asList(userRole));
@@ -157,9 +156,9 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 
     @Transactional
     private UserToken createTokenForUserIfNotFound(User user) {
-        UserToken userToken = userTokenService.getUserToken(user);
-        if (user == null) {
-            userToken = userTokenService.createOrUpdateTokenForUser(user);
+        UserToken userToken = userTokenService.getUserToken(user, "0.0.0.0");
+        if (userToken == null) {
+            userToken = userTokenService.createOrUpdateToken(user, "0.0.0.0");
             log.info("Preloading for user '" + user.getEmail() + "' " + userToken);
         }
         return userToken;

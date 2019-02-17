@@ -18,6 +18,7 @@ import ru.geekbrains.pocket.backend.repository.RoleRepository;
 import ru.geekbrains.pocket.backend.repository.UserRepository;
 import ru.geekbrains.pocket.backend.repository.UserTokenRepository;
 import ru.geekbrains.pocket.backend.resource.UserResource;
+import ru.geekbrains.pocket.backend.service.RoleService;
 import ru.geekbrains.pocket.backend.service.UserService;
 
 import javax.validation.constraints.NotNull;
@@ -29,12 +30,10 @@ import java.util.stream.Collectors;
 @Log4j2
 @Service
 public class UserServiceImpl implements UserService {
-    private final static String ROLE_USER = "ROLE_USER";
-
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private RoleRepository roleRepository;
+    private RoleService roleService;
     @Autowired
     private UserTokenRepository userTokenRepository;
     @Autowired
@@ -63,7 +62,7 @@ public class UserServiceImpl implements UserService {
         user.setPassword(passwordEncoder.encode(password)); //получаем хэш пароля
         //user.setUsing2FA(account.isUsing2FA());
         user.setProfile(new UserProfile(name));
-        user.setRoles(Arrays.asList(getRoleUser()));
+        user.setRoles(Arrays.asList(roleService.createRoleUserIfNotFound()));
         return userRepository.insert(user);
     }
 
@@ -75,6 +74,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public void delete(String email) {
         deleteCascade(getUserByEmail(email));
+    }
+
+    @Override
+    public void deleteAll() {
+        userRepository.deleteAll();
     }
 
     private void deleteCascade(User user) {
@@ -134,16 +138,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public User insert(User user) throws RuntimeException {
         if (user.getRoles() == null)
-            user.setRoles(Arrays.asList(getRoleUser()));
+            user.setRoles(Arrays.asList(roleService.createRoleUserIfNotFound()));
         return userRepository.insert(user);
     }
 
-    private Role getRoleUser() {
-        Role roleUser = roleRepository.findByName(ROLE_USER);
-        if (roleUser == null)
-            roleUser = roleRepository.insert(new Role(ROLE_USER));
-        return roleUser;
-    }
 
     @Override
     public User update(User user) throws DuplicateKeyException, MongoWriteException {
