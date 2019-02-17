@@ -16,6 +16,7 @@ import ru.geekbrains.pocket.backend.util.validation.ValidEmail;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.Collection;
 import java.util.Date;
 
@@ -31,6 +32,7 @@ public class User {
     @NotNull
     @NotEmpty
     @ValidEmail
+    @Size(min = 6, max = 32)
     @Indexed(unique = true)
     private String email;
 
@@ -38,15 +40,8 @@ public class User {
     @JsonIgnore
 //    @Pattern(regexp = "^\\S*(?=\\S{6,})(?=\\S*[a-z])(?=\\S*[A-Z])(?=\\S*[\\d])\\S*$",
 //            message = "Enter a password containing 6 characters with at least one capital letter and one number.")
+    @Size(min = 8, max = 32)
     private String password;
-
-    private Date created_at;
-
-    private boolean enabled = false;
-
-    private boolean isUsing2FA = false;
-
-    private String secret = Base32.random();
 
     @NotNull
     @Valid
@@ -57,6 +52,14 @@ public class User {
     @Valid
     @JsonIgnore
     private Collection<Role> roles;
+
+    private Date created_at = new Date();
+
+    private boolean enabled = false;
+
+    private boolean isUsing2FA = false;
+
+    private String secret = Base32.random();
 
     public User(String email, String password, UserProfile userProfile) {
         if (userProfile == null) userProfile = new UserProfile(email);

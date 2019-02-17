@@ -1,14 +1,16 @@
 package ru.geekbrains.pocket.backend.config;
 
+import lombok.extern.log4j.Log4j2;
+
 import javax.servlet.*;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-
+@Log4j2
 public class CORSFilter implements Filter {
 
 	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
-		System.out.println("Filtering on...........................................................");
+		log.debug("Filtering on...........................................................");
 		HttpServletResponse response = (HttpServletResponse) res;
         response.setHeader("Access-Control-Allow-Origin", "*");
         response.setHeader("Access-Control-Allow-Credentials", "true");

@@ -9,6 +9,8 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -18,15 +20,19 @@ import java.util.Date;
 @Document(collection = "users.tokens")
 public class UserToken {
     private static final int EXPIRATION = 60 * 24;
-
+    //TODO unique index = user + token
     @Id
     private ObjectId id;
 
+    @NotNull
+    @Valid
     @DBRef
+    @Indexed(unique = true)
     private User user;
 
+    @NotNull
     @Indexed
-    private String token;
+    private String token; //несколько токенов на разные устройства
 
     private String user_ip;
 
@@ -34,6 +40,7 @@ public class UserToken {
 
     private Date logged_at = new Date();
 
+    //TODO убрать лишнее
     private Date expiryDate;
 
     public UserToken(final String token) {
@@ -52,8 +59,6 @@ public class UserToken {
     }
 
     public UserToken(final String token, final User user, final Date expiryDate) {
-        super();
-
         this.token = token;
         this.user = user;
         this.expiryDate = expiryDate;
@@ -81,9 +86,9 @@ public class UserToken {
     @Override
     public String toString() {
         final StringBuilder builder = new StringBuilder();
-        builder.append("Token [String=").append(token).append("]")
-                .append("[logged_at=").append(expiryDate).append("]")
-                .append("[Expires=").append(expiryDate).append("]");
+        builder.append("token 'String':'").append(token).append("'")
+                .append("'logged_at':'").append(expiryDate).append("'")
+                .append("'Expires':'").append(expiryDate).append("'");
         return builder.toString();
     }
 

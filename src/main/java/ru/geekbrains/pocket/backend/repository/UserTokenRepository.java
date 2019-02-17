@@ -14,9 +14,17 @@ public interface UserTokenRepository extends MongoRepository<UserToken, ObjectId
 
     UserToken findByUser(User user);
 
+    UserToken findByUserEmail(String email);
+
+    UserToken findByUserAndToken(User user, String token);
+
     Stream<UserToken> findAllByExpiryDateLessThan(Date now);
 
     void deleteByExpiryDateLessThan(Date now);
+
+    void deleteByUser(User user);
+
+    //void deleteByUserEmail(String email);
 
 //    @Modifying
 //    @Query("delete from UserToken t where t.expiryDate <= ?1")

@@ -44,18 +44,39 @@ public class UserTokenServiceImpl implements UserTokenService {
     }
 
     @Override
-    public UserToken createTokenForUser(User user) {
+    public UserToken createOrUpdateTokenForUser(User user) {
+        if (user == null) return null;
         //final String token = UUID.randomUUID().toString();
-        final String token = jwtTokenUtil.generateToken(user);
-        Date expiryDate = jwtTokenUtil.getExpirationDateFromToken(token);
-        final UserToken userToken = new UserToken(token, user, expiryDate);
+        final String newToken = jwtTokenUtil.generateToken(user);
+        Date expiryDate = jwtTokenUtil.getExpirationDateFromToken(newToken);
+        UserToken userToken = userTokenRepository.findByUser(user);
+        if (userToken == null)
+            userToken = new UserToken(newToken, user, expiryDate);
+        else {
+            userToken.setToken(newToken);
+            userToken.setExpiryDate(expiryDate);
+        }
         return userTokenRepository.save(userToken);
+    }
+
+    @Override
+    public UserToken getNewToken(User user) {
+        //ищем есть ли токен у этого юзера
+        UserToken userToken = getUserToken(user);
+        if (userToken != null) {
+            //обновляем токен
+            userToken = updateUserToken(userToken);
+        } else {
+            //токен не найден, создаём новый токен
+            userToken = createOrUpdateTokenForUser(user);
+        }
+        return userToken;
     }
 
     @Override
     public User getUserByToken(String token) {
         if (token != null && !token.equals("")) {
-            final UserToken UserToken = userTokenRepository.findByToken(token);
+            UserToken UserToken = userTokenRepository.findByToken(token);
             if (UserToken != null) {
                 return UserToken.getUser();
             }
@@ -64,64 +85,55 @@ public class UserTokenServiceImpl implements UserTokenService {
     }
 
     @Override
-    public UserToken getNewToken(User user) {
-        //ищем есть ли токен у этого юзера
-        UserToken userToken = getToken(user);
-        if (userToken != null) {
-            //обновляем токен
-            userToken = updateToken(userToken);
-        } else {
-            //токен не найден, создаём новый токен
-            userToken = createTokenForUser(user);
-        }
-        return userToken;
-    }
-
-    @Override
-    public UserToken getToken(User user) {
+    public UserToken getUserToken(User user) {
         return userTokenRepository.findByUser(user);
     }
 
     @Override
-    public UserToken getToken(String token) {
+    public UserToken getUserToken(String token) {
         return userTokenRepository.findByToken(token);
     }
 
     @Override
     public UserToken getValidToken(User user) {
         //ищем есть ли токен у этого юзера
-        UserToken userToken = getToken(user);
+        UserToken userToken = getUserToken(user);
         if (userToken != null) {
             //проверяем токен
-//            if (jwtTokenUtil.validateToken(userToken.getToken(), user.getEmail())){
+//            if (jwtTokenUtil.getTokenStatus(userToken.getUserToken(), user.getEmail())){
 //                //обновляем токен
-//                userToken = updateToken(userToken);
+//                userToken = updateUserToken(userToken);
 //            }
-//            if (jwtTokenUtil.getExpirationDateFromToken(userToken.getToken()).before(new Date())){
+//            if (jwtTokenUtil.getExpirationDateFromToken(userToken.getUserToken()).before(new Date())){
 //                //обновляем токен
-//                userToken = updateToken(userToken);
+//                userToken = updateUserToken(userToken);
 //            }
-            if (validateToken(userToken.getToken()).equals(TokenStatus.EXPIRED)) {
+            if (getTokenStatus(userToken.getToken()).equals(TokenStatus.EXPIRED)) {
                 //обновляем токен
-                userToken = updateToken(userToken);
+                userToken = updateUserToken(userToken);
             }
         } else {
             //токен не найден, создаём новый токен
-            userToken = createTokenForUser(user);
+            userToken = createOrUpdateTokenForUser(user);
         }
         return userToken;
     }
 
     @Override
-    public UserToken updateToken(UserToken userToken) {
-        String newToken = jwtTokenUtil.generateToken(userToken.getUser());
-        Date expiryDate = jwtTokenUtil.getExpirationDateFromToken(newToken);
-        userToken.updateToken(newToken, expiryDate);
+    public UserToken updateUserToken(UserToken userToken) {
+        userToken = userTokenRepository.findByUserAndToken(userToken.getUser(), userToken.getToken());
+        if (userToken == null){
+            userToken = createOrUpdateTokenForUser(userToken.getUser());
+        } else {
+            String newToken = jwtTokenUtil.generateToken(userToken.getUser());
+            Date expiryDate = jwtTokenUtil.getExpirationDateFromToken(newToken);
+            userToken.updateToken(newToken, expiryDate);
+        }
         return userTokenRepository.save(userToken);
     }
 
     @Override
-    public UserToken updateToken(final String token) throws TokenNotFoundException {
+    public UserToken updateUserToken(final String token) throws TokenNotFoundException {
         UserToken userToken = Optional.of(userTokenRepository.findByToken(token)).orElseThrow(
                 () -> new TokenNotFoundException("Token not found : " + token));
         String newToken = jwtTokenUtil.generateToken(userToken.getUser());
@@ -131,7 +143,8 @@ public class UserTokenServiceImpl implements UserTokenService {
     }
 
     @Override
-    public void deleteUserToken(UserToken tokenOnDelete) {
+    public void deleteUserToken(UserToken userToken) {
+        userTokenRepository.delete(userToken);
     }
 
     @Override
@@ -158,7 +171,7 @@ public class UserTokenServiceImpl implements UserTokenService {
     }
 
     @Override
-    public TokenStatus validateToken(String token) {
+    public TokenStatus getTokenStatus(String token) {
         final UserToken UserToken = userTokenRepository.findByToken(token);
         if (UserToken == null) {
             return TokenStatus.INVALID;

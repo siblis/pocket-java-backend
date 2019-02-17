@@ -31,7 +31,7 @@ public class HttpHandshakeInterceptor implements HandshakeInterceptor {
 //            String principal = authentication.getPrincipal().toString();
 //            boolean isAuthenticated = authentication.isAuthenticated();
 //            String name = authentication.getName();
-//            logger.info("name=" + name + ", isAuthenticated=" + isAuthenticated + ", principal=" + principal);
+//            log.info("name=" + name + ", isAuthenticated=" + isAuthenticated + ", principal=" + principal);
 //        }
 
         if (request instanceof ServletServerHttpRequest) {
@@ -50,7 +50,7 @@ public class HttpHandshakeInterceptor implements HandshakeInterceptor {
 //            String principal = authentication.getPrincipal().toString();
 //            boolean isAuthenticated = authentication.isAuthenticated();
 //            String name = authentication.getName();
-//            logger.info("name=" + name + ", isAuthenticated=" + isAuthenticated + ", principal=" + principal);
+//            log.info("name=" + name + ", isAuthenticated=" + isAuthenticated + ", principal=" + principal);
 //        }
     }
 

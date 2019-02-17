@@ -11,21 +11,21 @@ public interface UserTokenService {
 
     PasswordResetToken createPasswordResetTokenForUser(User user, String token);
 
-    UserToken createTokenForUser(User user);
+    UserToken createOrUpdateTokenForUser(User user);
 
     User getUserByToken(String token);
 
     UserToken getNewToken(User user);
 
-    UserToken getToken(User user);
+    UserToken getUserToken(User user);
 
-    UserToken getToken(String token);
+    UserToken getUserToken(String token);
 
     UserToken getValidToken(User user);
 
-    UserToken updateToken(UserToken userToken);
+    UserToken updateUserToken(UserToken userToken);
 
-    UserToken updateToken(String token) throws TokenNotFoundException;
+    UserToken updateUserToken(String token) throws TokenNotFoundException;
 
     void deleteUserToken(UserToken tokenOnDelete);
 
@@ -33,6 +33,6 @@ public interface UserTokenService {
 
     String validatePasswordResetToken(ObjectId id, String token);
 
-    TokenStatus validateToken(String token);
+    TokenStatus getTokenStatus(String token);
 
 }

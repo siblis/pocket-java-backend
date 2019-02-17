@@ -16,9 +16,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.WebRequest;
 import ru.geekbrains.pocket.backend.domain.db.User;
 import ru.geekbrains.pocket.backend.domain.db.UserToken;
 import ru.geekbrains.pocket.backend.domain.pub.UserPub;
@@ -68,12 +66,12 @@ public class AuthRestController {
         User user = userService.getUserByEmail(loginRequest.getEmail());
         if (user == null) {
             log.debug("User not exists.");
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Login or password is incorrect", HttpStatus.NOT_FOUND);
         }
 
         if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
-            log.debug("Password does not match");
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            log.debug("The current password specified is incorrect!");
+            return new ResponseEntity<>("Login or password is incorrect", HttpStatus.NOT_FOUND);
         }
 
         //ищем есть ли токен у этого юзера
@@ -82,6 +80,7 @@ public class AuthRestController {
         try {
             AuthenticationUser.authWithoutPassword(user);
         } catch (AuthenticationException ex){
+            log.error(ex.getMessage());
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.UNAUTHORIZED);
         }
 
@@ -90,11 +89,11 @@ public class AuthRestController {
 
     @PostMapping(path = "/registration", consumes = "application/json")
     public ResponseEntity<?> registration(@Valid @RequestBody RegistrationRequest registrationRequest,
-                                          final HttpServletRequest request,
-                                          BindingResult result, WebRequest webRequest, Errors errors)
+                                          final BindingResult result, final HttpServletRequest request)
             throws AuthenticationException {
-        //TODO validate
-        //If error, just return a 400 bad request, along with the error message
+        //, WebRequest webRequest, Errors errors) {
+        //аргумент класса BindingResult должен быть сразу после аргумента, помеченного аннотациями @RequestBody и valid,
+        // в других случаях валидация работать не будет
         if (result.hasErrors()) {
             final Map<String, Object> response = new HashMap<>();
             response.put("message", "Your request contains errors");
@@ -102,10 +101,9 @@ public class AuthRestController {
                     .stream()
                     .map(x -> String.format("%s : %s", x.getCode(), x.getDefaultMessage()))
                     .collect(Collectors.toList()));
-            //return ResponseEntity.badRequest().body(response);
+            log.debug(response);
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
-
-        log.debug("Processing registration form for: " + registrationRequest);
 
         User user;
         try {
@@ -150,7 +148,7 @@ public class AuthRestController {
     public ResponseEntity<?> confirmRegistration(final HttpServletRequest request, @RequestParam("token") final String token)
             throws UnsupportedEncodingException {
         Locale locale = request.getLocale();
-        final TokenStatus result = userTokenService.validateToken(token);
+        final TokenStatus result = userTokenService.getTokenStatus(token);
         if (result.equals(TokenStatus.VALID)) {
             final User user = userTokenService.getUserByToken(token);
             // if (user.isUsing2FA()) {
@@ -238,7 +236,7 @@ public class AuthRestController {
     @Getter
     @Setter
     @AllArgsConstructor
-    private static class RegistrationResponse {
+    public static class RegistrationResponse {
         private String token;
         private UserPub user;
     }

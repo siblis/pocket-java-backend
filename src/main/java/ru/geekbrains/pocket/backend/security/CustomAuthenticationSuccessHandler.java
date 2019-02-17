@@ -1,5 +1,6 @@
 package ru.geekbrains.pocket.backend.security;
 
+import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.RedirectStrategy;
@@ -18,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
+@Log4j2
 @Component
 public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
@@ -37,7 +39,7 @@ public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         final SavedRequest savedRequest = requestCache.getRequest(request, response);
 
         String emailUser = authentication.getName();
-        System.out.println("authentication user name (email) = " + emailUser);
+        log.debug("authentication user name (email) = " + emailUser);
 
         //User user = userService.getUserByEmail(emailUser);
         //user.setUsername(user.getEmail());
@@ -61,7 +63,7 @@ public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         // Use the DefaultSavedRequest URL
         // final String targetUrl = savedRequest.getRedirectUrl();
-        // logger.debug("Redirecting to DefaultSavedRequest Url: " + targetUrl);
+        // log.debug("Redirecting to DefaultSavedRequest Url: " + targetUrl);
         // getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
 

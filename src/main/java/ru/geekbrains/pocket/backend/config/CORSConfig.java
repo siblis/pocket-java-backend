@@ -1,8 +1,7 @@
 package ru.geekbrains.pocket.backend.config;
 
-import org.springframework.context.annotation.Configuration;
-
-@Configuration
+//@Log4j2
+//@Configuration
 //@EnableWebMvc
 public class CORSConfig { //implements WebMvcConfigurer {
 
@@ -49,7 +48,7 @@ public class CORSConfig { //implements WebMvcConfigurer {
 
 //    @Bean
 //    public CorsFilter corsFilter() {
-//        System.out.println("Filchain");
+//        log.debug("Filchain");
 //        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 //        CorsConfiguration config = new CorsConfiguration();
 //        config.setAllowCredentials(true); // you USUALLY want this
@@ -58,7 +57,7 @@ public class CORSConfig { //implements WebMvcConfigurer {
 //        config.addAllowedMethod("*");
 //        config.addAllowedMethod("*");
 //        source.registerCorsConfiguration("/api/**", config);
-//        System.out.println("Filchain");
+//        log.debug("Filchain");
 //        return new CorsFilter(source);
 //    }
 

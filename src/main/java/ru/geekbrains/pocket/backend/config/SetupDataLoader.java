@@ -55,10 +55,10 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         //userRepository.deleteAll();
         //userRepository.deleteByEmail("a@mail.ru");
         //userTokenService.deleteAllUserToken();
-        userChatService.deleteAllUserChats();
-        userMessageService.deleteAllMessages();
+        //userChatService.deleteAllUserChats();
+        //userMessageService.deleteAllMessages();
         //groupService.deleteAllGroups();
-        groupMessageService.deleteAllMessages();
+        //groupMessageService.deleteAllMessages();
 
         // == create initial privileges
         final Privilege readPrivilege = createPrivilegeIfNotFound("READ_PRIVILEGE");
@@ -132,10 +132,10 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         Role role = roleRepository.findByName(name);
         if (role == null) {
             role = new Role(name);
+            role.setPrivileges(privileges);
+            role = roleRepository.save(role);
+            log.info("Preloading " + role);
         }
-        role.setPrivileges(privileges);
-        role = roleRepository.save(role);
-        log.info("Preloading " + role);
         return role;
     }
 
@@ -148,33 +148,37 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
             user.setPassword(passwordEncoder.encode(password));
             user.setProfile(new UserProfile(userName));
             user.setEnabled(true);
+            user.setRoles(roles);
+            user = userService.update(user);
+            log.info("Preloading " + user);
         }
-        user.setRoles(roles);
-        user = userService.update(user);
-        log.info("Preloading " + user);
         return user;
     }
 
     @Transactional
     private UserToken createTokenForUserIfNotFound(User user) {
-        UserToken userToken = userTokenService.getToken(user);
-        if (userToken == null) {
-            userToken = userTokenService.createTokenForUser(user);
-        }
+        UserToken userToken = userTokenService.createOrUpdateTokenForUser(user);
+        log.info("Preloading for user '" + user.getEmail() + "' " + userToken);
         return userToken;
     }
 
     @Transactional
     private UserChat createUserChat(User user, User direct, User sender) {
-        UserChat userChat = new UserChat(user, direct, sender);
-        log.info("Preloading " + userChat);
-        return userChatService.insert(userChat);
+        UserChat userChat = userChatService.getUserChat(user, direct);
+        if (userChat == null) {
+            userChat = userChatService.createUserChat(user, direct, sender);
+            log.info("Preloading " + userChat);
+        }
+        return userChat;
     }
 
     @Transactional
     private UserMessage createUserMessage(User sender, User recipient, String text) {
-        UserMessage message = userMessageService.createMessage(sender, recipient, text);
-        log.info("Preloading " + message);
+        UserMessage message = userMessageService.getMessage(sender, recipient, text);
+        if (message == null) {
+            message = userMessageService.createMessage(sender, recipient, text);
+            log.info("Preloading " + message);
+        }
         return message;
     }
 
@@ -200,14 +204,22 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 
     @Transactional
     private GroupMessage createGroupMessage(User sender, Group group, String text) {
-        GroupMessage message = groupMessageService.createMessage(sender, group, text);
-        log.info("Preloading " + message);
+        GroupMessage message = groupMessageService.getMessage(sender, group, text);
+        if (message == null) {
+            message = groupMessageService.createMessage(sender, group, text);
+            log.info("Preloading " + message);
+        }
         return message;
     }
 
     @Transactional
     private UserContact createUserContact(User user, User contact){
-        return userContactService.createUserContact(user, contact);
+        UserContact userContact = userContactService.getUserContact(user, contact);
+        if (userContact == null) {
+            userContact = userContactService.createUserContact(user, contact);
+            log.info("Preloading " + userContact);
+        }
+        return userContact;
     }
 
 //    @Bean

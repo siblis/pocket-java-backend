@@ -36,7 +36,7 @@ public class RegistrationListener implements ApplicationListener<OnRegistrationC
 
     private void confirmRegistration(final OnRegistrationCompleteEvent event) {
         final User user = event.getUser();
-        UserToken userToken = userTokenService.createTokenForUser(user);
+        UserToken userToken = userTokenService.createOrUpdateTokenForUser(user);
 
         final SimpleMailMessage email = constructEmailMessage(event, user, userToken.getToken());
         mailSender.send(email);
