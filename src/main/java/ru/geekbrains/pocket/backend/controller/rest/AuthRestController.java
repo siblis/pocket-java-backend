@@ -143,6 +143,7 @@ public class AuthRestController {
 
     }
 
+    //test
     //https://www.baeldung.com/registration-verify-user-by-email
     @GetMapping("/registrationConfirm")
     public ResponseEntity<?> confirmRegistration(final HttpServletRequest request, @RequestParam("token") final String token)

@@ -14,7 +14,6 @@ import ru.geekbrains.pocket.backend.domain.db.UserProfile;
 import ru.geekbrains.pocket.backend.exception.InvalidOldPasswordException;
 import ru.geekbrains.pocket.backend.exception.UserAlreadyExistException;
 import ru.geekbrains.pocket.backend.exception.UserNotFoundException;
-import ru.geekbrains.pocket.backend.repository.RoleRepository;
 import ru.geekbrains.pocket.backend.repository.UserRepository;
 import ru.geekbrains.pocket.backend.repository.UserTokenRepository;
 import ru.geekbrains.pocket.backend.resource.UserResource;
@@ -62,7 +61,7 @@ public class UserServiceImpl implements UserService {
         user.setPassword(passwordEncoder.encode(password)); //получаем хэш пароля
         //user.setUsing2FA(account.isUsing2FA());
         user.setProfile(new UserProfile(name));
-        user.setRoles(Arrays.asList(roleService.createRoleUserIfNotFound()));
+        user.setRoles(Arrays.asList(roleService.getRoleUser()));
         return userRepository.insert(user);
     }
 
@@ -138,7 +137,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User insert(User user) throws RuntimeException {
         if (user.getRoles() == null)
-            user.setRoles(Arrays.asList(roleService.createRoleUserIfNotFound()));
+            user.setRoles(Arrays.asList(roleService.getRoleUser()));
         return userRepository.insert(user);
     }
 

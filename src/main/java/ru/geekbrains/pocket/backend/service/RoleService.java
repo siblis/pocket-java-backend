@@ -13,9 +13,9 @@ public interface RoleService {
 
     Role createRoleIfNotFound(final String name, final List<Privilege> privileges);
 
-    Role createRoleAdminIfNotFound();
+    Role getRoleAdmin();
 
-    Role createRoleUserIfNotFound();
+    Role getRoleUser();
 
     Role getRole(String roleName);
 

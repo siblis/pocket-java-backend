@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.geekbrains.pocket.backend.domain.db.Privilege;
 import ru.geekbrains.pocket.backend.domain.db.Role;
-import ru.geekbrains.pocket.backend.exception.RoleNotFoundException;
 import ru.geekbrains.pocket.backend.repository.PrivilegeRepository;
 import ru.geekbrains.pocket.backend.repository.RoleRepository;
 import ru.geekbrains.pocket.backend.service.RoleService;
@@ -12,7 +11,6 @@ import ru.geekbrains.pocket.backend.service.RoleService;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class RoleServiceImpl implements RoleService {
@@ -56,12 +54,12 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public Role createRoleAdminIfNotFound() {
+    public Role getRoleAdmin() {
         return createRoleIfNotFound("ROLE_ADMIN");
     }
 
     @Override
-    public Role createRoleUserIfNotFound() {
+    public Role getRoleUser() {
         return createRoleIfNotFound("ROLE_USER");
     }
 

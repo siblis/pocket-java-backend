@@ -7,7 +7,9 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
+import javax.validation.constraints.NotNull;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -22,12 +24,15 @@ public class PasswordResetToken {
     @Id
     private ObjectId id;
 
-    private String token;
-
+    @NotNull
     @DBRef
     private User user;
 
-    private Date logged_at = new Date();
+    @NotNull
+    private String token;
+
+    @Field("logged_at")
+    private Date loggedAt = new Date();
 
     private Date expiryDate;
 
@@ -55,7 +60,7 @@ public class PasswordResetToken {
 
     public void updateToken(final String token) {
         this.token = token;
-        this.logged_at = new Date();
+        this.loggedAt = new Date();
         this.expiryDate = calculateExpiryDate(EXPIRATION);
     }
 

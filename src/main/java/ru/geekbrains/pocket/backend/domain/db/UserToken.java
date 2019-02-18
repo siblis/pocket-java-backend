@@ -46,15 +46,11 @@ public class UserToken {
     private Date expiryDate;
 
     public UserToken(final String token) {
-        super();
-
         this.token = token;
         this.expiryDate = calculateExpiryDate(EXPIRATION);
     }
 
     public UserToken(final String token, final User user) {
-        super();
-
         this.token = token;
         this.user = user;
         this.expiryDate = calculateExpiryDate(EXPIRATION);
@@ -88,9 +84,9 @@ public class UserToken {
     @Override
     public String toString() {
         final StringBuilder builder = new StringBuilder();
-        builder.append("token 'String':'").append(token).append("'")
-                .append("'loggedAt':'").append(expiryDate).append("'")
-                .append("'Expires':'").append(expiryDate).append("'");
+        builder.append("Token [String=").append(token).append("]")
+                .append("[loggedAt=").append(expiryDate).append("]")
+                .append("[Expires=").append(expiryDate).append("]");
         return builder.toString();
     }
 

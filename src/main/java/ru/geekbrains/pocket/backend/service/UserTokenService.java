@@ -5,7 +5,6 @@ import ru.geekbrains.pocket.backend.domain.db.PasswordResetToken;
 import ru.geekbrains.pocket.backend.domain.db.User;
 import ru.geekbrains.pocket.backend.domain.db.UserToken;
 import ru.geekbrains.pocket.backend.enumeration.TokenStatus;
-import ru.geekbrains.pocket.backend.exception.TokenNotFoundException;
 
 import java.util.List;
 
@@ -21,11 +20,11 @@ public interface UserTokenService {
 
     User getUserByToken(String token);
 
+    UserToken getUserToken(String token);
+
     UserToken getUserToken(User user, String userIp);
 
     List<UserToken> getUserToken(User user);
-
-    UserToken getUserToken(String token);
 
     UserToken getValidToken(User user, String userIp);
 

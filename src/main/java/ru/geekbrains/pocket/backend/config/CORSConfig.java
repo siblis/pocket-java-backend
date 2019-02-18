@@ -2,7 +2,6 @@ package ru.geekbrains.pocket.backend.config;
 
 //@Log4j2
 //@Configuration
-//@EnableWebMvc
 public class CORSConfig { //implements WebMvcConfigurer {
 
     //===CORS===

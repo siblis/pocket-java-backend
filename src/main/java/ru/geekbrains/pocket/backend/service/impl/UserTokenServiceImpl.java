@@ -18,7 +18,10 @@ import ru.geekbrains.pocket.backend.repository.UserTokenRepository;
 import ru.geekbrains.pocket.backend.security.token.JwtTokenUtil;
 import ru.geekbrains.pocket.backend.service.UserTokenService;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 @Log4j2
 @Service
@@ -49,9 +52,8 @@ public class UserTokenServiceImpl implements UserTokenService {
         UserToken userToken = userTokenRepository.findFirstByUserAndUserip(user, userIp);
         if (userToken == null) {
             userToken = new UserToken(newToken, user, expiryDate);
-            return userTokenRepository.insert(userToken);
-        }
-        else {
+            return userTokenRepository.save(userToken);//insert
+        } else {
             userToken.setToken(newToken);
             userToken.setExpiryDate(expiryDate);
             return userTokenRepository.save(userToken);
@@ -96,7 +98,6 @@ public class UserTokenServiceImpl implements UserTokenService {
         }
 
         user.setEnabled(true);
-        // userTokenRepository.delete(UserToken);
         userRepository.save(user);
         return TokenStatus.VALID;
     }
@@ -113,6 +114,11 @@ public class UserTokenServiceImpl implements UserTokenService {
     }
 
     @Override
+    public UserToken getUserToken(String token) {
+        return userTokenRepository.findByToken(token);
+    }
+
+    @Override
     public UserToken getUserToken(User user, String userIp) {
         return userTokenRepository.findFirstByUserAndUserip(user, userIp);
     }
@@ -122,10 +128,6 @@ public class UserTokenServiceImpl implements UserTokenService {
         return userTokenRepository.findByUser(user);
     }
 
-    @Override
-    public UserToken getUserToken(String token) {
-        return null;
-    }
 
     @Override
     public UserToken getValidToken(User user, String userIp) {
@@ -133,6 +135,7 @@ public class UserTokenServiceImpl implements UserTokenService {
         //ищем есть ли токен у этого юзера
         UserToken userToken = getUserToken(user, userIp);
         if (userToken != null) {
+            //TODO перепроверить
             //проверяем токен
 //            if (jwtTokenUtil.getTokenStatus(userToken.getUserToken(), user.getEmail())){
 //                //обновляем токен
@@ -152,11 +155,6 @@ public class UserTokenServiceImpl implements UserTokenService {
         }
         return userToken;
     }
-
-//    @Override
-//    public UserToken getUserToken(String token) {
-//        return userTokenRepository.findByToken(token);
-//    }
 
     @Override
     public List<UserToken> getValidToken(User user) {

@@ -11,6 +11,7 @@ import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 import ru.geekbrains.pocket.backend.util.validation.ValidEmail;
 
 import javax.validation.Valid;
@@ -53,7 +54,8 @@ public class User {
     @JsonIgnore
     private Collection<Role> roles;
 
-    private Date created_at = new Date();
+    @Field("created_at")
+    private Date createdAt = new Date();
 
     private boolean enabled = false;
 
@@ -68,21 +70,18 @@ public class User {
         this.email = email;
         this.password = password;
         this.profile = userProfile;
-        this.created_at = new Date();
     }
 
     public User(String email, String password, String username) {
         this.email = email;
         this.password = password;
         this.profile = new UserProfile(username);
-        this.created_at = new Date();
     }
 
     public User(String email, String password, String username, Collection<Role> roles) {
         this.email = email;
         this.password = password;
         this.profile = new UserProfile(username);
-        this.created_at = new Date();
         this.roles = roles;
     }
 

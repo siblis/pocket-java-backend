@@ -61,9 +61,11 @@ public class AccountRestController {
             log.debug(response);
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
-        if (editAccountRequest.getName() == null
+        if ((editAccountRequest.getName() == null
                 && editAccountRequest.getOldPassword() == null
-                && editAccountRequest.getNewPassword() == null){
+                && editAccountRequest.getNewPassword() == null)
+            || (editAccountRequest.getOldPassword() == null
+                || editAccountRequest.getNewPassword() == null) ){
             log.debug("Error: all field in editAccountRequest is null");
             return new ResponseEntity<>("Error: all field in editAccountRequest is null", HttpStatus.BAD_REQUEST);
         }
