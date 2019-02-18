@@ -52,12 +52,12 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
             return;
         }
 
-        userService.deleteAll();
-        userTokenService.deleteAllUserToken();
-        userChatService.deleteAllUserChats();
-        userMessageService.deleteAllMessages();
-        groupService.deleteAllGroups();
-        groupMessageService.deleteAllMessages();
+//        userService.deleteAll();
+//        userTokenService.deleteAllUserToken();
+//        userChatService.deleteAllUserChats();
+//        userMessageService.deleteAllMessages();
+//        groupService.deleteAllGroups();
+//        groupMessageService.deleteAllMessages();
 
         // == createRoleIfNotFound initial privileges
         final Privilege readPrivilege = createPrivilegeIfNotFound("READ_PRIVILEGE");

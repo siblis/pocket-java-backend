@@ -1,7 +1,6 @@
 package ru.geekbrains.pocket.backend.service;
 
 import org.bson.types.ObjectId;
-import ru.geekbrains.pocket.backend.domain.db.PasswordResetToken;
 import ru.geekbrains.pocket.backend.domain.db.User;
 import ru.geekbrains.pocket.backend.domain.db.UserToken;
 import ru.geekbrains.pocket.backend.enumeration.TokenStatus;
@@ -10,7 +9,7 @@ import java.util.List;
 
 public interface UserTokenService {
 
-    PasswordResetToken createPasswordResetTokenForUser(User user, String token);
+//    PasswordResetToken createPasswordResetTokenForUser(User user, String token);
 
     UserToken createOrUpdateToken(User user, String userIp);
 
@@ -38,6 +37,6 @@ public interface UserTokenService {
 
     void deleteAllUserToken();
 
-    String validatePasswordResetToken(ObjectId id, String token);
+//    String validatePasswordResetToken(ObjectId id, String token);
 
 }
