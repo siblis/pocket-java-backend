@@ -83,7 +83,7 @@ public class ChatRestControllerTest {
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$", notNullValue()))
                 .andExpect(jsonPath("$.offset", isA(Number.class)))
-                .andExpect(jsonPath("$.offset", equalTo(0)))
+                .andExpect(jsonPath("$.offset", equalTo(new Integer(offset))))
                 .andExpect(jsonPath("$..[0]",  notNullValue()))
         ;
 
