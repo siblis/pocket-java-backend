@@ -7,7 +7,7 @@
 
     <groupId>ru.geekbrains</groupId>
     <artifactId>pocket.backend</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.2-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Pocket Java Backend</name>
     <description>Pocket Java Backend Application</description>
@@ -289,13 +289,13 @@
                 <executions>
                     <execution>
                         <id>copy-dependencies</id>
-<!--                        <phase>prepare-package</phase>-->
                         <phase>package</phase>
                         <goals>
                             <goal>copy-dependencies</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                            <includeScope>compile</includeScope><!--исключить тестовые зависимости-->
+                            <outputDirectory>${project.build.directory}/dependency</outputDirectory>
                             <overWriteReleases>false</overWriteReleases>
                             <overWriteSnapshots>false</overWriteSnapshots>
                             <overWriteIfNewer>true</overWriteIfNewer>
@@ -337,10 +337,38 @@
                         <manifestEntries>
                             <Implementation-Build>$\{buildNumber}</Implementation-Build>
                         </manifestEntries>
-                        <failOnMissingWebXml>false</failOnMissingWebXml>
                     </archive>
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
                 </configuration>
             </plugin>
+            <!--плагин для удаления ненужных артефактов после завершения сборки-->
+            <!--Например, если приложение упаковано в файл WAR, и вы хотите удалить все файлы JAR-->
+            <!--(потому что они дублируются внутри файла WAR) в результате остаётся только WAR файл-->
+<!--            <plugin>-->
+<!--                <groupId>org.apache.maven.plugins</groupId>-->
+<!--                <artifactId>maven-clean-plugin</artifactId>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <id>clean-jar-artifacts</id>-->
+<!--                        <phase>install</phase>-->
+<!--                        <goals><goal>clean</goal></goals>-->
+<!--                        <configuration>-->
+<!--                            <excludeDefaultDirectories>true</excludeDefaultDirectories>-->
+<!--                            <filesets>-->
+<!--                                <fileset>-->
+<!--                                    <directory>target/dependency/*.jar</directory>-->
+<!--                                </fileset>-->
+<!--                                <fileset>-->
+<!--                                    <directory>target</directory>-->
+<!--                                    <excludes>-->
+<!--                                        <exclude>*.war</exclude>-->
+<!--                                    </excludes>-->
+<!--                                </fileset>-->
+<!--                            </filesets>-->
+<!--                        </configuration>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--            </plugin>-->
             <!--плагин для генерации номера сборки-->
 <!--            http://www.mojohaus.org/buildnumber-maven-plugin/usage.html-->
             <plugin>
