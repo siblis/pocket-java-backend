@@ -11,17 +11,12 @@ Spring Data Rest, Spring HATEOAS, Spring Websocket,
 \
 Spring Security
 \
-Lombok, Slf4j,
+Lombok, Log4j2,
 \
 HTTPS (SSL/TLS) & tomcat.keystore,
 \
 OAuth2Configuration
 
 
-http (80) redirect to https (8888)
-\
-http://localhost:8888
 \
 https://localhost:8888
-
-OAuth2Configuration пока отключена (не работает)

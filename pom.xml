@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -9,7 +8,7 @@
     <artifactId>pocket.backend</artifactId>
     <version>0.0.2-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>Pocket Java Backend</name>
+    <name>PocketJavaBackend</name>
     <description>Pocket Java Backend Application</description>
 
     <parent>
@@ -25,6 +24,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <java.version>1.8</java.version>
+        <mainClass>ru.geekbrains.pocket.backend.PocketBackendApplication</mainClass>
         <spring-cloud.version>Greenwich.RC2</spring-cloud.version>
         <aerogear.version>1.0.0</aerogear.version>
         <passay.version>1.0</passay.version>
@@ -94,10 +94,6 @@
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-messaging</artifactId>
         </dependency>
-        <!--        <dependency>-->
-        <!--            <groupId>org.thymeleaf.extras</groupId>-->
-        <!--            <artifactId>thymeleaf-extras-springsecurity4</artifactId>-->
-        <!--        </dependency>-->
 
         <!-- test -->
         <dependency>
@@ -153,21 +149,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-log4j2</artifactId>
         </dependency>
-<!--            <groupId>org.apache.logging.log4j</groupId>-->
-<!--            <artifactId>log4j-api</artifactId>-->
-<!--            <version>2.11.1</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>org.apache.logging.log4j</groupId>-->
-<!--            <artifactId>log4j-core</artifactId>-->
-<!--            <version>2.11.1</version>-->
-<!--        </dependency>-->
-        <!-- slf4j -->
-<!--        <dependency>-->
-<!--        <groupId>org.slf4j</groupId>-->
-<!--        <artifactId>slf4j-jdk14</artifactId>-->
-<!--        <version>1.7.25</version>-->
-<!--        </dependency>-->
 
         <!-- Lombok -->
         <dependency>
@@ -204,14 +185,14 @@
     </dependencyManagement>
 
     <scm>
-        <connection>scm:git:ssh:git@github.com:siblis/pocket-java-backend.git</connection>
-        <developerConnection>scm:git:ssh:git@github.com:siblis/pocket-java-backend.git</developerConnection>
+        <connection>scm:git:ssh:git@github.com:zundarik/pocket-java-backend.git</connection>
+        <developerConnection>scm:git:ssh:git@github.com:zundarik/pocket-java-backend.git</developerConnection>
         <tag>HEAD</tag>
-        <url>https://github.com/siblis/pocket-java-backend.git</url>
+        <url>https://github.com/zundarik/pocket-java-backend.git</url>
     </scm>
 
     <build>
-        <finalName>${project.name}-${project.version}</finalName>
+        <finalName>${project.name}</finalName>
         <resources>
             <resource>
                 <directory>${basedir}/src/main/resources</directory>
@@ -241,7 +222,13 @@
             </plugin>
             <!--плагин для копирования файлов ресурсов в директорию target-->
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
+                <configuration>
+                    <nonFilteredFileExtensions>
+                        <nonFilteredFileExtension>jks</nonFilteredFileExtension>
+                    </nonFilteredFileExtensions>
+                </configuration>
                 <executions>
                     <execution>
                         <id>copy-resources</id>
@@ -275,9 +262,6 @@
 <!--                                    </includes>-->
 <!--                                </resource>-->
                             </resources>
-                            <nonFilteredFileExtensions>
-                                <nonFilteredFileExtension>jks</nonFilteredFileExtension>
-                            </nonFilteredFileExtensions>
                         </configuration>
                     </execution>
                 </executions>
@@ -313,14 +297,14 @@
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
                             <classpathLayoutType>simple</classpathLayoutType>
-                            <mainClass>ru.geekbrains.pocket.backend.PocketBackendApplication</mainClass>
+                            <mainClass>${mainClass}</mainClass>
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                             <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                         </manifest>
                         <manifestEntries>
                             <Version>${project.build}</Version>
                             <Implementation-Version>${project.version}-${buildNumber}</Implementation-Version>
-                            <Implementation-Build>$\{buildNumber}</Implementation-Build>
+                            <Implementation-Build>${buildNumber}</Implementation-Build>
                         </manifestEntries>
                     </archive>
                 </configuration>
