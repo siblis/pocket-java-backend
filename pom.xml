@@ -7,7 +7,7 @@
     <groupId>ru.geekbrains</groupId>
     <artifactId>pocket.backend</artifactId>
     <version>0.0.2-SNAPSHOT</version>
-    <packaging>war</packaging>
+<!--    <packaging>war</packaging>-->
     <name>PocketJavaBackend</name>
     <description>Pocket Java Backend Application</description>
 
@@ -24,8 +24,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <java.version>1.8</java.version>
-        <mainClass>ru.geekbrains.pocket.backend.PocketBackendApplication</mainClass>
-        <spring-cloud.version>Greenwich.RELEASE</spring-cloud.version>
+        <start-class>ru.geekbrains.pocket.backend.PocketBackendApplication</start-class>
         <aerogear.version>1.0.0</aerogear.version>
         <passay.version>1.0</passay.version>
         <guava.version>20.0</guava.version>
@@ -207,20 +206,20 @@
         <plugins>
 <!--            http://java-online.ru/maven-plugins.xhtml#maven-compiler-plugin-->
 <!--            https://habr.com/ru/post/310738/-->
-<!--            <plugin>-->
-<!--                <groupId>org.springframework.boot</groupId>-->
-<!--                <artifactId>spring-boot-maven-plugin</artifactId>-->
-<!--            </plugin>-->
-            <!--плагин для компиляции проекта-->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                    <encoding>UTF-8</encoding>
-                </configuration>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
+            <!--плагин для компиляции проекта-->
+<!--            <plugin>-->
+<!--                <groupId>org.apache.maven.plugins</groupId>-->
+<!--                <artifactId>maven-compiler-plugin</artifactId>-->
+<!--                <configuration>-->
+<!--                    <source>1.8</source>-->
+<!--                    <target>1.8</target>-->
+<!--                    <encoding>UTF-8</encoding>-->
+<!--                </configuration>-->
+<!--            </plugin>-->
             <!--плагин для копирования файлов ресурсов в директорию target-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -298,7 +297,7 @@
 <!--                            <addClasspath>true</addClasspath>-->
 <!--                            <classpathPrefix>lib/</classpathPrefix>-->
 <!--                            <classpathLayoutType>simple</classpathLayoutType>-->
-<!--                            <mainClass>${mainClass}</mainClass>-->
+<!--                            <mainClass>${start-class}</mainClass>-->
 <!--                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>-->
 <!--                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>-->
 <!--                        </manifest>-->
@@ -311,21 +310,21 @@
 <!--                </configuration>-->
 <!--            </plugin>-->
             <!--плагин для формирования war-файла и манифеста-->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                        </manifest>
-<!--                        <manifestEntries>-->
-<!--                            <Implementation-Build>${buildNumber}</Implementation-Build>-->
-<!--                        </manifestEntries>-->
-                    </archive>
-                    <failOnMissingWebXml>false</failOnMissingWebXml>
-                </configuration>
-            </plugin>
+<!--            <plugin>-->
+<!--                <groupId>org.apache.maven.plugins</groupId>-->
+<!--                <artifactId>maven-war-plugin</artifactId>-->
+<!--                <configuration>-->
+<!--                    <archive>-->
+<!--                        <manifest>-->
+<!--                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>-->
+<!--                        </manifest>-->
+<!--&lt;!&ndash;                        <manifestEntries>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <Implementation-Build>${buildNumber}</Implementation-Build>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </manifestEntries>&ndash;&gt;-->
+<!--                    </archive>-->
+<!--                    <failOnMissingWebXml>false</failOnMissingWebXml>-->
+<!--                </configuration>-->
+<!--            </plugin>-->
             <!--плагин для удаления ненужных артефактов после завершения сборки-->
             <!--Например, если приложение упаковано в файл WAR, и вы хотите удалить все файлы JAR-->
             <!--(потому что они дублируются внутри файла WAR) в результате остаётся только WAR файл-->
