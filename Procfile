@@ -1,1 +1,1 @@
-web: java -jar target/PocketJavaBackend.jar
+web: java -jar target/PocketJavaBackend.jar --port $PORT
