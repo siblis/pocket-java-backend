@@ -57,6 +57,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity web) throws Exception {
         super.configure(web);
         web.httpFirewall(allowHttpMethodsFirewall());
+        web.ignoring().antMatchers("/v2/api-docs", "/configuration/ui",
+                "/swagger-resources/**", "/configuration/**",
+                "/swagger-resources", "/configuration/security", "/swagger-ui.html", "/webjars/**");
     }
 
     @Override
@@ -69,6 +72,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
             .cors().and()
             .csrf().disable()   //Межсайтовая подделка запроса
+                .authorizeRequests()
+             .and()
                 //.anonymous().disable()
                 .exceptionHandling()
                 .accessDeniedHandler(accessDeniedHandler)
@@ -82,17 +87,22 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             //более конкретные правила должны стоять первыми, а затем более общие
                 .antMatchers("/auth/**").permitAll() //rest
                 .antMatchers("/socket/**").permitAll() //websocket
+                .antMatchers("/swagger-ui.html","/swagger*","/swagger/**","/swagger*/**","/swagger-ui/**").permitAll() //swagger
+                .antMatchers("/swagger-resources/**", "swagger-ui.html","/v2/api-docs","/v2/api-docs*","/v2/api-docs/**").permitAll()
+                .antMatchers("/resources/**", "/webjars/**", "/static/**").permitAll() //web
                 //.antMatchers("/test/**").permitAll() //websocket
-                .antMatchers("/**").hasAnyRole("ADMIN", "USER")
+                //.antMatchers("/**").hasAnyRole("ADMIN", "USER")
                 //.anyRequest().hasAuthority("READ_PRIVILEGE")
                 .anyRequest().authenticated()
             .and()
             .formLogin()
                 //.passwordParameter("")
-                .loginPage("/auth/login")
+                //.loginPage("/auth/login")
                 .successHandler(customAuthenticationSuccessHandler)
                 .failureHandler(customAuthenticationFailureHandler)
                 .permitAll()
+            .and()
+            .httpBasic()
             .and()
             .logout()
                 .logoutSuccessHandler(customLogoutSuccessHandler)

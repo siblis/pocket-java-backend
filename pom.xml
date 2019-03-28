@@ -7,7 +7,7 @@
     <groupId>ru.geekbrains</groupId>
     <artifactId>pocket.backend</artifactId>
     <version>0.0.2-SNAPSHOT</version>
-<!--    <packaging>war</packaging>-->
+    <packaging>jar</packaging>
     <name>PocketJavaBackend</name>
     <description>Pocket Java Backend Application</description>
 
@@ -25,11 +25,13 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <java.version>1.8</java.version>
         <start-class>ru.geekbrains.pocket.backend.PocketBackendApplication</start-class>
+        <spring-cloud.version>Greenwich.SR1</spring-cloud.version>
         <aerogear.version>1.0.0</aerogear.version>
         <passay.version>1.0</passay.version>
         <guava.version>20.0</guava.version>
         <uap-java.version>1.4.0</uap-java.version>
         <geoip2.version>2.12.0</geoip2.version>
+        <swagger.version>2.9.2</swagger.version>
     </properties>
 
     <dependencies>
@@ -175,6 +177,18 @@
             <artifactId>joda-time</artifactId>
             <version>2.10.1</version>
         </dependency>
+
+        <!-- swagger -->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>${swagger.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>${swagger.version}</version>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>
@@ -182,7 +196,7 @@
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
-                <version>Greenwich.SR1</version>
+                <version>${spring-cloud.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -272,48 +286,48 @@
                 </executions>
             </plugin>
             <!--плагин для исключения из джарника библиотек зависимостей-->
-<!--            <plugin>-->
-<!--                <groupId>org.apache.maven.plugins</groupId>-->
-<!--                <artifactId>maven-dependency-plugin</artifactId>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <id>copy-dependencies</id>-->
-<!--                        <phase>package</phase>-->
-<!--                        <goals>-->
-<!--                            <goal>copy-dependencies</goal>-->
-<!--                        </goals>-->
-<!--                        <configuration>-->
-<!--                            <includeScope>compile</includeScope>&lt;!&ndash;исключить тестовые зависимости&ndash;&gt;-->
-<!--                            <outputDirectory>${project.build.directory}/dependency</outputDirectory>-->
-<!--                            <overWriteReleases>false</overWriteReleases>-->
-<!--                            <overWriteSnapshots>false</overWriteSnapshots>-->
-<!--                            <overWriteIfNewer>true</overWriteIfNewer>-->
-<!--                        </configuration>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--            </plugin>-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeScope>compile</includeScope><!--исключить тестовые зависимости-->
+                            <outputDirectory>${project.build.directory}/dependency</outputDirectory>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <overWriteIfNewer>true</overWriteIfNewer>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <!--плагин для формирования jar-файла и манифеста-->
-<!--            <plugin>-->
-<!--                <groupId>org.apache.maven.plugins</groupId>-->
-<!--                <artifactId>maven-jar-plugin</artifactId>-->
-<!--                <configuration>-->
-<!--                    <archive>-->
-<!--                        <manifest>-->
-<!--                            <addClasspath>true</addClasspath>-->
-<!--                            <classpathPrefix>lib/</classpathPrefix>-->
-<!--                            <classpathLayoutType>simple</classpathLayoutType>-->
-<!--                            <mainClass>${start-class}</mainClass>-->
-<!--                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>-->
-<!--                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>-->
-<!--                        </manifest>-->
-<!--                        <manifestEntries>-->
-<!--                            <Version>${project.build}</Version>-->
-<!--&lt;!&ndash;                            <Implementation-Version>${project.version}-${buildNumber}</Implementation-Version>&ndash;&gt;-->
-<!--&lt;!&ndash;                            <Implementation-Build>${buildNumber}</Implementation-Build>&ndash;&gt;-->
-<!--                        </manifestEntries>-->
-<!--                    </archive>-->
-<!--                </configuration>-->
-<!--            </plugin>-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
+                            <classpathLayoutType>simple</classpathLayoutType>
+                            <mainClass>${start-class}</mainClass>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                        </manifest>
+                        <manifestEntries>
+                            <Version>${project.build}</Version>
+<!--                            <Implementation-Version>${project.version}-${buildNumber}</Implementation-Version>-->
+<!--                            <Implementation-Build>${buildNumber}</Implementation-Build>-->
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
             <!--плагин для формирования war-файла и манифеста-->
 <!--            <plugin>-->
 <!--                <groupId>org.apache.maven.plugins</groupId>-->
@@ -323,9 +337,9 @@
 <!--                        <manifest>-->
 <!--                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>-->
 <!--                        </manifest>-->
-<!--&lt;!&ndash;                        <manifestEntries>&ndash;&gt;-->
-<!--&lt;!&ndash;                            <Implementation-Build>${buildNumber}</Implementation-Build>&ndash;&gt;-->
-<!--&lt;!&ndash;                        </manifestEntries>&ndash;&gt;-->
+<!--                        <manifestEntries>-->
+<!--                            <Implementation-Build>${buildNumber}</Implementation-Build>-->
+<!--                        </manifestEntries>-->
 <!--                    </archive>-->
 <!--                    <failOnMissingWebXml>false</failOnMissingWebXml>-->
 <!--                </configuration>-->
