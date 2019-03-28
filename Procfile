@@ -1,1 +1,1 @@
-web: java -jar target/PocketJavaBackend.jar --port $PORT
+web: java -Dserver.port=$PORT -jar target/PocketJavaBackend.jar --port $PORT
