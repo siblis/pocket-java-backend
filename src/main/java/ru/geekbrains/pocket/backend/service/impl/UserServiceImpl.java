@@ -18,7 +18,6 @@ import ru.geekbrains.pocket.backend.repository.UserChatRepository;
 import ru.geekbrains.pocket.backend.repository.UserContactRepository;
 import ru.geekbrains.pocket.backend.repository.UserRepository;
 import ru.geekbrains.pocket.backend.repository.UserTokenRepository;
-import ru.geekbrains.pocket.backend.resource.UserResource;
 import ru.geekbrains.pocket.backend.service.RoleService;
 import ru.geekbrains.pocket.backend.service.UserService;
 
@@ -26,7 +25,6 @@ import javax.validation.constraints.NotNull;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Log4j2
 @Service
@@ -99,14 +97,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> getAllUsers() {
         return userRepository.findAll();
-    }
-
-    @Override
-    public List<UserResource> getAllUserResources() {
-        return userRepository.findAll()
-                .stream()
-                .map(UserResource::new)
-                .collect(Collectors.toList());
     }
 
     @Override
