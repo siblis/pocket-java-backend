@@ -4,10 +4,11 @@
 
 are used 
 \
-Spring Boot, Spring Data MongoDB, 
+Spring Boot, 
 \
-Spring Web, 
-Spring Data Rest, Spring HATEOAS, Spring Websocket, 
+Spring Data MongoDB, 
+\
+Spring Data Rest, Spring Websocket, 
 \
 Spring Security
 \
@@ -19,4 +20,5 @@ OAuth2Configuration
 
 
 \
-https://localhost:8888
+https://pocket-java-backend.herokuapp.com
+https://localhost:8080
