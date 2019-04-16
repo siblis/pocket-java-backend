@@ -8,11 +8,9 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import ru.geekbrains.pocket.backend.domain.db.*;
-import ru.geekbrains.pocket.backend.repository.PrivilegeRepository;
-import ru.geekbrains.pocket.backend.repository.RoleRepository;
+import ru.geekbrains.pocket.backend.enumeration.Role;
 import ru.geekbrains.pocket.backend.service.*;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -24,10 +22,10 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 
     @Autowired
     private UserService userService;
-    @Autowired
-    private RoleRepository roleRepository;
-    @Autowired
-    private PrivilegeRepository privilegeRepository;
+//    @Autowired
+//    private RoleRepository roleRepository;
+//    @Autowired
+//    private PrivilegeRepository privilegeRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
@@ -60,15 +58,18 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 //        groupMessageService.deleteAllMessages();
 
         // == createRoleIfNotFound initial privileges
-        final Privilege readPrivilege = createPrivilegeIfNotFound("READ_PRIVILEGE");
-        final Privilege writePrivilege = createPrivilegeIfNotFound("WRITE_PRIVILEGE");
-        final Privilege passwordPrivilege = createPrivilegeIfNotFound("CHANGE_PASSWORD_PRIVILEGE");
+//        final Privilege readPrivilege = createPrivilegeIfNotFound("READ_PRIVILEGE");
+//        final Privilege writePrivilege = createPrivilegeIfNotFound("WRITE_PRIVILEGE");
+//        final Privilege passwordPrivilege = createPrivilegeIfNotFound("CHANGE_PASSWORD_PRIVILEGE");
 
         // == createRoleIfNotFound initial roles
-        final List<Privilege> adminPrivileges = new ArrayList<>(Arrays.asList(readPrivilege, writePrivilege, passwordPrivilege));
-        final List<Privilege> userPrivileges = new ArrayList<>(Arrays.asList(readPrivilege, passwordPrivilege));
-        final Role adminRole = createRoleIfNotFound("ROLE_ADMIN", adminPrivileges);
-        final Role userRole = createRoleIfNotFound("ROLE_USER", userPrivileges);
+//        final List<Privilege> adminPrivileges = new ArrayList<>(Arrays.asList(readPrivilege, writePrivilege, passwordPrivilege));
+//        final List<Privilege> userPrivileges = new ArrayList<>(Arrays.asList(readPrivilege, passwordPrivilege));
+//        final Role adminRole = createRoleIfNotFound("ROLE_ADMIN", adminPrivileges);
+//        final Role userRole = createRoleIfNotFound("ROLE_USER", userPrivileges);
+
+        final Role adminRole = Role.ROLE_ADMIN;
+        final Role userRole = Role.ROLE_USER;
 
         // == createRoleIfNotFound initial user
         User user1 = createUserIfNotFound("test@test.com", "Test", "Test1234", Arrays.asList(adminRole, userRole));
@@ -115,28 +116,28 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         alreadySetup = true;
     }
 
-    @Transactional
-    private Privilege createPrivilegeIfNotFound(final String name) {
-        Privilege privilege = privilegeRepository.findByName(name);
-        if (privilege == null) {
-            privilege = new Privilege(name);
-            privilege = privilegeRepository.save(privilege);
-            log.info("Preloading " + privilege);
-        }
-        return privilege;
-    }
-
-    @Transactional
-    private Role createRoleIfNotFound(final String name, final List<Privilege> privileges) {
-        Role role = roleRepository.findByName(name);
-        if (role == null) {
-            role = new Role(name);
-            role.setPrivileges(privileges);
-            role = roleRepository.save(role);
-            log.info("Preloading " + role);
-        }
-        return role;
-    }
+//    @Transactional
+//    private Privilege createPrivilegeIfNotFound(final String name) {
+//        Privilege privilege = privilegeRepository.findByName(name);
+//        if (privilege == null) {
+//            privilege = new Privilege(name);
+//            privilege = privilegeRepository.save(privilege);
+//            log.info("Preloading " + privilege);
+//        }
+//        return privilege;
+//    }
+//
+//    @Transactional
+//    private Role createRoleIfNotFound(final String name, final List<Privilege> privileges) {
+//        Role role = roleRepository.findByName(name);
+//        if (role == null) {
+//            role = new Role(name);
+//            role.setPrivileges(privileges);
+//            role = roleRepository.save(role);
+//            log.info("Preloading " + role);
+//        }
+//        return role;
+//    }
 
     @Transactional
     private User createUserIfNotFound(final String email, final String userName, final String password, final Collection<Role> roles) {
@@ -146,8 +147,8 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
             user.setEmail(email);
             user.setPassword(passwordEncoder.encode(password));
             user.setProfile(new UserProfile(userName));
-            user.setEnabled(true);
-            user.setRoles(roles);
+            //user.setEnabled(true);
+            //user.setRoles(roles);
             user = userService.update(user);
             log.info("Preloading " + user);
         }
