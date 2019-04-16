@@ -3,13 +3,11 @@
 ## RESTfull backend api
 
 \
-Spring Boot, 
-\
-Spring Data MongoDB, 
+Spring Boot, Spring Security
 \
 Spring Data Rest, Spring Websocket, 
 \
-Spring Security
+Spring Data MongoDB, 
 \
 Lombok, Log4j2,
 \
@@ -19,5 +17,5 @@ OAuth2Configuration
 
 
 \
-https://java-api.pocketmsg.ru
-https://localhost:8080
+https://java-api.pocketmsg.ru/v1/
+https://localhost:8888/v1/

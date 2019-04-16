@@ -6,7 +6,7 @@
 
     <groupId>ru.geekbrains</groupId>
     <artifactId>pocket.backend</artifactId>
-    <version>0.0.3-SNAPSHOT</version>
+    <version>0.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>PocketJavaBackend</name>
     <description>Pocket Java Backend</description>
@@ -51,11 +51,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.boot</groupId>-->
-<!--            <artifactId>spring-boot-starter-tomcat</artifactId>-->
-<!--            <scope>provided</scope>-->
-<!--        </dependency>-->
 
         <!-- DB dependencies -->
         <dependency>
@@ -67,10 +62,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-messaging</artifactId>
         </dependency>
 
         <!-- test -->
@@ -140,8 +131,6 @@
             </resource>
         </resources>
         <plugins>
-<!--            http://java-online.ru/maven-plugins.xhtml#maven-compiler-plugin-->
-<!--            https://habr.com/ru/post/310738/-->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
