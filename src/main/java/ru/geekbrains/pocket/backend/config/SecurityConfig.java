@@ -84,7 +84,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/socket/**").permitAll() //websocket
                 .antMatchers("/swagger-ui.html","/swagger-ui/**","/swagger-resources/**","/v2/api-docs/**").permitAll() //swagger
                 //.antMatchers("/resources/**", "/webjars/**", "/static/**").permitAll() //web
-                .antMatchers("/**").hasAnyRole("ADMIN", "USER")
+                //.antMatchers("/**").hasAnyRole("ADMIN", "USER")
                 //.anyRequest().hasAuthority("READ_PRIVILEGE")
                 .anyRequest().authenticated()
             .and()

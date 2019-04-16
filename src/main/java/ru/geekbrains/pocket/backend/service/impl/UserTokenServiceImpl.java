@@ -89,7 +89,7 @@ public class UserTokenServiceImpl implements UserTokenService {
             return TokenStatus.EXPIRED;
         }
 
-        user.setEnabled(true);
+        //user.setEnabled(true);
         userRepository.save(user);
         return TokenStatus.VALID;
     }

@@ -2,7 +2,6 @@
 
 ## RESTfull backend api
 
-are used 
 \
 Spring Boot, 
 \
@@ -20,5 +19,5 @@ OAuth2Configuration
 
 
 \
-https://pocket-java-backend.herokuapp.com
+https://java-api.pocketmsg.ru
 https://localhost:8080
