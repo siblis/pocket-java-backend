@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.bson.types.ObjectId;
-import org.jboss.aerogear.security.otp.api.Base32;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -61,7 +60,7 @@ public class User {
 
     private boolean isUsing2FA = false;
 
-    private String secret = Base32.random();
+    private String secret = ""; //Base32.random();
 
     public User(String email, String password, UserProfile userProfile) {
         if (userProfile == null) userProfile = new UserProfile(email);

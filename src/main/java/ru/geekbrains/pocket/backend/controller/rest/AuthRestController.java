@@ -7,12 +7,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
-import org.springframework.core.env.Environment;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
@@ -48,17 +45,6 @@ public class AuthRestController {
     private UserTokenService userTokenService;
     @Autowired
     private PasswordEncoder passwordEncoder;
-
-    //отправка электронного письма с запросом подтверждения email
-//    @Autowired
-//    ApplicationEventPublisher eventPublisher;
-    @Autowired
-    private MessageSource messages;
-//    @Autowired
-//    private JavaMailSender mailSender;
-    @Autowired
-    private Environment env;
-
 
     @PostMapping(path = "/login", consumes = "application/json")// produces = "application/json;charset=UTF-8")
     public ResponseEntity login(@Valid @RequestBody LoginRequest loginRequest) {
@@ -164,40 +150,6 @@ public class AuthRestController {
         // - UserToken не существует по какой-либо причине или
         // - Срок действия UserToken истек
         return new ResponseEntity<>(HttpStatus.CONFLICT);
-    }
-
-    // ============== NON-API ============
-
-    private SimpleMailMessage constructResendVerificationTokenEmail
-            (final String contextPath, final Locale locale, final UserToken newToken, final User user) {
-        String confirmationUrl =
-                contextPath + "/regitrationConfirm.html?token=" + newToken.getToken();
-        String message = messages.getMessage("message.resendToken", null, locale);
-        SimpleMailMessage email = new SimpleMailMessage();
-        email.setSubject("Resend Registration Token");
-        email.setText(message + " rn" + confirmationUrl);
-        email.setFrom(env.getProperty("support.email"));
-        email.setTo(user.getEmail());
-        return constructEmail("Resend Registration Token", message + " \r\n" + confirmationUrl, user);
-    }
-
-    private SimpleMailMessage constructResetTokenEmail(final String contextPath, final Locale locale, final String token, final User user) {
-        final String url = contextPath + "/user/changePassword?id=" + user.getId() + "&token=" + token;
-        final String message = messages.getMessage("message.resetPassword", null, locale);
-        return constructEmail("Reset Password", message + " \r\n" + url, user);
-    }
-
-    private SimpleMailMessage constructEmail(String subject, String body, User user) {
-        final SimpleMailMessage email = new SimpleMailMessage();
-        email.setSubject(subject);
-        email.setText(body);
-        email.setTo(user.getEmail());
-        email.setFrom(env.getProperty("support.email"));
-        return email;
-    }
-
-    private String getAppUrl(HttpServletRequest request) {
-        return "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
     }
 
     //===== Request & Response =====
