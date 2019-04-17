@@ -15,13 +15,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.geekbrains.pocket.backend.domain.db.User;
-import ru.geekbrains.pocket.backend.domain.db.UserToken;
 import ru.geekbrains.pocket.backend.domain.pub.UserPub;
 import ru.geekbrains.pocket.backend.enumeration.TokenStatus;
 import ru.geekbrains.pocket.backend.exception.UserAlreadyExistException;
 import ru.geekbrains.pocket.backend.security.AuthenticationUser;
 import ru.geekbrains.pocket.backend.service.UserService;
-import ru.geekbrains.pocket.backend.service.UserTokenService;
 import ru.geekbrains.pocket.backend.util.validation.ValidEmail;
 
 import javax.servlet.http.HttpServletRequest;
@@ -41,8 +39,8 @@ import java.util.stream.Collectors;
 public class AuthRestController {
     @Autowired
     private UserService userService;
-    @Autowired
-    private UserTokenService userTokenService;
+//    @Autowired
+//    private UserTokenService userTokenService;
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -61,7 +59,9 @@ public class AuthRestController {
         }
 
         //ищем есть ли токен у этого юзера
-        UserToken userToken = userTokenService.getValidToken(user, "0.0.0.0");
+//        UserToken userToken = userTokenService.getValidToken(user, "0.0.0.0");
+
+        String newToken = userService.getNewToken(user);
 
 //        try {
 //            AuthenticationUser.authWithoutPassword(user);
@@ -70,7 +70,8 @@ public class AuthRestController {
 //            return new ResponseEntity<>(ex.getMessage(), HttpStatus.UNAUTHORIZED);
 //        }
 
-        return new ResponseEntity<>(new RegistrationResponse(userToken.getToken(), new UserPub(userToken.getUser())), HttpStatus.OK);
+        return new ResponseEntity<>(new RegistrationResponse(newToken, new UserPub(user)), HttpStatus.OK);
+//        return new ResponseEntity<>(new RegistrationResponse(userToken.getToken(), new UserPub(userToken.getUser())), HttpStatus.OK);
     }
 
     @PostMapping(path = "/registration", consumes = "application/json")
@@ -108,7 +109,8 @@ public class AuthRestController {
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT);
         }
 
-        UserToken userToken = userTokenService.createOrUpdateToken(user, "0.0.0.0");
+//        UserToken userToken = userTokenService.createOrUpdateToken(user, "0.0.0.0");
+        String newToken = userService.getNewToken(user);
 
 //        try {
 //            AuthenticationUser.authWithoutPassword(user);
@@ -123,33 +125,11 @@ public class AuthRestController {
 //        } catch (Exception me) {
 //            return new ResponseEntity<>(HttpStatus.CONFLICT);
 //        }
-        log.debug("Successfully created user: " + user.getEmail() + " and token " + userToken.getToken());
+        log.debug("Successfully created user: " + user.getEmail() + " and token " + newToken);
 
-        return new ResponseEntity<>(new RegistrationResponse(userToken.getToken(), new UserPub(userToken.getUser())), HttpStatus.CREATED);
+        return new ResponseEntity<>(new RegistrationResponse(newToken, new UserPub(user)), HttpStatus.CREATED);
+//        return new ResponseEntity<>(new RegistrationResponse(userToken.getToken(), new UserPub(userToken.getUser())), HttpStatus.CREATED);
 
-    }
-
-    //test
-    //https://www.baeldung.com/registration-verify-user-by-email
-    @GetMapping("/registrationConfirm")
-    public ResponseEntity<?> confirmRegistration(final HttpServletRequest request, @RequestParam("token") final String token)
-            throws UnsupportedEncodingException {
-        Locale locale = request.getLocale();
-        final TokenStatus result = userTokenService.getTokenStatus(token);
-        if (result.equals(TokenStatus.VALID)) {
-            final User user = userTokenService.getUserByToken(token);
-            // if (user.isUsing2FA()) {
-            // model.addAttribute("qr", userService.generateQRUrl(user));
-            // return "redirect:/qrcode.html?lang=" + locale.getLanguage();
-            // }
-            AuthenticationUser.authWithoutPassword(user);
-            return new ResponseEntity<>(HttpStatus.OK);
-        }
-
-        //Пользователь будет перенаправлен на страницу ошибки с соответствующим сообщением, если:
-        // - UserToken не существует по какой-либо причине или
-        // - Срок действия UserToken истек
-        return new ResponseEntity<>(HttpStatus.CONFLICT);
     }
 
     //===== Request & Response =====

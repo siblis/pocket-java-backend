@@ -13,7 +13,7 @@ import java.util.function.Function;
 
 @Component
 public class JwtTokenUtil implements Serializable {
-    private static final long ACCESS_TOKEN_VALIDITY_SECONDS = 5*60*60;
+    private static final long ACCESS_TOKEN_VALIDITY_SECONDS = 30*24*60*60;//30 дней
     private static final String SIGNING_KEY = "pocket";
 
     public String getUsernameFromToken(String token) {
@@ -57,6 +57,7 @@ public class JwtTokenUtil implements Serializable {
                 .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_VALIDITY_SECONDS*1000))
                 .signWith(SignatureAlgorithm.HS256, SIGNING_KEY)
                 .compact();
+
     }
 
     public Boolean validateToken(String token, UserDetails userDetails) {
