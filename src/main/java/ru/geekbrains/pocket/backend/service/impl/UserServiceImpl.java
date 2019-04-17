@@ -10,16 +10,19 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.geekbrains.pocket.backend.domain.db.User;
 import ru.geekbrains.pocket.backend.domain.db.UserProfile;
+import ru.geekbrains.pocket.backend.enumeration.TokenStatus;
 import ru.geekbrains.pocket.backend.exception.InvalidOldPasswordException;
 import ru.geekbrains.pocket.backend.exception.UserAlreadyExistException;
 import ru.geekbrains.pocket.backend.exception.UserNotFoundException;
 import ru.geekbrains.pocket.backend.repository.UserChatRepository;
 import ru.geekbrains.pocket.backend.repository.UserContactRepository;
 import ru.geekbrains.pocket.backend.repository.UserRepository;
-import ru.geekbrains.pocket.backend.repository.UserTokenRepository;
+import ru.geekbrains.pocket.backend.security.token.JwtTokenUtil;
 import ru.geekbrains.pocket.backend.service.UserService;
 
 import javax.validation.constraints.NotNull;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,10 +35,12 @@ public class UserServiceImpl implements UserService {
     private UserChatRepository userChatRepository;
     @Autowired
     private UserContactRepository userContactRepository;
-    @Autowired
-    private UserTokenRepository userTokenRepository;
+//    @Autowired
+//    private UserTokenRepository userTokenRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
 
     @Override
     public User changeUserPassword(User user, String password) {
@@ -83,7 +88,7 @@ public class UserServiceImpl implements UserService {
         if (user != null ) {
             userRepository.deleteById(user.getId());
             //TODO каскадное удаление
-            userTokenRepository.deleteByUser(user);
+//            userTokenRepository.deleteByUser(user);
             userChatRepository.deleteByUser(user);
             userContactRepository.deleteByUser(user);
         }
@@ -166,4 +171,56 @@ public class UserServiceImpl implements UserService {
                 () -> new UserNotFoundException("User with username = " + username + " not found"));
     }
 
+
+    @Override
+    public boolean isValidToken(String token, User user) {
+        if (user == null) return false;
+        if (token != null && !token.equals("")) {
+            //проверяем токен
+            return jwtTokenUtil.validateToken(token, user.getEmail());
+        }
+        return false;
+    }
+
+    @Override
+    public String getEmailFromToken(String token){
+        return jwtTokenUtil.getUsernameFromToken(token);
+    }
+
+    @Override
+    public String getNewToken(User user){
+        return jwtTokenUtil.generateToken(user);
+    }
+
+//    public boolean isValidToken2(String token, User user) {
+//        if (user == null) return false;
+//        String newToken = "";
+//        if (token != null && !token.equals("")) {
+//            //проверяем токен
+//            if (jwtTokenUtil.validateToken(token, user.getEmail())) {
+//                //if (getTokenStatus(token).equals(TokenStatus.EXPIRED)) {
+//                return false;
+//                //обновляем токен
+//                //newToken = jwtTokenUtil.generateToken(user);
+//            }
+//            String email = jwtTokenUtil.getUsernameFromToken(token);
+//        } else {
+//            //токен не найден, создаём новый токен
+//            return false;
+//            //newToken = jwtTokenUtil.generateToken(user);
+//            //Date expiryDate = jwtTokenUtil.getExpirationDateFromToken(newToken);
+//        }
+//        return true;
+//    }
+//    private TokenStatus getTokenStatus(String token) {
+//        final Calendar cal = Calendar.getInstance();
+//        if ((jwtTokenUtil.getExpirationDateFromToken(token).getTime()
+//                - cal.getTime()
+//                .getTime()) <= 0) {
+//            return TokenStatus.EXPIRED;
+//        }
+//        return TokenStatus.VALID;
+//    }
+
 }
+
