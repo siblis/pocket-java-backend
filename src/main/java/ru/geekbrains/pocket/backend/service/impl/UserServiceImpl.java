@@ -8,7 +8,6 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import ru.geekbrains.pocket.backend.domain.db.Role;
 import ru.geekbrains.pocket.backend.domain.db.User;
 import ru.geekbrains.pocket.backend.domain.db.UserProfile;
 import ru.geekbrains.pocket.backend.exception.InvalidOldPasswordException;
@@ -18,11 +17,9 @@ import ru.geekbrains.pocket.backend.repository.UserChatRepository;
 import ru.geekbrains.pocket.backend.repository.UserContactRepository;
 import ru.geekbrains.pocket.backend.repository.UserRepository;
 import ru.geekbrains.pocket.backend.repository.UserTokenRepository;
-import ru.geekbrains.pocket.backend.service.RoleService;
 import ru.geekbrains.pocket.backend.service.UserService;
 
 import javax.validation.constraints.NotNull;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,8 +28,6 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
-    @Autowired
-    private RoleService roleService;
     @Autowired
     private UserChatRepository userChatRepository;
     @Autowired
@@ -65,7 +60,7 @@ public class UserServiceImpl implements UserService {
         user.setPassword(passwordEncoder.encode(password)); //получаем хэш пароля
         //user.setUsing2FA(account.isUsing2FA());
         user.setProfile(new UserProfile(name));
-        user.setRoles(Arrays.asList(roleService.getRoleUser()));
+        //user.setRoles(Arrays.asList(Role.ROLE_USER));
         return userRepository.insert(user);
     }
 
@@ -123,17 +118,17 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByProfileUsername(username);
     }
 
-    @Override
-    public List<Role> getRolesByUsername(String username) throws RuntimeException {
-        User user = Optional.of(userRepository.findByProfileUsername(username)).orElseThrow(
-                () -> new UserNotFoundException("User with username = '" + username + "' not found"));
-        return (List<Role>) user.getRoles();
-    }
+//    @Override
+//    public List<Role> getRolesByUsername(String username) throws RuntimeException {
+//        User user = Optional.of(userRepository.findByProfileUsername(username)).orElseThrow(
+//                () -> new UserNotFoundException("User with username = '" + username + "' not found"));
+//        return (List<Role>) user.getRoles();
+//    }
 
     @Override
     public User insert(User user) throws RuntimeException {
-        if (user.getRoles() == null)
-            user.setRoles(Arrays.asList(roleService.getRoleUser()));
+//        if (user.getRoles() == null)
+//            user.setRoles(Arrays.asList(Role.ROLE_USER));
         return userRepository.insert(user);
     }
 

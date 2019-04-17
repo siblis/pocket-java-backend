@@ -17,5 +17,5 @@ OAuth2Configuration
 
 
 \
-https://java-api.pocketmsg.ru/v1/
-http://localhost:8888/v1/
+https://java-api.pocketmsg.ru
+http://localhost:8888
