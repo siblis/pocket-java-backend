@@ -45,4 +45,10 @@ public interface UserService {
 
     User validateUser(String username);
 
+    boolean isValidToken(String token, User user);
+
+    String getEmailFromToken(String token);
+
+    String getNewToken(User user);
+
 }

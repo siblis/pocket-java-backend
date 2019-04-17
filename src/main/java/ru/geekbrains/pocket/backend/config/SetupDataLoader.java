@@ -28,8 +28,8 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 //    private PrivilegeRepository privilegeRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
-    @Autowired
-    private UserTokenService userTokenService;
+//    @Autowired
+//    private UserTokenService userTokenService;
     @Autowired
     private UserChatService userChatService;
     @Autowired
@@ -77,9 +77,9 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         User user3 = createUserIfNotFound("b@mail.ru", "Bob", "Abc12345", Arrays.asList(userRole));
         User user4 = createUserIfNotFound("i@mail.ru", "ivan", "Qwe12345", Arrays.asList(userRole));
 
-        createTokenForUserIfNotFound(user1);
-        createTokenForUserIfNotFound(user2);
-        createTokenForUserIfNotFound(user3);
+//        createTokenForUserIfNotFound(user1);
+//        createTokenForUserIfNotFound(user2);
+//        createTokenForUserIfNotFound(user3);
         //createTokenForUserIfNotFound(user4); не создаём токен специально для тестирования
 
         createUserChat(user1, user2, user3);
@@ -155,15 +155,15 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         return user;
     }
 
-    @Transactional
-    private UserToken createTokenForUserIfNotFound(User user) {
-        UserToken userToken = userTokenService.getUserToken(user, "0.0.0.0");
-        if (userToken == null) {
-            userToken = userTokenService.createOrUpdateToken(user, "0.0.0.0");
-            log.info("Preloading for user '" + user.getEmail() + "' " + userToken);
-        }
-        return userToken;
-    }
+//    @Transactional
+//    private UserToken createTokenForUserIfNotFound(User user) {
+//        UserToken userToken = userTokenService.getUserToken(user, "0.0.0.0");
+//        if (userToken == null) {
+//            userToken = userTokenService.createOrUpdateToken(user, "0.0.0.0");
+//            log.info("Preloading for user '" + user.getEmail() + "' " + userToken);
+//        }
+//        return userToken;
+//    }
 
     @Transactional
     private UserChat createUserChat(User user, User direct, User sender) {
