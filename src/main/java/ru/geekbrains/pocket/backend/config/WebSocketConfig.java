@@ -2,16 +2,20 @@ package ru.geekbrains.pocket.backend.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.converter.MessageConverter;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.messaging.simp.stomp.StompCommand;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.server.standard.TomcatRequestUpgradeStrategy;
 import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
-import ru.geekbrains.pocket.backend.controller.websocket.MyChannelInterceptor;
 
 import java.util.List;
 
@@ -71,6 +75,17 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 .setDisconnectDelay(30 * 1000);
     }
 
+//    @Bean
+//    public DefaultHandshakeHandler handshakeHandler() {
+//
+//        WebSocketPolicy policy = new WebSocketPolicy(WebSocketBehavior.SERVER);
+//        policy.setInputBufferSize(8192);
+//        policy.setIdleTimeout(600000);
+//
+//        return new DefaultHandshakeHandler(
+//                new JettyRequestUpgradeStrategy(new WebSocketServerFactory(policy)));
+//    }
+
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
         registration.interceptors(new MyChannelInterceptor()); //перехват всех сообщений
@@ -96,4 +111,28 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 //        registration.setMessageSizeLimit(128 * 1024);
 //    }
 
+    class MyChannelInterceptor implements ChannelInterceptor {
+
+//    @Autowired
+//    AuthenticationManager authenticationManager;
+
+        //https://docs.spring.io/spring/docs/current/spring-framework-reference/web.html#websocket-server
+        //4.4.13. Token Authentication
+        @Override
+        public Message<?> preSend(Message<?> message, MessageChannel channel) {
+            StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
+//        StompHeaderAccessor accessor =
+//                MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+            StompCommand command = accessor.getCommand();// .getStompCommand();
+            if (StompCommand.CONNECT.equals(command)) {
+                //Authentication user =  ... ; // access authentication header(s)
+                //accessor.setUser(user);
+            }
+
+            return message;
+        }
+    }
+
 }
+
+
