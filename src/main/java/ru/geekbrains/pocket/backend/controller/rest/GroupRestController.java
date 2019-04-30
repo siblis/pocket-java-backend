@@ -47,15 +47,25 @@ public class GroupRestController {
     @GetMapping("/groups/{id}") //Получить информацию о группе
     public ResponseEntity<?> getGroup(@PathVariable String id,
                                       @Valid @RequestBody InvitationCodeRequest invitationCodeRequest,
-                                      final BindingResult result) {
+                                      final BindingResult result,
+                                      HttpServletRequest request) {
         if(result.hasErrors()) {
             return getResponseEntity(result);
         }
 
         Group group = groupService.getGroup(new ObjectId(id));
         if (group != null) {
-            if (group.getInvitation_code() == null ||
-                    (group.getInvitation_code() != null
+            if (group.getInvitation_code() == null && invitationCodeRequest.getInvitation_code() == null) {
+                User user = httpRequestComponent.getUserFromToken(request);
+                GroupMember groupMember = groupMemberService.getGroupMember(group, user);
+                if (user != null) {
+                    if (groupMember != null) {
+                        return new ResponseEntity<>(new GroupPub(group), HttpStatus.OK);
+                    } else {
+                        return new ResponseEntity<>("You must provide an invitation code", HttpStatus.FORBIDDEN);
+                    }
+                }
+            } else if ((group.getInvitation_code() != null
                     && group.getInvitation_code().equals(invitationCodeRequest.getInvitation_code())))
                 return new ResponseEntity<>(new GroupPub(group), HttpStatus.OK);
         }
@@ -219,7 +229,7 @@ public class GroupRestController {
     @AllArgsConstructor
     public static class InvitationCodeRequest {
 
-        //@Nullable
+        @Nullable
         private String invitation_code;
 
     }
