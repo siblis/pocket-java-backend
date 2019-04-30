@@ -102,9 +102,9 @@ public class AuthRestControllerTest {
 
         MvcResult mvcResult  = result.andReturn();
         String r = mvcResult.getResponse().getContentAsString();
-        AuthRestController.RegistrationResponse registrationResponse =
-                gson.fromJson(r, AuthRestController.RegistrationResponse.class);
-        String token = registrationResponse.getToken();
+        AuthRestController.LoginResponse loginResponse =
+                gson.fromJson(r, AuthRestController.LoginResponse.class);
+        String token = loginResponse.getToken();
         log.debug("token : " + token);
         System.out.println("token : " + token);
     }

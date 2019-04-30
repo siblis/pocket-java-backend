@@ -2,11 +2,10 @@ package ru.geekbrains.pocket.backend.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.service.ApiKey;
-import springfox.documentation.service.AuthorizationScope;
-import springfox.documentation.service.SecurityReference;
+import springfox.documentation.service.*;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
@@ -20,19 +19,30 @@ import java.util.List;
 @Configuration
 @EnableSwagger2
 public class SwaggerConfig {
-    public static final String AUTH_SERVER = "http://localhost:8080/v1/auth";
     public static final String CLIENT_ID = "PocketClientIdPassword";
     public static final String CLIENT_SECRET = "secret";
 
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
+                .apiInfo(apiInfo())
                 .select()
-                .apis(RequestHandlerSelectors.any())
+                .apis(RequestHandlerSelectors.basePackage("ru.geekbrains.pocket.backend.controller")) //RequestHandlerSelectors.any())
                 .paths(PathSelectors.any())
                 .build()
                 .securitySchemes(Arrays.asList(apiKey()))
                 .securityContexts(Arrays.asList(securityContext()));
+    }
+
+    public static ApiInfo apiInfo(){
+        return new ApiInfoBuilder()
+                .title("PocketMSG API")
+                .description("API for Pocket messanger clients")
+                .contact(new Contact("PocketMSG", "https://pocketmsg.ru", "email"))
+                .license("Apache License Version 2.0")
+                .licenseUrl("https://apache.org/licenses/LICENSE-2.0")
+                .version("1.0")
+                .build();
     }
 
     @Bean
@@ -51,7 +61,7 @@ public class SwaggerConfig {
     private SecurityContext securityContext() {
         return SecurityContext.builder()
                 .securityReferences(defaultAuth())
-                .forPaths(PathSelectors.any()) //PathSelectors.regex("/v1/**"))
+                .forPaths(PathSelectors.any())
                 .build();
     }
 

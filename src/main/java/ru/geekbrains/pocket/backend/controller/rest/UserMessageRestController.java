@@ -1,5 +1,6 @@
 package ru.geekbrains.pocket.backend.controller.rest;
 
+import io.swagger.annotations.*;
 import lombok.extern.log4j.Log4j2;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import ru.geekbrains.pocket.backend.domain.pub.MessageCollection;
 import ru.geekbrains.pocket.backend.domain.pub.MessagePub;
 import ru.geekbrains.pocket.backend.service.UserMessageService;
 import ru.geekbrains.pocket.backend.service.UserService;
+import ru.geekbrains.pocket.backend.util.Constant;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -20,6 +22,7 @@ import java.util.List;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/user")
+@Api(tags = "User messages", value = "/user/messages")
 public class UserMessageRestController {
     @Autowired
     private UserService userService;
@@ -28,9 +31,17 @@ public class UserMessageRestController {
     @Autowired
     private HttpRequestComponent httpRequestComponent;
 
+    @ApiOperation(value = "Get messages",
+            authorizations =  {@Authorization(value="Bearer Token")},
+            notes = "Получить историю переписки.",
+            response = MessageCollection.class)
+    @ApiImplicitParams({@ApiImplicitParam(name = "Authorization", value = "token",
+            required = true, dataType = "string", paramType = "header",
+            example = Constant.EXAMPLE_TOKEN)})
     @GetMapping("/{idUser}/messages") //Получить историю переписки
     //пользователь от которого пришел запрос может получить историю переписки только в которой он учавствовал
-    public ResponseEntity<?> getMessages(@PathVariable String idUser,
+    public ResponseEntity<?> getMessages(@ApiParam(value = "Id user. String ObjectId.", required = true)
+                                         @PathVariable String idUser,
                                          @RequestParam("offset") Integer offset,
                                          HttpServletRequest request) {
         User currentUser = httpRequestComponent.getUserFromToken(request);
@@ -50,8 +61,17 @@ public class UserMessageRestController {
         return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ApiOperation(value = "Find message",
+            authorizations =  {@Authorization(value="Bearer Token")},
+            notes = "Получить конкретное сообщение.",
+            response = MessagePub.class)
+    @ApiImplicitParams({@ApiImplicitParam(name = "Authorization", value = "token",
+            required = true, dataType = "string", paramType = "header",
+            example = Constant.EXAMPLE_TOKEN)})
     @GetMapping("/{idUser}/messages/{idMessage}") //Получить конкретное сообщение
-    public ResponseEntity<?> findMessage(@PathVariable String idUser,
+    public ResponseEntity<?> findMessage(@ApiParam(value = "Id user. String ObjectId.", required = true)
+                                         @PathVariable String idUser,
+                                         @ApiParam(value = "Id message. String ObjectId.", required = true)
                                          @PathVariable String idMessage,
                                          HttpServletRequest request) {
         User currentUser = httpRequestComponent.getUserFromToken(request);
