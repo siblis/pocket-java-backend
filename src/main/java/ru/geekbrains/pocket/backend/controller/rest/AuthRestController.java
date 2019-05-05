@@ -1,6 +1,10 @@
 package ru.geekbrains.pocket.backend.controller.rest;
 
 import com.mongodb.MongoServerException;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,9 +20,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.geekbrains.pocket.backend.domain.db.User;
 import ru.geekbrains.pocket.backend.domain.pub.UserPub;
-import ru.geekbrains.pocket.backend.enumeration.TokenStatus;
 import ru.geekbrains.pocket.backend.exception.UserAlreadyExistException;
-import ru.geekbrains.pocket.backend.security.AuthenticationUser;
 import ru.geekbrains.pocket.backend.service.UserService;
 import ru.geekbrains.pocket.backend.util.validation.ValidEmail;
 
@@ -26,9 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -36,6 +36,7 @@ import java.util.stream.Collectors;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/auth")
+@Api(tags = "Authentification", value = "Authentification сontroller")
 public class AuthRestController {
     @Autowired
     private UserService userService;
@@ -44,6 +45,9 @@ public class AuthRestController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @ApiOperation(value = "Login user",
+            notes = "User authentication using login and password",
+            response = LoginResponse.class)
     @PostMapping(path = "/login", consumes = "application/json")// produces = "application/json;charset=UTF-8")
     public ResponseEntity login(@Valid @RequestBody LoginRequest loginRequest) {
         //TODO validate
@@ -70,10 +74,13 @@ public class AuthRestController {
 //            return new ResponseEntity<>(ex.getMessage(), HttpStatus.UNAUTHORIZED);
 //        }
 
-        return new ResponseEntity<>(new RegistrationResponse(newToken, new UserPub(user)), HttpStatus.OK);
-//        return new ResponseEntity<>(new RegistrationResponse(userToken.getToken(), new UserPub(userToken.getUser())), HttpStatus.OK);
+        return new ResponseEntity<>(new LoginResponse(newToken, new UserPub(user)), HttpStatus.OK);
+//        return new ResponseEntity<>(new LoginResponse(userToken.getToken(), new UserPub(userToken.getUser())), HttpStatus.OK);
     }
 
+    @ApiOperation(value = "Registration new user",
+            notes = "New user registration",
+            response = LoginResponse.class)
     @PostMapping(path = "/registration", consumes = "application/json")
     public ResponseEntity<?> registration(@Valid @RequestBody RegistrationRequest registrationRequest,
                                           final BindingResult result, final HttpServletRequest request)
@@ -127,9 +134,8 @@ public class AuthRestController {
 //        }
         log.debug("Successfully created user: " + user.getEmail() + " and token " + newToken);
 
-        return new ResponseEntity<>(new RegistrationResponse(newToken, new UserPub(user)), HttpStatus.CREATED);
-//        return new ResponseEntity<>(new RegistrationResponse(userToken.getToken(), new UserPub(userToken.getUser())), HttpStatus.CREATED);
-
+        return new ResponseEntity<>(new LoginResponse(newToken, new UserPub(user)), HttpStatus.CREATED);
+//        return new ResponseEntity<>(new LoginResponse(userToken.getToken(), new UserPub(userToken.getUser())), HttpStatus.CREATED);
     }
 
     //===== Request & Response =====
@@ -138,14 +144,20 @@ public class AuthRestController {
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
+    @ApiModel(value = "Login request",
+            description="Тело запроса в формате JSON для аутентификации пользователя по логину и паролю.")
     public static class LoginRequest {
 
         @NotNull
         @ValidEmail
         @Size(min = 6, max = 32)
+        @ApiModelProperty(value = "Email specified during registration. Size(min = 6, max = 32).",
+                example = "petr@mail.ru", position = 0, required = true)
         private String email;
         @NotNull
         @Size(min = 8, max = 32)
+        @ApiModelProperty(value = "Password size(min = 8, max = 32)",
+                example = "Abc12345", position = 1, required = true)
         private String password;
     }
 
@@ -153,23 +165,32 @@ public class AuthRestController {
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
+    @ApiModel(value = "Registration request",
+            description="Тело запроса в формате JSON для регистрации нового пользователя.")
     public static class RegistrationRequest {
         @NotNull
         @ValidEmail //(message = "email names must comply with the standard")
         @Size(min = 6, max = 32)
+        @ApiModelProperty(value = "Email specified during registration. Size(min = 6, max = 32).",
+                example = "petr@mail.ru", position = 0, required = true)
         private String email;
         @NotNull
         @Size(min = 8, max = 32)
+        @ApiModelProperty(value = "Password size(min = 8, max = 32)",
+                example = "Abc12345", position = 1, required = true)
         private String password;
         @NotNull
         @Size(min = 2, max = 32)
+        @ApiModelProperty(value = "Username. Size(min = 2, max = 32)", position = 2, required = true)
         private String name;
     }
 
     @Getter
     @Setter
     @AllArgsConstructor
-    public static class RegistrationResponse {
+    @ApiModel(value = "Login response",
+            description="Тело ответа, содержит token и информацию о пользователе в формате JSON.")
+    public static class LoginResponse {
         private String token;
         private UserPub user;
     }

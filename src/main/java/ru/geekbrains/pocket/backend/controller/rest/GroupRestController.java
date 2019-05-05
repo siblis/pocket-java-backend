@@ -3,6 +3,7 @@ package ru.geekbrains.pocket.backend.controller.rest;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gson.Gson;
 import com.mongodb.lang.Nullable;
+import io.swagger.annotations.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,6 +22,7 @@ import ru.geekbrains.pocket.backend.domain.pub.GroupPub;
 import ru.geekbrains.pocket.backend.enumeration.RoleGroupMember;
 import ru.geekbrains.pocket.backend.service.GroupMemberService;
 import ru.geekbrains.pocket.backend.service.GroupService;
+import ru.geekbrains.pocket.backend.util.Constant;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -34,6 +36,7 @@ import java.util.stream.Collectors;
 @Log4j2
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
+@Api(tags = "Groups", value = "/groups")
 public class GroupRestController {
     //private static final Logger logger = LoggerFactory.getLogger(GroupRestController.class.getName());
 
@@ -44,24 +47,50 @@ public class GroupRestController {
     @Autowired
     private HttpRequestComponent httpRequestComponent;
 
+    @ApiOperation(value = "Get group data",
+            authorizations =  {@Authorization(value="Bearer Token")},
+            notes = "Получить информацию о группе. Её могут получить все у кого есть invitation_code " +
+                    "или все кто уже входит в группу, в т.ч. админы группы.",
+            response = GroupPub.class)
+    @ApiImplicitParams({@ApiImplicitParam(name = "Authorization", value = "token",
+            required = true, dataType = "string", paramType = "header",
+            example = Constant.EXAMPLE_TOKEN)})
     @GetMapping("/groups/{id}") //Получить информацию о группе
-    public ResponseEntity<?> getGroup(@PathVariable String id,
+    public ResponseEntity<?> getGroup(@ApiParam(value = "Id group. String ObjectId.", required = true)
+                                      @PathVariable String id,
                                       @Valid @RequestBody InvitationCodeRequest invitationCodeRequest,
-                                      final BindingResult result) {
+                                      final BindingResult result,
+                                      HttpServletRequest request) {
         if(result.hasErrors()) {
             return getResponseEntity(result);
         }
 
         Group group = groupService.getGroup(new ObjectId(id));
         if (group != null) {
-            if (group.getInvitation_code() == null ||
-                    (group.getInvitation_code() != null
+            if (group.getInvitation_code() == null && invitationCodeRequest.getInvitation_code() == null) {
+                User user = httpRequestComponent.getUserFromToken(request);
+                GroupMember groupMember = groupMemberService.getGroupMember(group, user);
+                if (user != null) {
+                    if (groupMember != null) {
+                        return new ResponseEntity<>(new GroupPub(group), HttpStatus.OK);
+                    } else {
+                        return new ResponseEntity<>("You must provide an invitation code", HttpStatus.FORBIDDEN);
+                    }
+                }
+            } else if ((group.getInvitation_code() != null
                     && group.getInvitation_code().equals(invitationCodeRequest.getInvitation_code())))
                 return new ResponseEntity<>(new GroupPub(group), HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
+    @ApiOperation(value = "Create group",
+            authorizations =  {@Authorization(value="Bearer Token")},
+            notes = "Создать группу.",
+            response = GroupPub.class)
+    @ApiImplicitParams({@ApiImplicitParam(name = "Authorization", value = "token",
+            required = true, dataType = "string", paramType = "header",
+            example = Constant.EXAMPLE_TOKEN)})
     @PostMapping("/groups") //Создать группу
     public ResponseEntity<?> createGroup(@Valid @RequestBody NewGroupRequest newGroupRequest,
                                          final BindingResult result,
@@ -88,8 +117,16 @@ public class GroupRestController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
+    @ApiOperation(value = "Edit group",
+            authorizations =  {@Authorization(value="Bearer Token")},
+            notes = "Изменить информацию о группе.",
+            response = GroupPub.class)
+    @ApiImplicitParams({@ApiImplicitParam(name = "Authorization", value = "token",
+            required = true, dataType = "string", paramType = "header",
+            example = Constant.EXAMPLE_TOKEN)})
     @PutMapping("/groups/{id}") //Изменить информацию о группе
-    public ResponseEntity<?> editGroup(@PathVariable String id,
+    public ResponseEntity<?> editGroup(@ApiParam(value = "Id group. String ObjectId.", required = true)
+                                       @PathVariable String id,
                                        @Valid @RequestBody EditGroupRequest groupRequest,
                                        final BindingResult result,
                                        HttpServletRequest request) {
@@ -120,8 +157,17 @@ public class GroupRestController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
+    @ApiOperation(value = "Join or leave group",
+            authorizations =  {@Authorization(value="Bearer Token")},
+            notes = "Вступить в группу или покинуть группу. ВНИМАНИЕ!!! Тип запроса не POST. Нужно использовать типы запросов LINK - вступить в группу, запрос UNLINK - покинуть группу.",
+            response = GroupPub.class,
+            httpMethod = "POST")
+    @ApiImplicitParams({@ApiImplicitParam(name = "Authorization", value = "token",
+            required = true, dataType = "string", paramType = "header",
+            example = Constant.EXAMPLE_TOKEN)})
     @RequestMapping("/groups/{id}") //Вступить в группу //Покинуть группу
-    public ResponseEntity<?> joinOrLeaveTheGroup(@PathVariable String id,
+    public ResponseEntity<?> joinOrLeaveTheGroup(@ApiParam(value = "Id group. String ObjectId.", required = true)
+                                                 @PathVariable String id,
                                          HttpServletRequest request) {
         InvitationCodeRequest invitationCodeRequest = null;
         try {
@@ -158,6 +204,36 @@ public class GroupRestController {
         }
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
+
+//    @ApiOperation(value = "Leave group",
+//            authorizations =  {@Authorization(value="Bearer Token")},
+//            notes = "Вступить в группу или покинуть группу. Запрос LINK - вступить, запрос UNLINK - покинуть.",
+//            response = GroupPub.class,
+//            httpMethod = "UNLINK")
+//    @RequestMapping("/groups/{id}") //Вступить в группу //Покинуть группу
+//    public ResponseEntity<?> leaveTheGroup(@ApiParam(value = "Id group. String ObjectId.", required = true)
+//                                                 @PathVariable String id,
+//                                                 HttpServletRequest request) {
+//        InvitationCodeRequest invitationCodeRequest = null;
+//        try {
+//            invitationCodeRequest = new Gson().fromJson(request.getReader(), InvitationCodeRequest.class);
+//        } catch (IOException e) {
+//            log.debug(e.getMessage());
+//        }
+//        if (request.getMethod().equals("UNLINK") || request.getMethod().equals("unlink")) {
+//            log.info("UNLINK METHOD"); //Покинуть группу
+//            User user = httpRequestComponent.getUserFromToken(request);
+//            Group group = groupService.getGroup(new ObjectId(id));
+//            if (user != null && group != null) {
+//                GroupMember groupMember = groupMemberService.getGroupMember(group, user);
+//                if (groupMember != null) {
+//                    groupMemberService.deleteGroupMember(groupMember);
+//                }
+//                return new ResponseEntity<>(HttpStatus.OK);
+//            }
+//        }
+//        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+//    }
 
 //    //TODO replace to LINK method
 //    @PostMapping("/groups/{id}") //Вступить в группу
@@ -217,9 +293,13 @@ public class GroupRestController {
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
+    @ApiModel(value = "Invitation code request",
+            description="Код приглашения в группу.")
     public static class InvitationCodeRequest {
 
-        //@Nullable
+        @Nullable
+        @ApiModelProperty(value = "Invitation code. Length = 32.",
+                example = "petr@mail.ru")
         private String invitation_code;
 
     }
@@ -228,13 +308,19 @@ public class GroupRestController {
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
+    @ApiModel(value = "New group request",
+            description="Название и описание группы для её необходимые создания.")
     public static class NewGroupRequest {
 
         @NotNull
         @Size(min = 6, max = 32)
+        @ApiModelProperty(value = "Group name. Size(min = 6, max = 32)",
+                example = "Classmates", position = 0, required = true)
         private String name;
 
         @Nullable
+        @ApiModelProperty(value = "Group description. Size(max = 255)",
+                example = "To communicate classmates school number 1.", position = 1)
         private String description;
 
         @JsonProperty("public")
@@ -254,13 +340,19 @@ public class GroupRestController {
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
+    @ApiModel(value = "Edit group request",
+            description="Измение названия и/или описания группы.")
     public static class EditGroupRequest {
 
         @Nullable
         @Size(min = 6, max = 32)
+        @ApiModelProperty(value = "Group name. Size(min = 6, max = 32)",
+                example = "Classmates", position = 0, required = true)
         private String name;
 
         @Nullable
+        @ApiModelProperty(value = "Group description. Size(max = 255)",
+                example = "To communicate classmates school number 1.", position = 1)
         private String description;
 
         @JsonProperty("public")

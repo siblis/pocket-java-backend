@@ -1,6 +1,7 @@
 package ru.geekbrains.pocket.backend.controller.rest;
 
 import com.mongodb.MongoWriteException;
+import io.swagger.annotations.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,6 +18,7 @@ import ru.geekbrains.pocket.backend.domain.db.User;
 import ru.geekbrains.pocket.backend.domain.pub.UserPub;
 import ru.geekbrains.pocket.backend.exception.InvalidOldPasswordException;
 import ru.geekbrains.pocket.backend.service.UserService;
+import ru.geekbrains.pocket.backend.util.Constant;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -28,12 +30,20 @@ import java.util.stream.Collectors;
 @Log4j2
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
+@Api(tags = "Account", value = "/account")
 public class AccountRestController {
     @Autowired
     private UserService userService;
     @Autowired
     private HttpRequestComponent httpRequestComponent;
 
+    @ApiOperation(value = "Get account data",
+            authorizations =  {@Authorization(value="Bearer Token")},
+            notes = "Получить информацию о своем аккаунте",
+            response = UserPub.class)
+    @ApiImplicitParams({@ApiImplicitParam(name = "Authorization", value = "token",
+            required = true, dataType = "string", paramType = "header",
+            example = Constant.EXAMPLE_TOKEN)})
     @GetMapping("/account") //Получить информацию о своем аккаунте
     public ResponseEntity<?> getAccount(HttpServletRequest request) {
         User user = httpRequestComponent.getUserFromToken(request);
@@ -44,6 +54,12 @@ public class AccountRestController {
     }
 
 
+    @ApiOperation(value = "Edit account data",
+            notes = "Изменить данные аккаунта",
+            response = UserPub.class)
+    @ApiImplicitParams({@ApiImplicitParam(name = "Authorization", value = "token",
+            required = true, dataType = "string", paramType = "header",
+            example = Constant.EXAMPLE_TOKEN)})
     @PutMapping(path = "/account", consumes = "application/json") //Изменить данные аккаунта
     public ResponseEntity<?> editAccount(@Valid @RequestBody EditAccountRequest editAccountRequest,
                                          final BindingResult result, final HttpServletRequest request) {
@@ -101,15 +117,32 @@ public class AccountRestController {
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
+    @ApiModel(value = "Edit account request",
+            description="Тело запроса в формате JSON, содержит Username если его нужно изменить и/или " +
+                    "старый и новый пароль если нужно изменить пароль.")
     public static class EditAccountRequest {
         @Nullable
         @Size(min = 2, max = 32)
+        @ApiModelProperty(value = "Username specified during registration. Size(min = 2, max = 32)",
+                example = "petr@mail.ru", position = 0, required = true)
         private String name;
         @Nullable
         @Size(min = 8, max = 32)
+        @ApiModelProperty(value = "Старый пароль. Size(min = 8, max = 32)", position = 1)
         private String oldPassword;
         @Nullable
         @Size(min = 8, max = 32)
+        @ApiModelProperty(value = "Новый пароль. Size(min = 8, max = 32)", position = 2)
         private String newPassword;
+
+        public EditAccountRequest(@Nullable @Size(min = 2, max = 32) String name) {
+            this.name = name;
+        }
+
+        public EditAccountRequest(@Nullable @Size(min = 8, max = 32) String oldPassword,
+                                  @Nullable @Size(min = 8, max = 32) String newPassword) {
+            this.oldPassword = oldPassword;
+            this.newPassword = newPassword;
+        }
     }
 }

@@ -55,9 +55,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity web) throws Exception {
         super.configure(web);
         web.httpFirewall(allowHttpMethodsFirewall());
-        web.ignoring().antMatchers("/v2/api-docs", "/configuration/ui",
-                "/swagger-resources/**", "/swagger-ui.html", "/webjars/**");
-        //"/swagger-resources", "/configuration/**", "/configuration/security",
+        web.ignoring().antMatchers("/webjars/**", "/v2/api-docs/**",
+                "/configuration/ui/**", "/configuration/security/**",
+                "/swagger-resources/**", "/swagger-ui.html/**", "/swagger-ui.html#/**");
     }
 
     @Override
@@ -72,7 +72,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .csrf().disable()   //Межсайтовая подделка запроса
                 .authorizeRequests()
              .and()
-                //.anonymous().disable()
                 .exceptionHandling()
                 .accessDeniedHandler(accessDeniedHandler)
                 .authenticationEntryPoint(restAuthenticationEntryPoint)
@@ -82,10 +81,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             //более конкретные правила должны стоять первыми, а затем более общие
                 .antMatchers("/auth/**").permitAll() //rest
                 .antMatchers("/socket/**").permitAll() //websocket
-                .antMatchers("/swagger-ui.html","/swagger-ui/**","/swagger-resources/**","/v2/api-docs/**").permitAll() //swagger
                 //.antMatchers("/resources/**", "/webjars/**", "/static/**").permitAll() //web
                 //.antMatchers("/**").hasAnyRole("ADMIN", "USER")
-                //.anyRequest().hasAuthority("READ_PRIVILEGE")
                 .anyRequest().authenticated()
             .and()
             .formLogin()
