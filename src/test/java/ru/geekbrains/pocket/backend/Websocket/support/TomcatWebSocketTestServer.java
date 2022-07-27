@@ -28,6 +28,7 @@ import org.springframework.web.servlet.DispatcherServlet;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.HashSet;
 
@@ -69,9 +70,7 @@ public class TomcatWebSocketTestServer implements WebSocketTestServer {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     private static File createBaseDir(int port) {
         try {
-            File file = File.createTempFile("tomcat.", "." + port);
-            file.delete();
-            file.mkdir();
+            File file = Files.createTempDirectory("tomcat." + "." + port).toFile();
             file.deleteOnExit();
             return file;
         } catch (IOException ex) {
